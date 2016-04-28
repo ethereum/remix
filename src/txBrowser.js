@@ -7,15 +7,15 @@ module.exports = React.createClass({
 	},
 
 	getInitialState: function() {
-		return {blockNumber: "1382256", txNumber: "1", from: "", to: "", hash: ""}
+		return {blockNumber: "1419597", txNumber: "1", from: "", to: "", hash: ""}
 	},
-
+	// contract invokation: 1382256 1
+	// contract creation: 1419597 1
 	submit: function()
 	{
 		var tx = web3.eth.getTransactionFromBlock(this.state.blockNumber, this.state.txNumber)
-		if (tx)
-			this.setState({from: tx.from, to: tx.to, hash: tx.hash})
-		this.props.onNewTxRequested(this.state.blockNumber, parseInt(this.state.txNumber))
+		this.setState({from: tx.from, to: tx.to ? tx.to : "(Contract Creation)", hash: tx.hash})
+		this.props.onNewTxRequested(this.state.blockNumber, parseInt(this.state.txNumber), tx)
 	},
 	
 	updateBlockN: function(ev) {

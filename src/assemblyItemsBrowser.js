@@ -29,7 +29,8 @@ module.exports = React.createClass({
 	getDefaultProps: function() 
 	{
 		return {
-			vmTrace: null
+			vmTrace: null,
+			transaction: null
 		};
 	},	
 
@@ -40,7 +41,7 @@ module.exports = React.createClass({
 			<div style={style.container}><span style={style.address}>Current code: {this.state.currentAddress}</span></div> 
 			<div style={style.container}>
 				<Slider ref="slider" onChange={this.selectState} min="0" max={this.props.vmTrace ? this.props.vmTrace.length : 0}/>
-				<ButtonNavigator
+                <ButtonNavigator
                     vmTraceLength={this.props.vmTrace ? this.props.vmTrace.length : 0} step={this.state.currentSelected} stepIntoBack={this.stepIntoBack} 
                     stepIntoForward={this.stepIntoForward} stepOverBack={this.stepOverBack} stepOverForward={this.stepOverForward} />
 			</div>
@@ -108,14 +109,20 @@ module.exports = React.createClass({
 		return ret
 	},
 
-	resolveAddress: function(address)
+	resolveAddress: function(address, props)
 	{
 		if (!this.state.codes[address])
 		{
-			var hexCode = web3.eth.getCode(address)	
+			console.log("loading new code from web3 " + address)
+			var hexCode
+			if (this.state.currentSelected === -1 && props.transaction.to === null) // contract creation
+				hexCode = props.transaction.input
+			else
+				hexCode = web3.eth.getCode(address)
+			
 			var code = codeUtils.nameOpCodes(new Buffer(hexCode.substring(2), 'hex'))
 			this.state.codes[address] = code[0]
-			this.state.instructionsIndexByBytesOffset[address] = code[1]
+			this.state.instructionsIndexByBytesOffset[address] = code[1]			
 		}
 	},	
 
@@ -131,11 +138,11 @@ module.exports = React.createClass({
 	},
 
 	componentWillReceiveProps: function (nextProps) 
-	{ 
+	{
 		if (!nextProps.vmTrace)
 			return
 		this.buildCallStack(nextProps.vmTrace)
-		this.setState({"currentSelected": -1})
+		this.setState({"currentSelected": -1, "currentAddress": nextProps.vmTrace[0].address})
 		this.updateState(nextProps, 0)
 	},
 
@@ -151,7 +158,17 @@ module.exports = React.createClass({
 			if (trace.depth === undefined || trace.depth === depth)
 				continue
 			if (trace.depth > depth)
-				callStack.push(trace.address) // new context
+			{				
+				if (k === 0)
+					callStack.push("0x" + vmTrace[k].address) // new context
+				else
+				{
+					// getting the address from the stack
+					var callTrace = vmTrace[k - 1]
+					var address = callTrace.stack[callTrace.stack.length - 2]
+					callStack.push(address) // new context
+				}				
+			}
 			else if (trace.depth < depth)
 				callStack.pop() // returning from context
 			depth = trace.depth
@@ -166,26 +183,27 @@ module.exports = React.createClass({
 		var previousIndex = this.state.currentSelected
 		var stateChanges = {}
 		
+		var stack;
 		if (props.vmTrace[vmTraceIndex].stack) // there's always a stack
 		{
-			var stack = props.vmTrace[vmTraceIndex].stack
+			stack = props.vmTrace[vmTraceIndex].stack.slice(0)
 			stack.reverse()
 			stateChanges["currentStack"] = stack
 		}
 		
 		var currentAddress = this.state.currentAddress
-		var addressIndex = this.shouldUpdateStateProperty("address", vmTraceIndex, previousIndex, props.vmTrace)
-		if (addressIndex > -1)
+		if (props.vmTrace[vmTraceIndex].address) // there's a new context
 		{
-			currentAddress = props.vmTrace[addressIndex].address
-			this.resolveAddress(currentAddress)
+			var stack = this.state.callStack[vmTraceIndex]
+			currentAddress = stack[stack.length - 1]
+			this.resolveAddress(currentAddress, props)
 			Object.assign(stateChanges, { "currentAddress": currentAddress })
 		}
-		
+				
 		var depthIndex = this.shouldUpdateStateProperty("depth", vmTraceIndex, previousIndex, props.vmTrace)
 		if (depthIndex > -1)
 			Object.assign(stateChanges, { "currentCallStack": this.state.callStack[depthIndex] })
-
+			
 		var storageIndex = this.shouldUpdateStateProperty("storage", vmTraceIndex, previousIndex, props.vmTrace)
 		if (storageIndex > -1)
 			Object.assign(stateChanges, { "currentStorage": props.vmTrace[storageIndex].storage })
@@ -235,6 +253,19 @@ module.exports = React.createClass({
 			index--
 		}
 		return index	
+	},
+	
+	jumpToNextCall: function()
+	{
+		var i = this.state.currentSelected
+		while (++i < this.props.vmTrace.length) 
+		{
+			if (this.isCallInstruction(i))
+			{
+				this.selectState(i + 1)
+				break		
+			}
+		}
 	},
 
 	stepIntoBack: function()

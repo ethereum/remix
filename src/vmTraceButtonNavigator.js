@@ -7,6 +7,7 @@ module.exports = React.createClass({
         stepIntoForward: React.PropTypes.func.isRequired,
         stepOverBack: React.PropTypes.func.isRequired,
         stepOverForward: React.PropTypes.func.isRequired,
+		jumpToNextCall: React.PropTypes.func.isRequired
   	},
     
     render: function() {		
@@ -16,6 +17,7 @@ module.exports = React.createClass({
 				<button onClick={this.props.stepOverBack} disabled={this.checkButtonState(-1)} >Step Over Back</button>
 				<button onClick={this.props.stepOverForward} disabled={this.checkButtonState(1)} >Step Over Forward</button>
 				<button onClick={this.props.stepIntoForward} disabled={this.checkButtonState(1)} >Step Into Forward</button>
+				<button onClick={this.props.jumpToNextCall} >Jump to Next Call</button>
 			</div>
 			);
 	},
