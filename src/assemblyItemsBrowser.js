@@ -43,7 +43,7 @@ module.exports = React.createClass({
 				<Slider ref="slider" onChange={this.selectState} min="0" max={this.props.vmTrace ? this.props.vmTrace.length : 0}/>
                 <ButtonNavigator
                     vmTraceLength={this.props.vmTrace ? this.props.vmTrace.length : 0} step={this.state.currentSelected} stepIntoBack={this.stepIntoBack} 
-                    stepIntoForward={this.stepIntoForward} stepOverBack={this.stepOverBack} stepOverForward={this.stepOverForward} />
+                    stepIntoForward={this.stepIntoForward} stepOverBack={this.stepOverBack} stepOverForward={this.stepOverForward} jumpToNextCall={this.jumpToNextCall} />
 			</div>
 			<div style={style.container}>
 			<table>
@@ -122,7 +122,7 @@ module.exports = React.createClass({
 			
 			var code = codeUtils.nameOpCodes(new Buffer(hexCode.substring(2), 'hex'))
 			this.state.codes[address] = code[0]
-			this.state.instructionsIndexByBytesOffset[address] = code[1]			
+			this.state.instructionsIndexByBytesOffset[address] = code[1]
 		}
 	},	
 
@@ -199,11 +199,11 @@ module.exports = React.createClass({
 			this.resolveAddress(currentAddress, props)
 			Object.assign(stateChanges, { "currentAddress": currentAddress })
 		}
-				
+
 		var depthIndex = this.shouldUpdateStateProperty("depth", vmTraceIndex, previousIndex, props.vmTrace)
 		if (depthIndex > -1)
 			Object.assign(stateChanges, { "currentCallStack": this.state.callStack[depthIndex] })
-			
+
 		var storageIndex = this.shouldUpdateStateProperty("storage", vmTraceIndex, previousIndex, props.vmTrace)
 		if (storageIndex > -1)
 			Object.assign(stateChanges, { "currentStorage": props.vmTrace[storageIndex].storage })
