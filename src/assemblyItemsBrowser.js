@@ -20,7 +20,7 @@ module.exports = React.createClass({
 			currentMemory: null,
 			currentCallData: null,
 			currentStepInfo: null,
-			codes: {}, // assembly items instructions list by contract addesses
+			executingCodes: {}, // assembly items instructions list by contract addesses
 			instructionsIndexByBytesOffset: {}, // mapping between bytes offset and instructions index.
 			callStack: {}
 		};
@@ -109,28 +109,34 @@ module.exports = React.createClass({
 		return ret
 	},
 
-	resolveAddress: function(address, props)
+	loadCode: function(address, props, callback)
 	{
-		if (!this.state.codes[address])
+		if (!this.state.executingCodes[address])
 		{
 			console.log("loading new code from web3 " + address)
-			var hexCode
-			if (this.state.currentSelected === -1 && props.transaction.to === null) // contract creation
-				hexCode = props.transaction.input
-			else
-				hexCode = web3.eth.getCode(address)
-			
-			var code = codeUtils.nameOpCodes(new Buffer(hexCode.substring(2), 'hex'))
-			this.state.codes[address] = code[0]
-			this.state.instructionsIndexByBytesOffset[address] = code[1]
-		}
-	},	
+            var self = this
+            web3.eth.getCode(address, function(error, result)
+            {
+                self.cacheCode(address, result)
+                callback(result)
+            })
+        }
+        else
+            callback(this.state.executingCodes[address])
+	},
+
+    cacheCode: function(address, hexCode)
+    {
+        var code = codeUtils.nameOpCodes(new Buffer(hexCode.substring(2), 'hex'))
+        this.state.executingCodes[address] = code[0]
+        this.state.instructionsIndexByBytesOffset[address] = code[1]
+    },
 
 	renderAssemblyItems: function()
 	{
-		if (this.props.vmTrace)
+		if (this.props.vmTrace && this.state.executingCodes[this.state.currentAddress])
 		{
-			return this.state.codes[this.state.currentAddress].map(function(item, i) 
+			return this.state.executingCodes[this.state.currentAddress].map(function(item, i)
 			{
 				return <option key={i} value={i} >{item}</option>;
 			});	
@@ -142,7 +148,7 @@ module.exports = React.createClass({
 		if (!nextProps.vmTrace)
 			return
 		this.buildCallStack(nextProps.vmTrace)
-		this.setState({"currentSelected": -1, "currentAddress": nextProps.vmTrace[0].address})
+        this.setState({"currentSelected": -1, "currentAddress": nextProps.vmTrace[0].address})
 		this.updateState(nextProps, 0)
 	},
 
@@ -178,7 +184,7 @@ module.exports = React.createClass({
 
 	updateState: function(props, vmTraceIndex)
 	{
-		if (!props.vmTrace || !props.vmTrace[vmTraceIndex])
+        if (!props.vmTrace || !props.vmTrace[vmTraceIndex])
 			return
 		var previousIndex = this.state.currentSelected
 		var stateChanges = {}
@@ -192,13 +198,58 @@ module.exports = React.createClass({
 		}
 		
 		var currentAddress = this.state.currentAddress
-		if (props.vmTrace[vmTraceIndex].address) // there's a new context
-		{
-			var stack = this.state.callStack[vmTraceIndex]
-			currentAddress = stack[stack.length - 1]
-			this.resolveAddress(currentAddress, props)
-			Object.assign(stateChanges, { "currentAddress": currentAddress })
-		}
+        var addressIndex = this.shouldUpdateStateProperty("address", vmTraceIndex, previousIndex, props.vmTrace)
+        if (addressIndex > -1)
+        {
+            if (this.state.currentSelected === -1) // beginning of the trace
+            {
+                currentAddress = props.vmTrace[addressIndex].address
+                if (props.transaction.to === null) // contract creation
+                {
+                    this.cacheCode(currentAddress, props.transaction.input)
+                    Object.assign(stateChanges,
+                    {
+                        "currentAddress": currentAddress,
+                        "selectedInst": this.state.instructionsIndexByBytesOffset[currentAddress][props.vmTrace[vmTraceIndex].pc],
+                        "currentSelected": vmTraceIndex
+                    })
+                }
+                else
+                {
+                    var self = this
+                    this.loadCode(currentAddress, props, function(code) // contract call
+                    {
+                        self.setState({
+                            "currentAddress": currentAddress,
+                            "selectedInst": self.state.instructionsIndexByBytesOffset[currentAddress][props.vmTrace[vmTraceIndex].pc],
+                            "currentSelected": vmTraceIndex
+                        })
+                    })
+                }
+            }
+            else
+            {
+                var stack = this.state.callStack[addressIndex] // call code ...
+                currentAddress = stack[stack.length - 1]
+                var self = this
+                this.loadCode(currentAddress, props, function(code)
+                {
+                    self.setState({
+                        "currentAddress": currentAddress,
+                        "selectedInst": self.state.instructionsIndexByBytesOffset[currentAddress][props.vmTrace[vmTraceIndex].pc],
+                        "currentSelected": vmTraceIndex
+                    })
+                })
+            }
+        }
+        else
+        {
+            Object.assign(stateChanges,
+            {
+                "selectedInst": this.state.instructionsIndexByBytesOffset[currentAddress][props.vmTrace[vmTraceIndex].pc],
+                "currentSelected": vmTraceIndex
+            })
+        }
 
 		var depthIndex = this.shouldUpdateStateProperty("depth", vmTraceIndex, previousIndex, props.vmTrace)
 		if (depthIndex > -1)
@@ -216,16 +267,14 @@ module.exports = React.createClass({
 		if (callDataIndex > -1)
 			Object.assign(stateChanges, { "currentCallData": [props.vmTrace[callDataIndex].calldata] })
 		
-		stateChanges["selectedInst"] = this.state.instructionsIndexByBytesOffset[currentAddress][props.vmTrace[vmTraceIndex].pc]
-		stateChanges["currentSelected"] = vmTraceIndex
-
 		stateChanges["currentStepInfo"] = [
 			"Current Step: " + props.vmTrace[vmTraceIndex].steps,
 			"Adding Memory: " + (props.vmTrace[vmTraceIndex].memexpand ? props.vmTrace[vmTraceIndex].memexpand : ""),
 			"Step Cost: " + props.vmTrace[vmTraceIndex].gascost,
 			"Remaining Gas: " + props.vmTrace[vmTraceIndex].gas
 		]
-		this.refs.slider.setValue(vmTraceIndex)
+
+        this.refs.slider.setValue(vmTraceIndex)
 		this.setState(stateChanges)
 	},
 	

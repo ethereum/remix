@@ -13,9 +13,17 @@ module.exports = React.createClass({
 	// contract creation: 1419597 1
 	submit: function()
 	{
-		var tx = web3.eth.getTransactionFromBlock(this.state.blockNumber, this.state.txNumber)
-		this.setState({from: tx.from, to: tx.to ? tx.to : "(Contract Creation)", hash: tx.hash})
-		this.props.onNewTxRequested(this.state.blockNumber, parseInt(this.state.txNumber), tx)
+        var self = this
+		var tx = web3.eth.getTransactionFromBlock(this.state.blockNumber, this.state.txNumber, function(error, tx)
+        {
+            if (tx)
+            {
+                self.setState({from: tx.from, to: tx.to ? tx.to : "(Contract Creation)", hash: tx.hash})
+		        self.props.onNewTxRequested(self.state.blockNumber, parseInt(self.state.txNumber), tx)
+            }
+            else
+                console.log("unable to get tx: " + self.state.blockNumber +  " " + self.state.txNumber)
+        })
 	},
 	
 	updateBlockN: function(ev) {
