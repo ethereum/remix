@@ -13,18 +13,18 @@ module.exports = React.createClass({
     render: function() {		
 		return (
 			<div>
-				<button onClick={this.props.stepIntoBack} disabled={this.checkButtonState(-1)} >Step Into Back</button>
-				<button onClick={this.props.stepOverBack} disabled={this.checkButtonState(-1)} >Step Over Back</button>
-				<button onClick={this.props.stepOverForward} disabled={this.checkButtonState(1)} >Step Over Forward</button>
-				<button onClick={this.props.stepIntoForward} disabled={this.checkButtonState(1)} >Step Into Forward</button>
+				<button onClick={this.props.stepIntoBack} disabled={this.buttonDisabled(-1)} >Step Into Back</button>
+				<button onClick={this.props.stepOverBack} disabled={this.buttonDisabled(-1)} >Step Over Back</button>
+				<button onClick={this.props.stepOverForward} disabled={this.buttonDisabled(1)} >Step Over Forward</button>
+				<button onClick={this.props.stepIntoForward} disabled={this.buttonDisabled(1)} >Step Into Forward</button>
 				<button onClick={this.props.jumpToNextCall} >Jump to Next Call</button>
 			</div>
 			);
 	},
 	
-	checkButtonState: function(incr)
+	buttonDisabled: function(incr)
 	{
-		if (incr === -1)
+        if (incr === -1)
 			return this.props.step === 0 ? "disabled" : ""
 		else if (incr === 1)
 			return this.props.step >= this.props.vmTraceLength - 1 ? "disabled" : "" 
