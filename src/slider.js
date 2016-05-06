@@ -17,10 +17,12 @@ module.exports = React.createClass({
     render: function () {
         return (
             <div>
-                <input ref="rule" style={style.rule} type="range"  min={this.props.min} max={this.props.max} onMouseUp={this.onMouseUp}  />
+                <input ref="rule" style={style.rule} type="range"  min={this.props.min} max={this.props.max} onChange={this.onChange} onMouseUp={this.onMouseUp}  />
             </div>
         );
     },
+    
+    onChange: function() {},	
 
     onMouseUp: function (event) {
         this.props.onChange(parseInt(this.refs.rule.value))
