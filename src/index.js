@@ -10,6 +10,10 @@ if (typeof (module) !== 'undefined' && typeof (module.exports) !== 'undefined') 
   module.exports = modules()
 }
 
+if (typeof (window) !== 'undefined') {
+  window.remix = modules()
+}
+
 function modules () {
   return {
     code: {
