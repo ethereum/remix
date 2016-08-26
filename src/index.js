@@ -6,6 +6,7 @@ var TraceManager = require('./trace/traceManager')
 var CodeManager = require('./code/codeManager')
 var SourceMappingDecoder = require('./util/sourceMappingDecoder')
 var AstWalker = require('./util/astWalker')
+var contractsHelper = require('./helpers/contracts')
 
 if (typeof (module) !== 'undefined' && typeof (module.exports) !== 'undefined') {
   module.exports = modules()
@@ -31,6 +32,9 @@ function modules () {
     util: {
       SourceMappingDecoder: SourceMappingDecoder,
       AstWalker: AstWalker
+    },
+    helpers: {
+      contracts: contractsHelper
     }
   }
 }

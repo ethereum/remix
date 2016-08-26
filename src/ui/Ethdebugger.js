@@ -73,7 +73,8 @@ Ethdebugger.prototype.switchProvider = function (type) {
   })
 }
 
-Ethdebugger.prototype.debug = function (tx) {
+Ethdebugger.prototype.debug = function (tx, compilationData) {
+  util.compilationData = compilationData
   if (tx instanceof Object) {
     this.txBrowser.load(tx.hash)
   } else if (tx instanceof String) {
@@ -101,6 +102,7 @@ Ethdebugger.prototype.render = function () {
 }
 
 Ethdebugger.prototype.unLoad = function () {
+  util.compilationData = null
   this.traceManager.init()
   this.stepManager.reset()
   this.trigger('traceUnloaded')

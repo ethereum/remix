@@ -7,6 +7,7 @@ var CallstackPanel = require('./CallstackPanel')
 var StackPanel = require('./StackPanel')
 var StoragePanel = require('./StoragePanel')
 var BasicPanel = require('./BasicPanel')
+var SolidityStatePanel = require('./SolidityStatePanel')
 var FullStoragesChangesPanel = require('./FullStoragesChanges')
 var yo = require('yo-yo')
 var ui = require('../helpers/ui')
@@ -18,6 +19,7 @@ function VmDebugger (_parent, _traceManager, _codeManager) {
   this.memoryPanel = new MemoryPanel(_parent, _traceManager)
   this.calldataPanel = new CalldataPanel(_parent, _traceManager)
   this.callstackPanel = new CallstackPanel(_parent, _traceManager)
+  this.solidityStatePanel = new SolidityStatePanel(_parent, _traceManager, _codeManager)
 
   /* Return values - */
   this.returnValuesPanel = new BasicPanel('Return Value', '1205px', '100px')
@@ -76,6 +78,9 @@ VmDebugger.prototype.render = function () {
               <tr>
                 <td>
                   ${this.storagePanel.render()}
+                </td>
+                <td>
+                  ${this.solidityStatePanel.render()}
                 </td>
                 <td>
                   ${this.memoryPanel.render()}
