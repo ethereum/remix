@@ -1,8 +1,7 @@
 'use strict'
 var BasicPanel = require('./BasicPanel')
 var yo = require('yo-yo')
-var util = require('../helpers/global')
-var contractsHelper = require('../helpers/contracts')
+var contractsHelper = require('../solidity/contracts')
 var helper = require('../helpers/traceHelper')
 
 function SolidityStatePanel (_parent, _traceManager, _codeManager) {
@@ -12,10 +11,18 @@ function SolidityStatePanel (_parent, _traceManager, _codeManager) {
   this.basicPanel = new BasicPanel('Solidity State')
   this.init()
   this.disabled = false
+  this.astList
+  this.compiledContracts
+  this.cache = new Cache()
 }
 
 SolidityStatePanel.prototype.render = function () {
   return yo`<div id='soliditystate' >${this.basicPanel.render()}</div>`
+}
+
+SolidityStatePanel.prototype.setCompilationResult = function (astList, compiledContracts) {
+  this.astList = astList
+  this.compiledContracts = compiledContracts
 }
 
 SolidityStatePanel.prototype.init = function () {
@@ -32,7 +39,7 @@ SolidityStatePanel.prototype.init = function () {
       } else if (self.parent.currentStepIndex === index) {
         self.traceManager.getCurrentCalledAddressAt(index, function (error, address) {
           if (!error) {
-            self.codeManager.getCode(address, index, function (error, code) {
+            self.codeManager.getCode(address, function (error, code) {
               if (!error) {
                 self.basicPanel.data = self.formatSolState(address, code, storage)
               }
@@ -46,18 +53,38 @@ SolidityStatePanel.prototype.init = function () {
 }
 
 SolidityStatePanel.prototype.formatSolState = function (address, code, storage) {
-  var ctrName
-  for (var k in util.compilationData.contracts) {
-    var isCreation = helper.isContractCreation(address)
-    var byteProp = isCreation ? 'bytecode' : 'runtimeBytecode'
-    if (util.compilationData.contracts[k][byteProp] === code.byte) {
-      ctrName = k
-      break
+  var ctrName = this.cache.contractNameByAddress[address]
+  if (!ctrName) {
+    for (var k in this.compiledContracts) {
+      var isCreation = helper.isContractCreation(address)
+      var byteProp = isCreation ? 'bytecode' : 'runtimeBytecode'
+      if ('0x' + this.compiledContracts[k][byteProp] === code.bytes) {
+        ctrName = k
+        break
+      }
     }
   }
+
   if (ctrName) {
-    var stateVar = contractsHelper.getSolidityState(storage, util.compilationData.sources, ctrName)
-    return JSON.stringify(stateVar)
+    this.cache.contractNameByAddress[address] = ctrName
+    var storageLocation = this.cache.storageLocationByContract[ctrName]
+    if (!storageLocation) {
+      storageLocation = contractsHelper.getStorageLocationOf(ctrName, this.astList)
+      this.cache.storageLocationByContract[ctrName] = storageLocation
+    }
+    var stateVar = contractsHelper.decodeState(storageLocation, storage)
+    return JSON.stringify(stateVar, null, ' ')
+  } else {
+    return 'cannot found contract for address ' + address
+  }
+}
+
+function Cache () {
+  this.contractNameByAddress = {}
+  this.storageLocationByContract = {}
+  this.clear = function () {
+    this.storageLocationByContract = {}
+    this.contractNameByAddress = {}
   }
 }
 

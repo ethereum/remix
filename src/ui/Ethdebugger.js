@@ -3,6 +3,7 @@ var TxBrowser = require('./TxBrowser')
 var StepManager = require('./StepManager')
 var TraceManager = require('../trace/traceManager')
 var VmDebugger = require('./VmDebugger')
+var SolidityDebugger = require('./SolidityDebugger')
 var Sticker = require('./Sticker')
 var style = require('./styles/basicStyles')
 var util = require('../helpers/global')
@@ -49,6 +50,7 @@ function Ethdebugger () {
     self.stepChanged(stepIndex)
   })
   this.vmDebugger = new VmDebugger(this, this.traceManager, this.codeManager)
+  this.solDebugger = new SolidityDebugger(this, this.traceManager, this.codeManager)
   this.sticker = new Sticker(this, this.traceManager)
 }
 
@@ -74,7 +76,9 @@ Ethdebugger.prototype.switchProvider = function (type) {
 }
 
 Ethdebugger.prototype.debug = function (tx, compilationData) {
-  util.compilationData = compilationData
+  if (compilationData) {
+    this.solDebugger.setCompilationResult(compilationData.data.sources, compilationData.data.contracts)
+  }
   if (tx instanceof Object) {
     this.txBrowser.load(tx.hash)
   } else if (tx instanceof String) {
@@ -93,6 +97,7 @@ Ethdebugger.prototype.render = function () {
           ${this.sticker.render()}
         </div>
         <div style=${ui.formatCss(style.statusMessage)} >${this.statusMessage}</div>
+        ${this.solDebugger.render()}
         ${this.vmDebugger.render()}
      </div>`
   if (!this.view) {
