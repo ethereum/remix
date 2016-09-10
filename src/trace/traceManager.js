@@ -205,7 +205,7 @@ TraceManager.prototype.getMemoryAt = function (stepIndex, callback) {
     return callback(check, null)
   }
   var lastChanges = util.findLowerBoundValue(stepIndex, this.traceCache.memoryChanges)
-  if (lastChanges === undefined) return callback('no memory found', null)
+  if (!lastChanges && lastChanges !== 0) return callback('no memory found', null)
   callback(null, this.trace[lastChanges].memory)
 }
 
