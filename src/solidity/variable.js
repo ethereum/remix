@@ -1,6 +1,17 @@
 'use strict'
 
 module.exports = {
+  getBasicType: function (variable) {
+    var ret = {}
+    ret.originalType = variable.attributes.type
+    ret.innerType = this.getInnerType(variable)
+    ret.size = this.getSize(variable, ret.innerType)
+    ret.memSize = isNaN(ret.size) ? ret.size : ret.size / 4
+    ret.dim = this.getDim(variable, ret.innerType)
+    ret.dim.reverse()
+    return ret
+  },
+
   /**
    * return parse the type and return an object representing the type
    *
@@ -19,58 +30,52 @@ module.exports = {
    *                    isArray: bool
    *                    isStruct: bool
    */
-  getType: function (variable, stateDeclarations) {
-    var ret = {}
-    ret.originalType = variable.attributes.type
-    ret.innerType = this.getInnerType(variable)
-    ret.size = this.getSize(variable, ret.innerType)
-    ret.memSize = isNaN(ret.size) ? ret.size : ret.size / 4
-    ret.dim = []
-    var dimension = this.getDim(variable, ret.innerType)
+  getType: function (variable, stateDefinitions) {
+    var ret = this.getBasicType(variable)
     if (ret.innerType === 'enum') {
-      ret.enum = this.getEnum(variable, stateDeclarations)
+      ret.enum = this.getEnum(variable, stateDefinitions)
+      ret.isEnum = true
     }
-    if (ret.innerType === 'bytes') {
+    if (ret.innerType === 'bytes' || ret.innerType === 'string') {
       ret.isBytes = true
     }
     var membersParsing
     if (ret.innerType.indexOf('struct') === 0) {
-      membersParsing = this.getStructMembers(variable, stateDeclarations)
+      membersParsing = this.getStructMembers(variable, stateDefinitions)
       ret.members = membersParsing.members
       ret.slotsUsed = membersParsing.slotsUsed
       ret.membersSlotsUsed = membersParsing.slotsUsed
       ret.isStruct = true
     }
-    if (dimension.length > 0) { // array
-      var slotUsed = 0
-      for (var k = 0; k < dimension.length; k++) {
-        var arraySize = dimension[k]
-        if (arraySize === 'dynamic') {
-          slotUsed++
-          break
-        }
-
-        try {
-          arraySize = parseInt(arraySize)
-          ret.dim.push(arraySize)
-        } catch (e) {
-          ret.dim.push(arraySize)
-        }
-
-        if (ret.members) {
-          slotUsed += arraySize * membersParsing.slotsUsed
-        } else {
-          var storageSize = isNaN(ret.memSize) ? 64 : ret.memSize
-          slotUsed += Math.ceil(arraySize * storageSize / 64)
-        }
-      }
-      ret.slotsUsed = slotUsed
-      ret.dim.reverse()
+    if (ret.dim.length > 0) { // array
+      var slotUsedByArray = []
+      this.getSlotsUsedByArray(ret.dim, ret, 0, slotUsedByArray)
+      ret.slotsUsed = slotUsedByArray[0]
       ret.isArray = true
     } else {
       ret.slotsUsed = 1
     }
     return ret
+  },
+
+  getSlotsUsedByArray: function (dimension, type, depth, slotUsedByArray) {
+    if (dimension[depth] === 'dynamic') {
+      slotUsedByArray.push(1) // 1 slot
+    } else {
+      if (depth === dimension.length - 1) {
+        var storageSize = isNaN(type.memSize) ? 64 : type.memSize
+        slotUsedByArray.push(Math.ceil(dimension[depth] * storageSize / 64))
+      } else {
+        var slotUsed = 0
+        var currentDepth = depth + 1
+        var slotUsedByInternalArray = []
+        for (var k = 0; k < dimension[depth]; k++) {
+          this.getSlotsUsedByArray(dimension, type, currentDepth, slotUsedByInternalArray)
+          slotUsed += slotUsedByInternalArray[slotUsedByInternalArray.length - 1]
+        }
+        slotUsedByArray.push(slotUsed)
+      }
+    }
   },
 
   /**
@@ -95,7 +100,7 @@ module.exports = {
       return 'dynamic'
     } else if (type === 'bool' || type === 'enum') {
       return 8
-    } else if (type === 'address') {
+    } else if (type === 'address' || type === 'contract') {
       return 160
     }
     var size = type.replace(innerType, '')
@@ -136,12 +141,12 @@ module.exports = {
   },
 
   /**
-   * retrieve enum declaration of the given @arg variable
-   *
-   * @param {Object} variable - variable declaration
-   * @param {Object} stateDeclarations  - all state declarations given by the AST (including struct and enum type declaration)
-   * @return [] containing all value declaration of the current enum type
-   */
+  * retrieve enum declaration of the given @arg variable
+  *
+  * @param {Object} variable - variable declaration
+  * @param {Object} stateDeclarations  - all state declarations given by the AST (including struct and enum type declaration)
+  * @return [] containing all value declaration of the current enum type
+  */
   getEnum: function (variable, stateDeclaration) {
     for (var k in stateDeclaration) {
       var dec = stateDeclaration[k]
@@ -196,7 +201,7 @@ module.exports = {
    * @return true if the type needs a new storage
    */
   typeNeedNewSlot: function (type, location) {
-    return (type.size === 'dynamic' || location.offset + type.memSize >= 64 || type.isArray || type.isStruct /* || type.isBytes*/)
+    return (type.size === 'dynamic' || location.offset + type.memSize > 64 || type.isArray || type.isStruct /* || type.isBytes*/)
   },
 
   /**
@@ -207,28 +212,33 @@ module.exports = {
    * @return {Object} return the location of the current type and the location of the next type in storage
    */
   walkStorage: function (type, location) {
-    if (location.offset > 0 && this.typeNeedNewSlot(type, location)) {
-      location = {
-        slot: location.slot + 1,
-        offset: 0
-      }
-    }
     var currentLocation = {
       slot: location.slot,
       offset: location.offset
     }
+    var nextLocation = {
+      slot: location.slot,
+      offset: location.offset
+    }
+    if (location.offset > 0 && this.typeNeedNewSlot(type, location)) {
+      currentLocation = {
+        slot: location.slot + 1,
+        offset: 0
+      }
+    }
     if (this.typeNeedNewSlot(type, location)) {
-      location.offset = 0
-      location.slot = location.slot + type.slotsUsed
+      nextLocation.offset = 0
+      nextLocation.slot = currentLocation.slot + type.slotsUsed
     } else {
-      location.offset = location.offset + type.memSize
+      nextLocation.offset = currentLocation.offset + type.memSize
+      if (nextLocation.offset >= 64) {
+        nextLocation.offset = 0
+        nextLocation.slot = currentLocation.slot + 1
+      }
     }
     return {
       currentLocation: currentLocation,
-      nextLocation: {
-        slot: location.slot,
-        offset: location.offset
-      }
+      nextLocation: nextLocation
     }
   },
 
@@ -239,7 +249,7 @@ module.exports = {
    * @return {String} return the base type
    */
   getInnerType: function (variable) {
-    var types = ['uint', 'int', 'bytes', 'string', 'address', 'struct', 'bool', 'enum']
+    var types = ['uint', 'int', 'bytes', 'string', 'address', 'struct', 'bool', 'enum', 'contract']
     for (var k in types) {
       if (this.extractType(variable.attributes.type).indexOf(types[k]) !== -1) {
         if (types[k] === 'struct') {
@@ -312,7 +322,7 @@ module.exports = {
      * @return {bool} true if type is an address
      */
   isAddress: function (type) {
-    return type.innerType === 'address'
+    return type.innerType === 'address' || type.innerType === 'contract'
   },
 
   /**

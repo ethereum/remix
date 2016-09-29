@@ -48,16 +48,16 @@ module.exports = {
    * @return {Object} - return the location of all contract variables in the storage
    */
   getStorageLocationOf: function (contractName, astList) {
-    var stateDeclarations = this.getStateDefinition(astList, contractName)
+    var stateDefinitions = this.getStateDefinition(astList, contractName)
     var ret = []
     var location = {
       offset: 0,
       slot: 0
     }
-    for (var k in stateDeclarations) {
-      var variable = stateDeclarations[k]
+    for (var k in stateDefinitions) {
+      var variable = stateDefinitions[k]
       if (variable.name === 'VariableDeclaration') {
-        var type = varUtil.getType(variable, stateDeclarations)
+        var type = varUtil.getType(variable, stateDefinitions)
         var loc = varUtil.walkStorage(type, location)
         ret.push({
           name: variable.attributes.name,

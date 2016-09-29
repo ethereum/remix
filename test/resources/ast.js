@@ -20,4 +20,5 @@ node.source = `contract test {
     }
 }`
 
+
 module.exports = node
