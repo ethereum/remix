@@ -1,6 +1,6 @@
 var decoder = require('./stateDecoder')
 var astHelper = require('./astHelper')
-var varUtil = require('./variable')
+var typeDecoder = require('./typeDecoder')
 
 module.exports = {
   /**
@@ -61,8 +61,10 @@ function getStateVariableLocations (contractName, astList) {
   for (var k in stateDefinitions) {
     var variable = stateDefinitions[k]
     if (variable.name === 'VariableDeclaration') {
-      var type = varUtil.getType(variable, stateDefinitions)
-      var loc = varUtil.walkStorage(type, location)
+      var type = typeDecoder.decodeType(variable, stateDefinitions)
+      console.log(type)
+      console.log('____________________')
+      var loc = typeDecoder.walkStorage(type, location)
       ret.push({
         name: variable.attributes.name,
         type: type,

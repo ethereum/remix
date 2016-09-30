@@ -4,11 +4,9 @@ module.exports = {
   decodeBasicType: function (variable) {
     var ret = {}
     ret.originalType = variable.attributes.type
-    ret.innerType = this.getInnerType(variable)
-    ret.size = this.getSize(variable, ret.innerType)
-    ret.memSize = isNaN(ret.size) ? ret.size : ret.size / 4
-    ret.dim = this.getDim(variable, ret.innerType)
-    ret.dim.reverse()
+    ret.typeCategory = this.getTypeCategory(variable)
+    ret.fullType = this.extractType(variable)
+    ret.storageBytes = this.getStorageBytes(variable, ret.typeCategory)
     return ret
   },
 
@@ -30,23 +28,33 @@ module.exports = {
    *                    isArray: bool
    *                    isStruct: bool
    */
-  getType: function (variable, stateDefinitions) {
+  decodeType: function (variable, stateDefinitions) {
     var ret = this.decodeBasicType(variable)
-    if (ret.innerType === 'enum') {
+    if (ret.typeCategory === 'enum') {
       ret.enum = this.getEnum(variable, stateDefinitions)
       ret.isEnum = true
     }
-    if (ret.innerType === 'bytes' || ret.innerType === 'string') {
+    if (ret.typeCategory === 'bytes' || ret.typeCategory === 'string') {
       ret.isBytes = true
     }
     var membersParsing
-    if (ret.innerType.indexOf('struct') === 0) {
+    if (ret.typeCategory.indexOf('struct') === 0) {
       membersParsing = this.getStructMembers(variable, stateDefinitions)
       ret.members = membersParsing.members
       ret.slotsUsed = membersParsing.slotsUsed
-      ret.membersSlotsUsed = membersParsing.slotsUsed
       ret.isStruct = true
     }
+    if (ret.type.indexOf('[') !== -1) {
+      ret.arrayBaseType = this.extractBaseType(ret.fullType)
+      ret.dim = this.getDim(variable)
+      var subArrayType = variable.attributes.type.subtring(0, variable.attributes.type.lastIndexOf('['))
+      if (subArrayType.indexOf('[') !== -1) {
+        var subArray = JSON.parse(JSON.stringify(variable))
+        subArray.attributes.type = subArrayType
+        ret.subArray = this.decodeType(subArray, stateDefinitions)
+      }
+    }
+    /*
     if (ret.dim.length > 0) { // array
       var slotUsedByArray = []
       this.getSlotsUsedByArray(ret.dim, ret, 0, slotUsedByArray)
@@ -54,7 +62,7 @@ module.exports = {
       ret.isArray = true
     } else {
       ret.slotsUsed = 1
-    }
+    }*/
     return ret
   },
 
@@ -83,12 +91,12 @@ module.exports = {
    *
    * @param {Object} variable - variable declaration
    * @param {String} innerType - base type
-   * @return {Int|String} - return the size of the type
-   *                        return 'unapplicable' if the size could not be determmined (struct)
+   * @return {Int|String} - return the size on storage of the type (bytes)
+   *                        return 'unapplicable' if the size could not be determmined directly (struct)
    *                        return 'dynamic' if dynamic size
    */
-  getSize: function (variable, innerType) {
-    if (innerType.indexOf('struct') === 0) {
+  getStorageBytes: function (variable, typeCategory) {
+    if (typeCategory.indexOf('struct') === 0) {
       return 'unapplicable'
     }
     var type = variable.attributes.type
@@ -97,37 +105,58 @@ module.exports = {
       type = type.substring(0, type.indexOf('['))
     }
     if (type === 'string' || type === 'bytes') {
-      return 'dynamic'
+      size = 'dynamic'
     } else if (type === 'bool' || type === 'enum') {
-      return 8
+      size = 8
     } else if (type === 'address' || type === 'contract') {
-      return 160
+      size = 160
+    } else {
+      var size = type.replace(typeCategory, '')
+      if (size !== '') {
+        size = parseInt(size)
+      }
     }
-    var size = type.replace(innerType, '')
-    if (size !== '') {
-      size = parseInt(size)
-    }
-    if (innerType === 'bytes') {
+    if (typeCategory === 'bytes') {
       size = 8 * size
     }
+    size = isNaN(size) ? size : size / 8 // bytes
     return size
+  },
+  
+  /**
+   * return the dim of the current array
+   *
+   * @param {Object} variable - variable declaration
+   * @return {String} containing the dim of the array ([] if dynamic array)
+   */
+  getDim: function (variable) {
+    if (variable.attributes.type.indexOf('[') !== -1) {
+      var squareBracket = /\[([0-9]+|\s*)\]/g
+      var type = variable.attributes.type
+      var dim = type.match(squareBracket)
+      if (dim.length === 0) {
+        return null
+      } else {
+        return dim[dim.length - 1]
+      }
+    }
   },
 
   /**
    * parse the number of dimension of the type
    *
    * @param {Object} variable - variable declaration
-   * @param {String} innerType - base type
    * @return [] containing the number of dimension of the given @arg variable
    *            return empty array for type that does not have dimension (int, uint, etc .. (not array))
    */
-  getDim: function (variable, innerType) {
+  getDimensionDeclaration: function (variable) {
     var ret = []
     if (variable.attributes.type.indexOf('[') !== -1) {
       var squareBracket = /\[([0-9]+|\s*)\]/g
       var type = variable.attributes.type
       var dim = type.match(squareBracket)
-      if (dim && dim.length > 0) {
+      return dim
+      /*if (dim && dim.length > 0) {
         for (var k in dim) {
           if (dim[k] === '[]') {
             ret.push('dynamic')
@@ -135,7 +164,7 @@ module.exports = {
             ret.push(parseInt(dim[k].replace('[', '').replace(']', '')))
           }
         }
-      }
+      }*/
     }
     return ret
   },
@@ -175,7 +204,7 @@ module.exports = {
         }
         for (var i in dec.children) {
           var member = dec.children[i]
-          var type = this.getType(member, stateDeclaration)
+          var type = this.decodeType(member, stateDeclaration)
           var loc = this.walkStorage(type, location)
           ret.push({
             name: member.attributes.name,
@@ -248,7 +277,7 @@ module.exports = {
    * @param {Object} variable - variable declaration
    * @return {String} return the base type
    */
-  getInnerType: function (variable) {
+  getTypeCategory: function (variable) {
     var types = ['uint', 'int', 'bytes', 'string', 'address', 'struct', 'bool', 'enum', 'contract']
     for (var k in types) {
       if (this.extractType(variable.attributes.type).indexOf(types[k]) !== -1) {
@@ -266,13 +295,34 @@ module.exports = {
    * extract the first part of the full type
    *
    * @param {String} fullType - type given by the AST (ex: uint[2] storage ref[2])
-   * @return {String} return the first part of the full type (uint[2] in that case)
+   * @return {String} return the first part of the full type. keep the array dim declaration (uint[2][2] in that case)
    */
   extractType: function (fullType) {
+    var dim = []
+    if (fullType.indexOf('[') !== -1) {
+      var dim = this.getDimensionDeclaration(fullType)
+    }
     if (fullType.indexOf(' ') !== -1) {
-      fullType = fullType.split(' ')[0]
+      fullType = fullType.split(' ')[0] 
+    }    
+    fullType = fullType.split('[')[0]
+    if (dim.length) {
+      fullType = fullType + dim.join('')
     }
     return fullType
+  },
+  
+   /**
+   * extract the first part of the full type and remove array declaration
+   *
+   * @param {String} fullType - type given by the AST (ex: uint[2] storage ref[2])
+   * @return {String} return the first part of the full type (uint in that case)
+   */
+  extractBaseType: function (fullType) {
+    if (type.indexOf('[') !== -1) {
+      type = type.substring(0, type.indexOf('['))
+    }
+    return type
   },
 
   /**
@@ -355,3 +405,4 @@ module.exports = {
     return type.innerType === 'string'
   }
 }
+
