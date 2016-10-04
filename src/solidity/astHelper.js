@@ -74,16 +74,7 @@ function getContractsDefinition (astList) {
  * @return {Object} - return the AST node of found contract
  */
 function getBaseContracts (astList, id, contracts) {
-  var baseContracts = contracts[id].attributes.linearizedBaseContracts.map(function (id) { return contracts[id]})
+  var baseContracts = contracts[id].attributes.linearizedBaseContracts.map(function (id) { return contracts[id] })
   baseContracts.reverse()
   return baseContracts
-/*
- var contract = contracts[id]
- var baseContracts = []
- for (var k in contract.attributes.linearizedBaseContracts) {
-   var subId = contract.attributes.linearizedBaseContracts[k]
-   baseContracts.unshift(contracts[subId])
- }
- return baseContracts
- */
 }

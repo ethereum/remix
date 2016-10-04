@@ -4,17 +4,19 @@ var typeDecoder = require('./typeDecoder')
 
 module.exports = {
   /**
-     * return the state of the given @a contractName as a json object
-     *
-     * @param {Map} storageContent  - contract storage
-     * @param {astList} astList  - AST nodes of all the sources
-     * @param {String} contractName  - contract for which state var should be resolved
-     * @return {Map} - return the state of the contract
-     */
+   * return the state of the given @a contractName as a json object
+   *
+   * @param {Map} storageContent  - contract storage
+   * @param {astList} astList  - AST nodes of all the sources
+   * @param {String} contractName  - contract for which state var should be resolved
+   * @return {Map} - return the state of the contract
+   */
   getSolidityState: function (storageContent, astList, contractName) {
     var locations = getStateVariableLocations(contractName, astList)
     return decodeState(locations, storageContent)
-  }
+  },
+
+  getStateVariableLocations: getStateVariableLocations
 }
 
 /**
@@ -62,8 +64,6 @@ function getStateVariableLocations (contractName, astList) {
     var variable = stateDefinitions[k]
     if (variable.name === 'VariableDeclaration') {
       var type = typeDecoder.decodeType(variable, stateDefinitions)
-      console.log(type)
-      console.log('____________________')
       var loc = typeDecoder.walkStorage(type, location)
       ret.push({
         name: variable.attributes.name,
