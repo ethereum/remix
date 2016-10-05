@@ -24,6 +24,27 @@ contract testSimpleStorage is testSimpleStorage1 {
     
     int32 i32;
     int16 i16_2;
+    
+    enum enumDef {
+        first,
+        second,
+        third
+    }
+    
+    enumDef enumDec;
+    bool boolean;
+}`
+
+contractStorage.testSimpleStorage2 = `
+contract testSimpleStorage2 {
+    uint32 ui32;
+    uint8 ui2;
+    uint64 ui3;
+    bytes4 _bytes4;
+    bytes32 _bytes32;
+    string _string;
+    string[2] stringArray;
+    bytes[] bytesArray;
 }`
 
 module.exports = contractStorage

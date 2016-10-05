@@ -2,30 +2,13 @@ var decoder = require('./stateDecoder')
 var astHelper = require('./astHelper')
 var typeDecoder = require('./typeDecoder')
 
-module.exports = {
-  /**
-   * return the state of the given @a contractName as a json object
-   *
-   * @param {Map} storageContent  - contract storage
-   * @param {astList} astList  - AST nodes of all the sources
-   * @param {String} contractName  - contract for which state var should be resolved
-   * @return {Map} - return the state of the contract
-   */
-  getSolidityState: function (storageContent, astList, contractName) {
-    var locations = getStateVariableLocations(contractName, astList)
-    return decodeState(locations, storageContent)
-  },
-
-  getStateVariableLocations: getStateVariableLocations
-}
-
 /**
-   * decode the ctr state storage
-   *
-   * @param {Array} storage location  - location of all state variables
-   * @param {Map} storageContent  - storage
-   * @return {Map} - decoded state variable
-   */
+  * decode the contract state storage
+  *
+  * @param {Array} storage location  - location of all state variables
+  * @param {Map} storageContent  - storage
+  * @return {Map} - decoded state variable
+  */
 function decodeState (storageLocations, storageContent) {
   if (storageContent['0x']) {
     storageContent['0x00'] = storageContent['0x']
@@ -44,12 +27,12 @@ function decodeState (storageLocations, storageContent) {
 }
 
 /**
-* return all storage location variables of the given @arg contractName
-*
-* @param {String} contractName  - name of the contract
-* @param {Object} astList  - AST nodes of all the sources
-* @return {Object} - return the location of all contract variables in the storage
-*/
+  * return all storage location variables of the given @arg contractName
+  *
+  * @param {String} contractName  - name of the contract
+  * @param {Object} astList  - AST nodes of all the sources
+  * @return {Object} - return the location of all contract variables in the storage
+  */
 function getStateVariableLocations (contractName, astList) {
   var stateDefinitions = astHelper.getStateDefinition(astList, contractName)
   var ret = []
@@ -74,4 +57,23 @@ function getStateVariableLocations (contractName, astList) {
     }
   }
   return ret
+}
+
+/**
+  * return the state of the given @a contractName as a json object
+  *
+  * @param {Map} storageContent  - contract storage
+  * @param {astList} astList  - AST nodes of all the sources
+  * @param {String} contractName  - contract for which state var should be resolved
+  * @return {Map} - return the state of the contract
+  */
+function getSolidityState (storageContent, astList, contractName) {
+  var locations = getStateVariableLocations(contractName, astList)
+  return decodeState(locations, storageContent)
+}
+
+module.exports = {
+  getSolidityState: getSolidityState,
+  getStateVariableLocations: getStateVariableLocations,
+  decodeState: decodeState
 }
