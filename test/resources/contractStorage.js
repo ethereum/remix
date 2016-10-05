@@ -33,6 +33,10 @@ contract testSimpleStorage is testSimpleStorage1 {
     
     enumDef enumDec;
     bool boolean;
+    
+    uint[][2][][3] ui5;
+    
+    string _string;
 }`
 
 contractStorage.testSimpleStorage2 = `

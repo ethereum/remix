@@ -1,6 +1,8 @@
 var decoder = require('./stateDecoder')
 var astHelper = require('./astHelper')
-var typeDecoder = require('./typeDecoder')
+var decoders = require('./decoders')
+var types = require('./types/list')
+var locationDecoder = require('./locationDecoder')
 
 /**
   * decode the contract state storage
@@ -17,11 +19,7 @@ function decodeState (storageLocations, storageContent) {
   var ret = {}
   for (var k in storageLocations) {
     var stateVar = storageLocations[k]
-    var location = {
-      slot: stateVar.location.slot,
-      offset: stateVar.location.offset
-    }
-    ret[stateVar.name] = decoder.decode(stateVar.type, storageContent, location)
+    ret[stateVar.name] = decoder.decode(stateVar.type, storageContent, stateVar.location)
   }
   return ret
 }
@@ -33,8 +31,8 @@ function decodeState (storageLocations, storageContent) {
   * @param {Object} astList  - AST nodes of all the sources
   * @return {Object} - return the location of all contract variables in the storage
   */
-function getStateVariableLocations (contractName, astList) {
-  var stateDefinitions = astHelper.getStateDefinition(astList, contractName)
+function stateVariableLocations (contractName, astList) {
+  var stateDefinitions = astHelper.getStateVariables(contractName, astList)
   var ret = []
   if (!stateDefinitions) {
     return ret
@@ -46,14 +44,15 @@ function getStateVariableLocations (contractName, astList) {
   for (var k in stateDefinitions) {
     var variable = stateDefinitions[k]
     if (variable.name === 'VariableDeclaration') {
-      var type = typeDecoder.decodeType(variable, stateDefinitions)
-      var loc = typeDecoder.walkStorage(type, location)
+      var decoded = decoders.decode(variable, stateDefinitions)
+      var type = new types[decoded.decoder](decoded)
+      var loc = locationDecoder.walkStorage(type, location)
       ret.push({
         name: variable.attributes.name,
         type: type,
         location: loc.currentLocation
       })
-      location = loc.nextLocation
+      location = loc.endLocation
     }
   }
   return ret
@@ -67,13 +66,13 @@ function getStateVariableLocations (contractName, astList) {
   * @param {String} contractName  - contract for which state var should be resolved
   * @return {Map} - return the state of the contract
   */
-function getSolidityState (storageContent, astList, contractName) {
-  var locations = getStateVariableLocations(contractName, astList)
+function solidityState (storageContent, astList, contractName) {
+  var locations = stateVariableLocations(contractName, astList)
   return decodeState(locations, storageContent)
 }
 
 module.exports = {
-  getSolidityState: getSolidityState,
-  getStateVariableLocations: getStateVariableLocations,
+  solidityState: solidityState,
+  stateVariableLocations: stateVariableLocations,
   decodeState: decodeState
 }

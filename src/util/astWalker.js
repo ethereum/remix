@@ -33,13 +33,13 @@ AstWalker.prototype.walk = function (ast, callback) {
 /**
   * walk the given @astList
   *
-  * @param {Object} astList  - ASTs of all the sources
+  * @param {Object} sourcesList - sources list (containing root AST node)
   * @param {Function} - callback used by AstWalker to compute response
   */
-AstWalker.prototype.walkAstList = function (astList, callback) {
+AstWalker.prototype.walkAstList = function (sourcesList, callback) {
   var walker = new AstWalker()
-  for (var k in astList) {
-    walker.walk(astList[k].AST, callback)
+  for (var k in sourcesList) {
+    walker.walk(sourcesList[k].AST, callback)
   }
 }
 
