@@ -254,3 +254,15 @@ function testStructArrayStorage (st) {
   st.equal(decoded['arrayStruct'].value[2].value[2].i8, '-34')
   st.equal(decoded['arrayStruct'].value[2].value[2].str.value, 'test_str_short')
 }
+
+function testStructArrayStorage (st) {
+  var structArrayStorage = require('./contracts/structArrayStorage')
+  var output = compiler.compile(structArrayStorage.contract, 0)
+  var decoded = stateDecoder.solidityState(structArrayStorage.storage, output.sources, 'structArrayStorage')
+  st.equal(decoded['intStructDec']['i8'], '32')
+  st.equal(decoded['intStructDec']['i16'], '-54')
+  st.equal(decoded['intStructDec']['ui32'], '128')
+  st.equal(decoded['intStructDec']['i256'], '-1243565465756')
+  st.equal(decoded['intStructDec']['ui16'], '34556')
+  st.equal(decoded['intStructDec']['i32'], '-345446546')
+}
