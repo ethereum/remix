@@ -5,10 +5,8 @@ function web3VmProvider () {
   var self = this
   this.web3 = new Web3()
   this.vm
-  this.vmTraces = {}
   this.txs = {}
-  this.processingHash
-  this.incr = 0
+  this.vms = {}
   this.eth = {}
   this.debug = {}
   this.eth.getCode = function (address, cb) { return self.getCode(address, cb) }
@@ -24,70 +22,11 @@ function web3VmProvider () {
 web3VmProvider.prototype.setVM = function (vm) {
   var self = this
   this.vm = vm
-  this.vm.on('step', function (data) {
-    self.pushTrace(self, data)
-  })
-  this.vm.on('afterTx', function (data) {
-    self.txProcessed(self, data)
-  })
   this.vm.on('beforeTx', function (data) {
-    self.txWillProcess(self, data)
+    var hash = util.hexConvert(data.hash())
+    self.txs[hash] = data
+    self.vms[hash] = self.vm.copy()
   })
-}
-
-web3VmProvider.prototype.releaseCurrentHash = function () {
-  var ret = this.processingHash
-  this.processingHash = undefined
-  return ret
-}
-
-web3VmProvider.prototype.txWillProcess = function (self, data) {
-  self.incr++
-  self.processingHash = util.hexConvert(data.hash())
-  self.vmTraces[self.processingHash] = {
-    gas: '0x0',
-    return: '0x0',
-    structLogs: []
-  }
-  var tx = {}
-  tx.hash = self.processingHash
-  tx.from = util.hexConvert(data.getSenderAddress())
-  if (data.to && data.to.length) {
-    tx.to = util.hexConvert(data.to)
-  }
-  tx.data = util.hexConvert(data.data)
-  tx.input = util.hexConvert(data.input)
-  tx.gas = util.hexConvert(data.gas)
-  if (data.value) {
-    tx.value = util.hexConvert(data.value)
-  }
-  self.txs[self.processingHash] = tx
-}
-
-web3VmProvider.prototype.txProcessed = function (self, data) {
-  self.vmTraces[self.processingHash].gas = '0x' + data.gasUsed.toString(16)
-  if (data.createdAddress) {
-    self.vmTraces[self.processingHash].return = util.hexConvert(data.createdAddress)
-  } else {
-    self.vmTraces[self.processingHash].return = util.hexConvert(data.vm.return)
-  }
-}
-
-web3VmProvider.prototype.pushTrace = function (self, data) {
-  if (!self.processingHash) {
-    console.log('no tx processing')
-    return
-  }
-  var step = {
-    stack: util.hexListConvert(data.stack),
-    memory: util.formatMemory(data.memory),
-    storage: data.storage,
-    op: data.opcode.name,
-    pc: data.pc,
-    gasCost: data.opcode.fee.toString(),
-    gas: data.gasLeft.toString()
-  }
-  self.vmTraces[self.processingHash].structLogs.push(step)
 }
 
 web3VmProvider.prototype.getCode = function (address, cb) {
@@ -99,16 +38,37 @@ web3VmProvider.prototype.getCode = function (address, cb) {
 web3VmProvider.prototype.setProvider = function (provider) {}
 
 web3VmProvider.prototype.traceTransaction = function (txHash, options, cb) {
-  if (this.vmTraces[txHash]) {
-    if (cb) {
-      cb(null, this.vmTraces[txHash])
-    }
-    return this.vmTraces[txHash]
-  } else {
-    if (cb) {
-      cb('unable to retrieve traces ' + txHash, null)
-    }
+  var vm = this.vms[txHash]
+  var tx = this.txs[txHash]
+  var vmtrace = {
+    gas: '0x0',
+    return: '0x0',
+    structLogs: []
   }
+  vm.on('step', function (data) {
+    var step = {
+      stack: util.hexListConvert(data.stack),
+      memory: util.formatMemory(data.memory),
+      storage: data.storage,
+      op: data.opcode.name,
+      pc: data.pc,
+      gasCost: data.opcode.fee.toString(),
+      gas: data.gasLeft.toString()
+    }
+    vmtrace.structLogs.push(step)
+  })
+  vm.on('afterTx', function (data) {
+    cb(null, vmtrace)
+  })
+  vm.runTx({
+    tx: tx,
+    skipBalance: true,
+    skipNonce: true
+  }, function (error, result) {
+    if (error) {
+      cb(error)
+    }
+  })
 }
 
 web3VmProvider.prototype.storageAt = function (blockNumber, txIndex, address, cb) { cb(null, {}) }
@@ -117,10 +77,23 @@ web3VmProvider.prototype.getBlockNumber = function (cb) { cb(null, 'vm provider'
 
 web3VmProvider.prototype.getTransaction = function (txHash, cb) {
   if (this.txs[txHash]) {
-    if (cb) {
-      cb(null, this.txs[txHash])
+    var dataTx = this.txs[txHash]
+    var tx = {}
+    tx.hash = txHash
+    tx.from = util.hexConvert(dataTx.getSenderAddress())
+    if (dataTx.to && dataTx.to.length) {
+      tx.to = util.hexConvert(dataTx.to)
     }
-    return this.txs[txHash]
+    tx.data = util.hexConvert(dataTx.data)
+    tx.input = util.hexConvert(dataTx.input)
+    tx.gas = util.hexConvert(dataTx.gas)
+    if (dataTx.value) {
+      tx.value = util.hexConvert(dataTx.value)
+    }
+    if (cb) {
+      cb(null, tx)
+    }
+    return tx
   } else {
     if (cb) {
       cb('unable to retrieve tx ' + txHash, null)
