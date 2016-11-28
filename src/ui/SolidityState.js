@@ -13,16 +13,20 @@ function SolidityState (_parent, _traceManager, _codeManager) {
 }
 
 SolidityState.prototype.render = function () {
-  return yo`<div id='soliditypanel' >${this.basicPanel.render()}</div>`
+  return yo`<div id='soliditystate' >${this.basicPanel.render()}</div>`
 }
 
 SolidityState.prototype.init = function () {
   var self = this
   this.parent.event.register('indexChanged', this, function (index) {
-    if (index < 0) return
+    if (index < 0) {
+      self.basicPanel.update({info: 'invalid step index'})
+      return
+    }
     if (self.parent.currentStepIndex !== index) return
     if (!this.parent.contractsDetail || !this.parent.sources) {
-      return self.basicPanel.update({info: 'no source has been specified'})
+      self.basicPanel.update({info: 'no source has been specified'})
+      return
     }
 
     self.traceManager.getStorageAt(index, null, function (error, storage) {
@@ -38,7 +42,7 @@ SolidityState.prototype.init = function () {
                 self.basicPanel.update({ info: error })
               } else {
                 var contractName = contractNameFromCode(self.parent.contractsDetail, code.bytecode, address)
-                if (!contractName) {
+                if (contractName === null) {
                   self.basicPanel.update({ info: 'could not find compiled contract with address ' + address })
                 } else {
                   var state = stateDecoder.solidityState(storage, self.parent.sources, contractName)
