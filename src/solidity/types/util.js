@@ -36,6 +36,9 @@ function readFromStorage (slot, storageContent) {
   }
   if (ret.length < 64) {
     ret = (new Array(64 - ret.length + 1).join('0')) + ret
+  }
+  return ret
+}
 
 /**
  * @returns a hex encoded byte slice of length @arg byteLength from inside @arg slotValue.
@@ -65,9 +68,6 @@ function sha3 (slot) {
   var remoteSlot = ethutil.bufferToHex(ethutil.setLengthLeft(slot, 32))
   var key = ethutil.sha3(remoteSlot)
   return ethutil.bufferToHex(key)
-}
-
-  }
 }
 
 function toBN (value) {
