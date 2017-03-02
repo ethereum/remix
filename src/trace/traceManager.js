@@ -74,32 +74,6 @@ TraceManager.prototype.getLength = function (callback) {
   }
 }
 
-TraceManager.prototype.getStorageAt = function (stepIndex, tx, callback, address) {
-  var check = this.checkRequestedStep(stepIndex)
-  if (check) {
-    return callback(check, null)
-  }
-  if (!address) {
-    var stoChange = util.findLowerBoundValue(stepIndex, this.traceCache.storageChanges)
-    if (stoChange === null) return callback('no storage found', null)
-    address = this.traceCache.sstore[stoChange].address
-  }
-  var self = this
-  if (this.traceRetriever.debugStorageAtAvailable()) {
-    this.traceRetriever.getStorage(tx, address, function (error, result) {
-      if (error) {
-        console.log(error)
-        callback(error, null)
-      } else {
-        var storage = self.traceCache.rebuildStorage(address, result, stepIndex)
-        callback(null, storage)
-      }
-    })
-  } else {
-    callback(null, this.trace[stoChange].storage)
-  }
-}
-
 TraceManager.prototype.getAddresses = function (callback) {
   callback(null, this.traceCache.addresses)
 }

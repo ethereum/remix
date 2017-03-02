@@ -23,6 +23,15 @@ module.exports = {
         params: 6
       }))
     }
+
+    if (!(web3.debug && web3.debug.preimage)) {
+      methods.push(new web3._extend.Method({
+        name: 'preimage',
+        call: 'debug_preimage',
+        inputFormatter: [null],
+        params: 1
+      }))
+    }
     if (methods.length > 0) {
       web3._extend({
         property: 'debug',

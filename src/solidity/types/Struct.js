@@ -8,7 +8,7 @@ class Struct extends RefType {
     this.members = memberDetails.members
   }
 
-  decodeFromStorage (location, storageContent) {
+  decodeFromStorage (location, storageResolver) {
     var ret = {}
     this.members.map(function (item, i) {
       var globalLocation = {

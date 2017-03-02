@@ -5,14 +5,14 @@ var decodeInfo = require('./decodeInfo')
   * decode the contract state storage
   *
   * @param {Array} storage location  - location of all state variables
-  * @param {Map} storageContent  - storage
+  * @param {Object} storageResolver  - resolve storage queries
   * @return {Map} - decoded state variable
   */
-function decodeState (stateVars, storageContent) {
+function decodeState (stateVars, storageResolver) {
   var ret = {}
   for (var k in stateVars) {
     var stateVar = stateVars[k]
-    ret[stateVar.name] = stateVar.type.decodeFromStorage(stateVar.storagelocation, storageContent)
+    ret[stateVar.name] = stateVar.type.decodeFromStorage(stateVar.storagelocation, storageResolver)
   }
   return ret
 }

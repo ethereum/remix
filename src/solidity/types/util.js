@@ -29,9 +29,13 @@ function decodeIntFromHex (value, byteLength, signed) {
   return bigNumber.toString(10)
 }
 
-function readFromStorage (slot, storageContent) {
+function readFromStorage (slot, storageResolver) {
   var ret
   var hexSlot = ethutil.bufferToHex(slot)
+  
+ var slotValue = storageResolver.
+  
+  
   if (storageContent[hexSlot] !== undefined) {
     ret = storageContent[hexSlot].replace(/^0x/, '')
   } else {
@@ -64,11 +68,11 @@ function extractHexByteSlice (slotValue, byteLength, offsetFromLSB) {
  * @returns a hex encoded storage content at the given @arg location. it does not have Ox prefix but always has the full length.
  *
  * @param {Object} location  - object containing the slot and offset of the data to extract.
- * @param {Object} storageContent  - full storage mapping.
+ * @param {Object} storageResolver  - storage resolver
  * @param {Int} byteLength  - Length of the byte slice to extract
  */
-function extractHexValue (location, storageContent, byteLength) {
-  var slotvalue = readFromStorage(location.slot, storageContent)
+function extractHexValue (location, storageResolver, byteLength) {
+  var slotvalue = readFromStorage(location.slot, storageResolver)
   return extractHexByteSlice(slotvalue, byteLength, location.offset)
 }
 

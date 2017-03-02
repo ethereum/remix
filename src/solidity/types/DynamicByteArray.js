@@ -8,7 +8,7 @@ class DynamicByteArray extends RefType {
     super(1, 32, 'bytes', location)
   }
 
-  decodeFromStorage (location, storageContent) {
+  decodeFromStorage (location, storageResolver) {
     var value = util.extractHexValue(location, storageContent, this.storageBytes)
     var bn = new BN(value, 16)
     if (bn.testn(0)) {

@@ -23,10 +23,10 @@ class ArrayType extends RefType {
     this.arraySize = arraySize
   }
 
-  decodeFromStorage (location, storageContent) {
+  decodeFromStorage (location, storageResolver) {
     var ret = []
     var size = null
-    var slotValue = util.extractHexValue(location, storageContent, this.storageBytes)
+    var slotValue = util.extractHexValue(location, storageResolver, this.storageBytes)
     var currentLocation = {
       offset: 0,
       slot: location.slot

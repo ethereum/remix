@@ -16,10 +16,10 @@ class RefType {
     * @param {Int} stackDepth - position of the type in the stack
     * @param {Array} stack - stack
     * @param {String} - memory
-    * @param {Object} - storage
+    * @param {Object} - storageResolver
     * @return {Object} decoded value
     */
-  decodeFromStack (stackDepth, stack, memory, storage) {
+  decodeFromStack (stackDepth, stack, memory, storageResolver) {
     if (stack.length - 1 < stackDepth) {
       return {
         error: '<decoding failed - stack underflow ' + stackDepth + '>',
