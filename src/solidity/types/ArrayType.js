@@ -23,10 +23,10 @@ class ArrayType extends RefType {
     this.arraySize = arraySize
   }
 
-  decodeFromStorage (location, storageResolver) {
+  async decodeFromStorage (location, storageResolver) {
     var ret = []
     var size = null
-    var slotValue = util.extractHexValue(location, storageResolver, this.storageBytes)
+    var slotValue = await util.extractHexValue(location, storageResolver, this.storageBytes)
     var currentLocation = {
       offset: 0,
       slot: location.slot
@@ -39,7 +39,8 @@ class ArrayType extends RefType {
     }
     var k = util.toBN(0)
     for (; k.lt(size) && k.ltn(300); k.iaddn(1)) {
-      ret.push(this.underlyingType.decodeFromStorage(currentLocation, storageContent))
+      var item = await this.underlyingType.decodeFromStorage(currentLocation, storageResolver)
+      ret.push(item)
       if (this.underlyingType.storageSlots === 1 && location.offset + this.underlyingType.storageBytes <= 32) {
         currentLocation.offset += this.underlyingType.storageBytes
         if (currentLocation.offset + this.underlyingType.storageBytes > 32) {

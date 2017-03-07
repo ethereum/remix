@@ -5,5 +5,6 @@ module.exports = {
       destination[property] = source[property]
     }
   },
-  web3: null
+  web3: null,
+  tx: null
 }

@@ -19,20 +19,17 @@ class RefType {
     * @param {Object} - storageResolver
     * @return {Object} decoded value
     */
-  decodeFromStack (stackDepth, stack, memory, storageResolver) {
+  async decodeFromStack (stackDepth, stack, memory, storageResolver) {
     if (stack.length - 1 < stackDepth) {
       return {
         error: '<decoding failed - stack underflow ' + stackDepth + '>',
         type: this.typeName
       }
     }
-    if (!storage) {
-      storage = {} // TODO this is a fallback, should manage properly locals store in storage
-    }
     var offset = stack[stack.length - 1 - stackDepth]
     if (this.isInStorage()) {
       offset = util.toBN(offset)
-      return this.decodeFromStorage({ offset: 0, slot: offset }, storage)
+      return await this.decodeFromStorage({ offset: 0, slot: offset }, storageResolver)
     } else if (this.isInMemory()) {
       offset = parseInt(offset, 16)
       return this.decodeFromMemoryInternal(offset, memory)

@@ -16,8 +16,8 @@ class ValueType {
     * @param {Object} storageResolver  - resolve storage queries
     * @return {Object} - decoded value
     */
-  decodeFromStorage (location, storageResolver) {
-    var value = util.extractHexValue(location, storageResolver, this.storageBytes)
+  async decodeFromStorage (location, storageResolver) {
+    var value = await util.extractHexValue(location, storageResolver, this.storageBytes)
     return {
       value: this.decodeValue(value),
       type: this.typeName
@@ -32,7 +32,7 @@ class ValueType {
     * @param {String} - memory
     * @return {Object} - decoded value
     */
-  decodeFromStack (stackDepth, stack, memory) {
+  async decodeFromStack (stackDepth, stack, memory) {
     var value
     if (stackDepth >= stack.length) {
       value = this.decodeValue('')

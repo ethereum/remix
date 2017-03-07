@@ -47,7 +47,7 @@ FullStoragesChanges.prototype.init = function () {
       var storageJSON = {}
       for (var k in self.addresses) {
         var address = self.addresses[k]
-        self.storageResolver.storageRangeAt(this.parent.tx, address, function (error, result) {
+        self.storageResolver.storageRange(function (error, result) {
           if (!error) {
             result = self.traceManager.traceCache.rebuildStorage(address, result, index)
             storageJSON[address] = result

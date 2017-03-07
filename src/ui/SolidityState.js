@@ -43,7 +43,7 @@ SolidityState.prototype.init = function () {
       return
     }
 
-    self.traceManager.getCurrentCalledAddressAt((error, result) => {
+    self.traceManager.getCurrentCalledAddressAt(self.parent.currentStepIndex, (error, result) => {
       if (error) {
         self.basicPanel.update({})
         console.log(error)
@@ -53,8 +53,11 @@ SolidityState.prototype.init = function () {
             self.basicPanel.update({})
             console.log(error)
           } else {
-            var decodedState = stateDecoder.decodeState(stateVars, this.storageResolver)
-            self.basicPanel.update(decodedState)
+            stateDecoder.decodeState(stateVars, self.storageResolver).then((result) => {
+              if (!result.error) {
+                self.basicPanel.update(result.decodedState)
+              }
+            })
           }
         })
       }

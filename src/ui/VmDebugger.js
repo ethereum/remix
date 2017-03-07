@@ -14,16 +14,16 @@ var StorageResolver = require('../storage/storageResolver.js')
 var yo = require('yo-yo')
 
 function VmDebugger (_parent, _traceManager, _codeManager, _solidityProxy, _callTree) {
-  var storageResolver = new StorageResolver()
+  var storageResolver = new StorageResolver(_parent)
   this.asmCode = new CodeListView(_parent, _codeManager)
   this.stackPanel = new StackPanel(_parent, _traceManager)
-  this.storagePanel = new StoragePanel(_parent, _traceManager)
+  this.storagePanel = new StoragePanel(_parent, _traceManager, storageResolver)
   this.memoryPanel = new MemoryPanel(_parent, _traceManager)
   this.calldataPanel = new CalldataPanel(_parent, _traceManager)
   this.callstackPanel = new CallstackPanel(_parent, _traceManager)
   this.stepDetail = new StepDetail(_parent, _traceManager)
   this.solidityState = new SolidityState(_parent, _traceManager, _codeManager, _solidityProxy, storageResolver)
-  this.solidityLocals = new SolidityLocals(_parent, _traceManager, _callTree)
+  this.solidityLocals = new SolidityLocals(_parent, _traceManager, _callTree, storageResolver)
 
   /* Return values - */
   this.returnValuesPanel = new DropdownPanel('Return Value', {json: true})
