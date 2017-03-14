@@ -22,17 +22,23 @@ function decodeIntFromHex (value, byteLength, signed) {
 }
 
 function readFromStorage (slot, storageResolver) {
-  var ret
   var hexSlot = ethutil.bufferToHex(slot)
   return new Promise((resolve, reject) => {
-    storageResolver.storageSlotValue(hexSlot, (error, result) => {
+    storageResolver.storageSlot(hexSlot, (error, slot) => {
       if (error) {
         return reject(error)
       } else {
-        if (result.slotValue.length < 64) {
-          result.slotValue = (new Array(64 - result.length + 1).join('0')) + ret
+        if (!slot) {
+          slot = {
+            key: slot,
+            value: ''
+          }
         }
-        return resolve(result)
+        slot.value = slot.value.replace('0x', '')
+        if (slot.value.length < 64) {
+          slot.value = (new Array(64 - slot.value.length + 1).join('0')) + slot.value
+        }
+        return resolve(slot.value)
       }
     })
   })
