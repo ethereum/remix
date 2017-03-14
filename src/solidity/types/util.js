@@ -7,7 +7,6 @@ module.exports = {
   decodeIntFromHex: decodeIntFromHex,
   extractHexValue: extractHexValue,
   extractHexByteSlice: extractHexByteSlice,
-  sha3: sha3,
   toBN: toBN,
   add: add,
   extractLocation: extractLocation,
@@ -61,12 +60,6 @@ function extractHexByteSlice (slotValue, byteLength, offsetFromLSB) {
 async function extractHexValue (location, storageResolver, byteLength) {
   var slotvalue = await readFromStorage(location.slot, storageResolver)
   return extractHexByteSlice(slotvalue, byteLength, location.offset)
-}
-
-function sha3 (slot) {
-  var remoteSlot = ethutil.bufferToHex(ethutil.setLengthLeft(slot, 32))
-  var key = ethutil.sha3(remoteSlot)
-  return ethutil.bufferToHex(key)
 }
 
 function toBN (value) {
