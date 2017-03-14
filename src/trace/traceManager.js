@@ -123,6 +123,12 @@ TraceManager.prototype.getStackAt = function (stepIndex, callback) {
   }
 }
 
+TraceManager.prototype.resolveStorage = function (index, address, storageOrigin, callback) {
+  var storage = this.traceCache.resolveStorage(index, address, storageOrigin)
+  callback(null, storage)
+}
+
+
 TraceManager.prototype.getLastCallChangeSince = function (stepIndex, callback) {
   var check = this.checkRequestedStep(stepIndex)
   if (check) {
