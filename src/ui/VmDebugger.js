@@ -14,7 +14,7 @@ var StorageResolver = require('../storage/storageResolver.js')
 var yo = require('yo-yo')
 
 function VmDebugger (_parent, _traceManager, _codeManager, _solidityProxy, _callTree) {
-  var storageResolver = new StorageResolver(_parent)
+  var storageResolver = new StorageResolver(_parent, _traceManager)
   this.asmCode = new CodeListView(_parent, _codeManager)
   this.stackPanel = new StackPanel(_parent, _traceManager)
   this.storagePanel = new StoragePanel(_parent, _traceManager, storageResolver)

@@ -49,12 +49,13 @@ FullStoragesChanges.prototype.init = function () {
         var address = self.addresses[k]
         self.storageResolver.storageRange(function (error, result) {
           if (!error) {
-            result = self.traceManager.traceCache.rebuildStorage(address, result, index)
             storageJSON[address] = result
             self.basicPanel.update(storageJSON)
           }
-        }, self.addresses[k])
+        })
       }
+    } else {
+      self.basicPanel.update({})
     }
   })
 }
