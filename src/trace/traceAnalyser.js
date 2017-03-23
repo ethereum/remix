@@ -20,6 +20,8 @@ TraceAnalyser.prototype.analyse = function (trace, tx, callback) {
     this.traceCache.pushContractCreation(tx.to, tx.input)
   }
   this.buildCalldata(0, this.trace[0], tx, true)
+  console.log('trace length ' + this.trace.length)
+  var start = new Date().getTime()
   for (var k = 0; k < this.trace.length; k++) {
     var step = this.trace[k]
     this.buildMemory(k, step)
@@ -27,6 +29,8 @@ TraceAnalyser.prototype.analyse = function (trace, tx, callback) {
     context = this.buildStorage(k, step, context)
     this.buildReturnValues(k, step)
   }
+  var end = (new Date().getTime() - start) / 1000
+  console.log('TraceAnalyser.prototype.analyse ' + end)
   callback(null, true)
 }
 

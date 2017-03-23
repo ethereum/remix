@@ -32,11 +32,14 @@ class InternalCallTree {
       if (!this.solidityProxy.loaded()) {
         this.event.trigger('callTreeBuildFailed', ['compilation result not loaded. Cannot build internal call tree'])
       } else {
+        var start = new Date().getTime()
         buildTree(this, 0, '').then((result) => {
           if (result.error) {
             this.event.trigger('callTreeBuildFailed', [result.error])
           } else {
             console.log('ready')
+            var end = (new Date().getTime() - start) / 1000
+            console.log('InternalCallTree ' + end)
             createReducedTrace(this, traceManager.trace.length - 1)
             this.event.trigger('callTreeReady', [this.scopes, this.scopeStarts])
           }

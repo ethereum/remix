@@ -11,7 +11,11 @@ TraceRetriever.prototype.getTrace = function (txHash, callback) {
     disableStack: false,
     fullStorage: false
   }
+  var start = new Date().getTime()
   util.web3.debug.traceTransaction(txHash, options, function (error, result) {
+    var end = (new Date().getTime() - start) / 1000
+    console.log('TraceRetriever.prototype.getTrace ' + end)
+    console.log(error)
     callback(error, result)
   })
 }
