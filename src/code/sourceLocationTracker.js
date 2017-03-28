@@ -10,6 +10,7 @@ function SourceLocationTracker (_codeManager) {
   this.codeManager = _codeManager
   this.event = new EventManager()
   this.sourceMappingDecoder = new SourceMappingDecoder()
+  this.sourceLocationByAddress = {}
 }
 
 /**
@@ -21,12 +22,15 @@ function SourceLocationTracker (_codeManager) {
  * @param {Function} cb - callback function
  */
 SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function (address, index, contracts, cb) {
-  var self = this
+  var cache = fromCache(address, 'instruction' + index)
+  if (cache) {
+    return cb(null, cache)
+  }
   extractSourceMap(this.codeManager, address, contracts, function (error, sourceMap) {
     if (error) {
       cb(error)
     } else {
-      cb(null, self.sourceMappingDecoder.atIndex(index, sourceMap))
+      cb(null, toCache(address, index, 'instruction' + sourceMap))
     }
   })
 }
@@ -40,6 +44,10 @@ SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function
  * @param {Function} cb - callback function
  */
 SourceLocationTracker.prototype.getSourceLocationFromVMTraceIndex = function (address, vmtraceStepIndex, contracts, cb) {
+  var cache = fromCache(address, 'vmtrace' + vmtraceStepIndex)
+  if (cache) {
+    return cb(null, cache)
+  }
   var self = this
   extractSourceMap(this.codeManager, address, contracts, function (error, sourceMap) {
     if (!error) {
@@ -47,7 +55,7 @@ SourceLocationTracker.prototype.getSourceLocationFromVMTraceIndex = function (ad
         if (error) {
           cb(error)
         } else {
-          cb(null, self.sourceMappingDecoder.atIndex(index, sourceMap))
+          cb(null, toCache(address, 'vmtrace' + index, sourceMap))
         }
       })
     } else {
@@ -87,6 +95,21 @@ function extractSourceMap (codeManager, address, contracts, cb) {
       cb(error)
     }
   })
+}
+
+function toCache (address, instIndex, sourceMap) {
+  if (!this.sourceLocationByAddress[address]) {
+    this.sourceLocationByAddress[address] = {}
+  }
+  this.sourceLocationByAddress[address][instIndex] = this.sourceMappingDecoder.atIndex(instIndex, sourceMap)
+  return this.sourceLocationByAddress[address][instIndex]
+}
+
+function fromCache (address, instIndex) {
+  if (this.sourceLocationByAddress[address] && this.sourceLocationByAddress[address][instIndex]) {
+    return this.sourceLocationByAddress[address][instIndex]
+  }
+  return null
 }
 
 module.exports = SourceLocationTracker
