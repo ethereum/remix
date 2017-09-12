@@ -5,7 +5,7 @@ Ethereum IDE and tools for the web
 
 ## REMIX WEBSITE:
 
-Remix is avalaible at http://ethereum.github.io/remix.
+Remix is available at https://remix.ethereum.org/.
 You can use it either inside Mist or by connecting to geth or eth.
 Note that connecting to Geth does not work through https.
 
