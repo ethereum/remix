@@ -4,6 +4,7 @@ var ui = require('../helpers/ui')
 var styleDropdown = require('./styles/dropdownPanel')
 var TreeView = require('./TreeView')
 var EventManager = require('../lib/eventManager')
+const copy = require('clipboard-copy')
 
 var csjs = require('csjs-inject')
 var styleGuide = require('./styles/style-guide')
@@ -23,14 +24,21 @@ var css = csjs`
     color: ${styles.rightPanel.debuggerTab.button_Debugger_icon_Color};
     margin-right: 5%;
   }
-  .eyeButton {
-    ${styles.rightPanel.debuggerTab.button_Debugger}
-    color: ${styles.rightPanel.debuggerTab.button_Debugger_icon_Color};
-    margin: 3px;
-    float: right;
+  .dropdownContainer {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
   }
-  .eyeButton:hover {
+  .copyToClipboard {
+    margin-left: 5px;
+    color: ${styles.rightPanel.debuggerTab.button_Debugger_icon_Color};
+  }
+  .copyToClipboard:hover {
     color: ${styles.rightPanel.debuggerTab.button_Debugger_icon_HoverColor};
+    cursor: pointer;
+  }
+  .dropdownContent {
+    background-color: red;
   }
 `
 
@@ -52,7 +60,6 @@ DropdownPanel.prototype.setMessage = function (message) {
   if (this.view) {
     this.view.querySelector('.dropdownpanel .dropdownrawcontent').style.display = 'none'
     this.view.querySelector('.dropdownpanel .dropdowncontent').style.display = 'none'
-    this.view.querySelector('.dropdownpanel .fa-refresh').style.display = 'none'
     this.message(message)
   }
 }
@@ -61,17 +68,14 @@ DropdownPanel.prototype.setLoading = function () {
   if (this.view) {
     this.view.querySelector('.dropdownpanel .dropdownrawcontent').style.display = 'none'
     this.view.querySelector('.dropdownpanel .dropdowncontent').style.display = 'none'
-    this.view.querySelector('.dropdownpanel .fa-refresh').style.display = 'inline-block'
     this.message('')
   }
 }
 
 DropdownPanel.prototype.update = function (_data, _header) {
   if (this.view) {
-    this.view.querySelector('.dropdownpanel .fa-refresh').style.display = 'none'
     this.view.querySelector('.dropdownpanel .dropdowncontent').style.display = 'block'
     this.view.querySelector('.dropdownpanel .dropdownrawcontent').innerText = JSON.stringify(_data, null, '\t')
-    this.view.querySelector('.dropdownpanel button.btn').style.display = 'block'
     this.view.querySelector('.title span').innerText = _header || ' '
     this.message('')
     if (this.json) {
@@ -96,29 +100,29 @@ DropdownPanel.prototype.render = function (overridestyle) {
   var self = this
   var view = yo`
     <div>
-    <style>
-      @-moz-keyframes spin {
-        to { -moz-transform: rotate(359deg); }
-      }
-      @-webkit-keyframes spin {
-        to { -webkit-transform: rotate(359deg); }
-      }
-      @keyframes spin {
-        to {transform:rotate(359deg);}
-      }
-    </style>
-    <div class='${css.title} title' onclick=${function () { self.toggle() }}>
-      <div class='${css.icon} fa fa-caret-right'></div>
-      <div class=${css.name}>${this.name}</div><span></span>
-    </div>
-    <div class='dropdownpanel' style=${ui.formatCss(styleDropdown.content)} style='display:none'>
-      <button onclick=${function () { self.toggleRaw() }} title='raw' class="${css.eyeButton} btn fa fa-eye" type="button">
-      </button>
-      <i class="fa fa-refresh" style=${ui.formatCss(styleDropdown.inner, overridestyle, {display: 'none', 'margin-left': '4px', 'margin-top': '4px', 'animation': 'spin 2s linear infinite'})} aria-hidden="true"></i>
-      <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='dropdowncontent'>${content}</div>
-      <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='dropdownrawcontent' style='display:none'></div>
-      <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='message' style='display:none'></div>
-    </div>
+      <style>
+        @-moz-keyframes spin {
+          to { -moz-transform: rotate(359deg); }
+        }
+        @-webkit-keyframes spin {
+          to { -webkit-transform: rotate(359deg); }
+        }
+        @keyframes spin {
+          to {transform:rotate(359deg);}
+        }
+      </style>
+      <div class=${css.dropdownContainer}>
+        <div class='${css.title} title' onclick=${function () { self.toggle() }}>
+          <div class='${css.icon} fa fa-caret-right'></div>
+          <div class=${css.name}>${this.name}</div><span></span>
+        </div>
+        <div onclick=${function () { self.toggleRaw() }} title='Copy raw' class="${css.copyToClipboard} fa fa-clipboard"></div>
+      </div>
+        <div class='dropdownpanel' style=${ui.formatCss(styleDropdown.content)} style='display:none'>
+          <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='dropdowncontent'>${content}</div>
+          <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='dropdownrawcontent' style='display:none'></div>
+          <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='message' style='display:none'></div>
+        </div>
     </div>`
   if (!this.view) {
     this.view = view
@@ -127,10 +131,8 @@ DropdownPanel.prototype.render = function (overridestyle) {
 }
 
 DropdownPanel.prototype.toggleRaw = function () {
-  var raw = this.view.querySelector('.dropdownpanel .dropdownrawcontent')
-  var formatted = this.view.querySelector('.dropdownpanel .dropdowncontent')
-  raw.style.display = raw.style.display === 'none' ? 'block' : 'none'
-  formatted.style.display = formatted.style.display === 'none' ? 'block' : 'none'
+  var raw = this.view.querySelector('.dropdownpanel .dropdownrawcontent').innerText
+  copy(raw)
 }
 
 DropdownPanel.prototype.toggle = function () {
