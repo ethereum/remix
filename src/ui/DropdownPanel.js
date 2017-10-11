@@ -38,7 +38,7 @@ var css = csjs`
     cursor: pointer;
   }
   .dropdownContent {
-    background-color: red;
+    margin: 0 10%;
   }
 `
 
@@ -92,9 +92,9 @@ DropdownPanel.prototype.setContent = function (node) {
 }
 
 DropdownPanel.prototype.render = function (overridestyle) {
-  var content = yo`<div>Empty</div>`
+  var content = yo`<div> Empty </div>`
   if (this.json) {
-    content = this.treeView.render({})
+    content = this.treeView.render({}) || 'No content available'
   }
   overridestyle === undefined ? {} : overridestyle
   var self = this
@@ -116,13 +116,15 @@ DropdownPanel.prototype.render = function (overridestyle) {
           <div class='${css.icon} fa fa-caret-right'></div>
           <div class=${css.name}>${this.name}</div><span></span>
         </div>
-        <div onclick=${function () { self.toggleRaw() }} title='Copy raw' class="${css.copyToClipboard} fa fa-clipboard"></div>
+        <div onclick=${function () { self.copyRaw() }} title='Copy raw' class="${css.copyToClipboard} fa fa-clipboard"></div>
       </div>
+      <div class=${css.dropdownContent}>
         <div class='dropdownpanel' style=${ui.formatCss(styleDropdown.content)} style='display:none'>
           <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='dropdowncontent'>${content}</div>
           <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='dropdownrawcontent' style='display:none'></div>
           <div style=${ui.formatCss(styleDropdown.inner, overridestyle)} class='message' style='display:none'></div>
         </div>
+      </div>
     </div>`
   if (!this.view) {
     this.view = view
@@ -130,7 +132,7 @@ DropdownPanel.prototype.render = function (overridestyle) {
   return view
 }
 
-DropdownPanel.prototype.toggleRaw = function () {
+DropdownPanel.prototype.copyRaw = function () {
   var raw = this.view.querySelector('.dropdownpanel .dropdownrawcontent').innerText
   copy(raw)
 }
