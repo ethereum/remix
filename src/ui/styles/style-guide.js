@@ -261,7 +261,7 @@ function styleGuide () {
       button: (opts = {}) => `
       margin                  : 1px;
       background-color        : ${opts.BackgroundColor};
-      border                  : .3px solid ${opts.BorderColor};
+      border                  : 1px solid ${opts.BorderColor};
       color                   : ${opts.Color};
       display                 : flex;
       align-items             : center;
@@ -381,18 +381,7 @@ function styleGuide () {
         Color: appProperties.dropdown_TextColor
       }),
 
-      button_Log_Debug: appProperties.uiElements.button({
-        BackgroundColor: appProperties.infoButton_BackgroundColor,
-        BorderColor: appProperties.infoButton_BorderColor,
-        Color: appProperties.infoButton_TextColor
-      }),
-
-      button_Log_Details: appProperties.uiElements.button({
-        BackgroundColor: appProperties.secondaryButton_BackgroundColor,
-        BorderColor: appProperties.secondaryButton_BorderColor,
-        Color: appProperties.secondaryButton_TextColor
-      })
-
+      link_Debug: appProperties.infoText_Color,
     },
 
     /* ------------------------------------------------------
@@ -488,6 +477,12 @@ function styleGuide () {
           BackgroundColor: appProperties.solidBorderBox_BackgroundColor,
           BorderColor: appProperties.solidBorderBox_BorderColor,
           Color: appProperties.solidBorderBox_TextColor
+        }),
+
+        button_Action: appProperties.uiElements.button({
+          BackgroundColor: appProperties.infoButton_BackgroundColor,
+          BorderColor: appProperties.infoButton_BorderColor,
+          Color: appProperties.infoButton_TextColor
         }),
 
         button_atAddress: appProperties.uiElements.button({
