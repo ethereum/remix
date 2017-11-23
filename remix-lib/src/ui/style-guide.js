@@ -484,6 +484,12 @@ function styleGuide () {
           Color: appProperties.input_TextColor
         }),
 
+        button_transaction: appProperties.uiElements.button({
+          BackgroundColor: appProperties.primaryButton_BackgroundColor,
+          BorderColor: appProperties.primaryButton_BorderColor,
+          Color: appProperties.primaryButton_TextColor
+        }),
+
         box_Instance: appProperties.uiElements.solidBorderBox({
           BackgroundColor: appProperties.solidBorderBox_BackgroundColor,
           BorderColor: appProperties.solidBorderBox_BorderColor,
