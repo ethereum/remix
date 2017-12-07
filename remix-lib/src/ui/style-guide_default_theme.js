@@ -3,8 +3,6 @@
 module.exports = styleGuide
 
 function styleGuide () {
-
-
   /* --------------------------------------------------------------------------
 
                               CSS PROPERTIES
@@ -17,49 +15,34 @@ function styleGuide () {
     colors: {
       // BASIC COLORS (B&W and transparent)
       transparent: 'transparent',
-      white: 'hsla(198, 100%, 97%, 1)',
-      black: 'hsla(240, 100%, 6%, 1)',
-      opacityBlack: 'hsla(240, 100%, 6%, .7)',
+      white: 'hsl(0, 0%, 100%)',
+      black: 'hsl(0, 0%, 0%)',
+      opacityBlack: 'hsla(0, 0%, 0%, .4)',
 
       // BLUE
-      blue: 'hsla(233, 91%, 36%, 1)',
-      lightBlue: 'hsla(202, 91%, 75%, 1)',
+      blue: 'hsla(229, 75%, 87%, 1)',
+      lightBlue: 'hsla(229, 75%, 87%, .5)',
+      backgroundBlue: 'hsla(229, 100%, 97%, 1)',
       blueLightTrans: 'hsla(202, 91%, 75%, .4)',
-      backgroundBlue: 'hsla(240, 100%, 21%, 1)',
       brightBlue: 'hsla(233, 91%, 58%, 1)',
-      blueGreyEve: 'hsla(213, 64%, 65%, 1)',
-      bluePruneEve: 'hsla(232, 30%, 20%, 1)',
-      blueBerrySmog: 'hsla(286, 15%, 22%, 1)',
-      blueBlur: 'hsla(232, 30%, 20%, 0.7)',
-      blueMascara: 'hsla(187, 100%, 51%, 1)',
-      blueMorningGlory: 'hsla(213, 74%, 80%, 1)',
-      blueFairyDust: 'hsla(181, 83%, 86%, 1)',
-      blueMonday: 'hsla(213, 100%, 16%, 1)',
-
-      greenZing: 'hsla(148, 79%, 47%, 1)',
-      
       // GREY
       grey: 'hsla(0, 0%, 40%, 1)',
-      blueGrey: 'hsla(206, 24%, 58%, .8)',
-      greyBlueNight: 'hsla(215, 55%, 18%, 1)',
-      greyBlueLight: 'hsla(213, 15%, 58%, 1)',
-      greyBlueMed: 'hsla(215, 55%, 28%, 1)',
       lightGrey: 'hsla(0, 0%, 40%, .5)',
       veryLightGrey: 'hsla(0, 0%, 40%, .2)',
-      desatGrey: 'hsla(173, 17%, 79%, 1)',
       // RED
       strongRed: 'hsla(0, 100%, 71%, 1)',
       red: 'hsla(0, 82%, 82%, 1)',
-      lightRed: 'hsla(0, 82%, 82%, .8)',
+      lightRed: 'hsla(0, 82%, 82%, .5)',
       // GREEN
       green: 'hsla(141, 75%, 84%, 1)',
       lightGreen: 'hsla(141, 75%, 84%, .5)',
+      greenZing: 'hsla(148, 79%, 47%, 1)',
       // PINK
       pink: 'hsla(300, 69%, 76%, 1)',
-      lightPink: 'hsla(286, 71%, 88%, 1)',
-      // YELLOW
-      orange: 'hsla(39, 87%, 50%, 1)',
-      lightOrange: 'hsla(39, 87%, 50%, .5)',
+      lightPink: 'hsla(300, 69%, 76%, .5)',
+      // ORANGE
+      orange: 'hsla(44, 100%, 50%, 1)',
+      lightOrange: 'hsla(44, 100%, 50%, .5)',
       // VIOLET
       violet: 'hsla(240, 64%, 68%, 1)',
       lightViolet: 'hsla(240, 64%, 68%, .5)'
@@ -89,17 +72,21 @@ function styleGuide () {
 
   var appProperties = {
 
-    aceTheme: 'tomorrow_night_blue',
+    /* ------------------------------------------------------
+                          ACE THEME
+    ------------------------------------------------------ */   
+
+    aceTheme: '',
 
     /* ------------------------------------------------------
                           BACKGROUND COLORS
     ------------------------------------------------------ */
-    primary_BackgroundColor: cssProperties.colors.black,
+    primary_BackgroundColor: cssProperties.colors.white,
     secondary_BackgroundColor: cssProperties.colors.backgroundBlue,
-    tertiary_BackgroundColor: cssProperties.colors.greyBlueNight,
-    quaternary_BackgroundColor: cssProperties.colors.blueGreyEve,
-    fifth_BackgroundColor: cssProperties.colors.bluePruneEve,
-    seventh_BackgroundColor: cssProperties.colors.blueMonday,
+    tertiary_BackgroundColor: cssProperties.colors.backgroundBlue,
+    quaternary_BackgroundColor: cssProperties.colors.backgroundBlue,
+    fifth_BackgroundColor: cssProperties.colors.backgroundBlue,
+    seventh_BackgroundColor: cssProperties.colors.veryLightGrey,  
     dark_BackgroundColor: cssProperties.colors.black,
     light_BackgroundColor: cssProperties.colors.white,
     debuggingMode_BackgroundColor: cssProperties.colors.lightViolet,
@@ -112,21 +99,24 @@ function styleGuide () {
     /* ------------------------------------------------------
                             TEXT COLORS
     ******************************************************** */
-    mainText_Color: cssProperties.colors.white,
-    supportText_Color: cssProperties.colors.lightBlue,
-    sub_supportText_Color: cssProperties.colors.greyBlueLight,
+    mainText_Color: cssProperties.colors.black,
+    supportText_Color: cssProperties.colors.grey,
+
+    sub_supportText_Color: cssProperties.colors.black,
+    
     specialText_Color: cssProperties.colors.greenZing,
-    brightText_Color: cssProperties.colors.blueMascara,
+    brightText_Color: cssProperties.colors.brightBlue,
     oppositeText_Color: cssProperties.colors.black,
     additionalText_Color: cssProperties.colors.desatGrey,
+
     errorText_Color: cssProperties.colors.strongRed,
     warningText_Color: cssProperties.colors.orange,
     infoText_Color: cssProperties.colors.violet,
     /* ------------------------------------------------------
                               ICONS
     ******************************************************** */
-    icon_Color: cssProperties.colors.white,
-    icon_AltColor: cssProperties.colors.black,
+    icon_Color: cssProperties.colors.black,
+    icon_AltColor: cssProperties.colors.white,
     icon_HoverColor: cssProperties.colors.orange,
 
     /* ------------------------------------------------------
@@ -144,8 +134,8 @@ function styleGuide () {
 
     // Warning
     warning_TextColor: cssProperties.colors.black,
-    warning_BackgroundColor: cssProperties.colors.orange,
-    // warning_BorderColor: cssProperties.colors.orange,
+    warning_BackgroundColor: cssProperties.colors.lightOrange,
+    warning_BorderColor: cssProperties.colors.orange,
 
     // Tooltip
     tooltip_Color: cssProperties.colors.white,
@@ -157,7 +147,7 @@ function styleGuide () {
     ******************************************************** */
     dropdown_TextColor: cssProperties.colors.black,
     dropdown_BackgroundColor: cssProperties.colors.white,
-    dropdown_SecondaryBackgroundColor: cssProperties.colors.blueMorningGlory,
+    dropdown_SecondaryBackgroundColor: cssProperties.colors.white,
     dropdown_BorderColor: cssProperties.colors.veryLightGrey,
 
     /* ------------------------------------------------------
@@ -170,15 +160,15 @@ function styleGuide () {
     /* ------------------------------------------------------
                       SOLID BORDER BOX
     ******************************************************** */
-    solidBorderBox_TextColor: cssProperties.colors.white,
-    solidBorderBox_BackgroundColor: cssProperties.colors.black,
-    solidBorderBox_BorderColor: cssProperties.colors.lightBlue,
+    solidBorderBox_TextColor: cssProperties.colors.black,
+    solidBorderBox_BackgroundColor: cssProperties.colors.white,
+    solidBorderBox_BorderColor: cssProperties.colors.veryLightGrey,
 
     /* ------------------------------------------------------
                       SOLID BOX
     ******************************************************** */
-    solidBox_TextColor: cssProperties.colors.white,
-    solidBox_BackgroundColor: cssProperties.colors.black,
+    solidBox_TextColor: cssProperties.colors.black,
+    solidBox_BackgroundColor: cssProperties.colors.white,
 
     /* ------------------------------------------------------
                           BUTTONS
@@ -195,7 +185,7 @@ function styleGuide () {
           SECONDARY
     .................. */
     secondaryButton_TextColor: cssProperties.colors.black,
-    secondaryButton_BackgroundColor: cssProperties.colors.lightBlue,
+    secondaryButton_BackgroundColor: cssProperties.colors.veryLightGrey,
     secondaryButton_BorderColor: cssProperties.colors.veryLightGrey,
 
     /* .................
@@ -210,7 +200,7 @@ function styleGuide () {
           Quaternary
     .................. */
     quaternaryButton_TextColor: cssProperties.colors.black,
-    quaternaryButton_BackgroundColor: cssProperties.colors.blueMascara,
+    quaternaryButton_BackgroundColor: cssProperties.colors.white,
     quaternaryButton_BorderColor: cssProperties.colors.veryLightGrey,
     /* .................
 
@@ -269,13 +259,13 @@ function styleGuide () {
 
     // TRANSACTION
     transactButton_TextColor: cssProperties.colors.black,
-    transactButton_BackgroundColor: cssProperties.colors.blueFairyDust,
+    transactButton_BackgroundColor: cssProperties.colors.lightRed,
     transactButton_BorderColor: cssProperties.colors.lightRed,
 
     // CONSTANT
     constantButton_TextColor: cssProperties.colors.black,
-    constantButton_BackgroundColor: cssProperties.colors.greenZing,
-    constantButton_BorderColor: cssProperties.colors.greenZing,
+    constantButton_BackgroundColor: cssProperties.colors.lightBlue,
+    constantButton_BorderColor: cssProperties.colors.lightBlue,
 
     // PAYABLE TRANSACTION
     transactPayableButton_TextColor: cssProperties.colors.black,
@@ -384,8 +374,8 @@ function styleGuide () {
                             REMIX GENERAL
     /* ------------------------------------------------------ */
     remix: {
-      modalDialog_BackgroundColor_Primary: appProperties.fifth_BackgroundColor,
-      modalDialog_text_Primary: appProperties.additionalText_Color,
+      modalDialog_BackgroundColor_Primary: appProperties.primary_BackgroundColor,
+      modalDialog_text_Primary: appProperties.mainText_Color,
       modalDialog_text_Secondary: appProperties.supportText_Color,
       modalDialog_text_Link: appProperties.brightText_Color,
       modalDialog_text_Em: appProperties.specialText_Color,
@@ -452,7 +442,8 @@ function styleGuide () {
       backgroundColor_Menu: appProperties.secondary_BackgroundColor,
       backgroundColor_Terminal: appProperties.seventh_BackgroundColor,
       backgroundColor_TerminalCLI: appProperties.seventh_BackgroundColor,
-      backgroundImage_Terminal: "url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik03MC41ODIsNDI4LjkwNGMwLjgxMSwwLDEuNjIyLDAuMjg1LDIuNDM3LDAuODU0YzAuODEyLDAuNTcsMS4yMTgsMS4zNCwxLjIxOCwyLjMxMw0KCQljMCwyLjI3Ny0xLjA1OSwzLjQ5Ni0zLjE2OCwzLjY1NmMtNS4wMzgsMC44MTMtOS4zODEsMi4zNTUtMTMuMDM2LDQuNjNjLTMuNjU1LDIuMjc2LTYuNjYzLDUuMTE3LTkuMDE3LDguNTI4DQoJCWMtMi4zNTYsMy40MTEtNC4xMDQsNy4yNzEtNS4yMzksMTEuNTc1Yy0xLjEzOSw0LjMwNy0xLjcwNiw4LjgxMy0xLjcwNiwxMy41MjN2MzIuNjUzYzAsMi4yNzItMS4xMzksMy40MTEtMy40MTEsMy40MTENCgkJYy0yLjI3NywwLTMuNDEyLTEuMTM5LTMuNDEyLTMuNDExdi03NC4zMjNjMC0yLjI3MywxLjEzNS0zLjQxMSwzLjQxMi0zLjQxMWMyLjI3MiwwLDMuNDExLDEuMTM4LDMuNDExLDMuNDExdjE1LjEwOA0KCQljMS40NjMtMi40MzgsMy4yMDYtNC43NTIsNS4yMzktNi45NDVjMi4wMjktMi4xOTMsNC4yNjUtNC4xNDMsNi43MDEtNS44NDhjMi40MzctMS43MDYsNS4wNzYtMy4wODUsNy45MTktNC4xNDQNCgkJQzY0Ljc3MSw0MjkuNDMzLDY3LjY1OCw0MjguOTA0LDcwLjU4Miw0MjguOTA0eiIvPg0KCTxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0xMzcuNzczLDQyNy4xOThjNS42ODYsMCwxMC45NjYsMS4xODIsMTUuODM5LDMuNTM0YzQuODc0LDIuMzU2LDkuMDU2LDUuNDgyLDEyLjU1MSw5LjM4MQ0KCQljMy40OTEsMy44OTksNi4yMTQsOC40MDcsOC4xNjQsMTMuNTI0YzEuOTQ4LDUuMTE3LDIuOTI0LDEwLjQzOSwyLjkyNCwxNS45NjFjMCwwLjk3Ni0wLjM2NiwxLjc5LTEuMDk4LDIuNDM4DQoJCWMtMC43MywwLjY1LTEuNTgzLDAuOTc2LTIuNTU5LDAuOTc2aC02Ny45ODdjMC40ODcsNC4yMjYsMS41ODQsOC4yODUsMy4yOSwxMi4xODRjMS43MDYsMy44OTksMy45MzgsNy4zMTIsNi43MDEsMTAuMjM0DQoJCWMyLjc2MSwyLjkyNSw2LjAwOCw1LjI4MSw5Ljc0OCw3LjA2NmMzLjczNSwxLjc4OSw3Ljg3NywyLjY4MiwxMi40MjgsMi42ODJjMTIuMDIxLDAsMjEuMzYtNC43OSwyOC4wMjMtMTQuMzc3DQoJCWMwLjY0Ni0xLjEzNywxLjYyMi0xLjcwNiwyLjkyNC0xLjcwNmMyLjI3MywwLDMuNDEyLDEuMTM5LDMuNDEyLDMuNDEyYzAsMC4xNjMtMC4xNjQsMC43MjktMC40ODcsMS43MDQNCgkJYy0zLjQxMiw2LjAxNC04LjIwNSwxMC40NzktMTQuMzc3LDEzLjQwMmMtNi4xNzYsMi45MjQtMTIuNjcxLDQuMzg3LTE5LjQ5NSw0LjM4N2MtNS42ODgsMC0xMC45MjgtMS4xODEtMTUuNzE4LTMuNTMyDQoJCWMtNC43OTMtMi4zNTQtOC45MzYtNS40ODMtMTIuNDI4LTkuMzgyYy0zLjQ5NS0zLjg5OS02LjIxNC04LjQwNy04LjE2My0xMy41MjRjLTEuOTUtNS4xMTgtMi45MjQtMTAuNDM4LTIuOTI0LTE1Ljk2Mg0KCQljMC01LjUyMSwwLjk3NS0xMC44NDQsMi45MjQtMTUuOTYxczQuNjY4LTkuNjI1LDguMTYzLTEzLjUyNGMzLjQ5Mi0zLjg5Nyw3LjYzNC03LjAyMywxMi40MjgtOS4zODENCgkJQzEyNi44NDYsNDI4LjM4LDEzMi4wODQsNDI3LjE5OCwxMzcuNzczLDQyNy4xOTh6IE0xNjkuOTQsNDY2LjE4OGMtMC4zMjgtNC4yMjMtMS4zNDEtOC4yODUtMy4wNDYtMTIuMTg0DQoJCWMtMS43MDYtMy44OTktMy45ODEtNy4zMTItNi44MjMtMTAuMjM1Yy0yLjg0NC0yLjkyNC02LjE3NS01LjI3Ny05Ljk5LTcuMDY3Yy0zLjgxOS0xLjc4NC03LjkyLTIuNjgtMTIuMzA3LTIuNjgNCgkJYy00LjU1LDAtOC42OTEsMC44OTYtMTIuNDI4LDIuNjhjLTMuNzM5LDEuNzktNi45ODcsNC4xNDUtOS43NDgsNy4wNjdjLTIuNzY0LDIuOTI0LTQuOTk1LDYuMzM2LTYuNzAxLDEwLjIzNQ0KCQljLTEuNzA2LDMuODk3LTIuODAyLDcuOTYxLTMuMjksMTIuMTg0SDE2OS45NHoiLz4NCgk8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMzA0LjY5LDQyNy40NDFjNS4wMzQsMCw5LjUwNCwxLjAxOSwxMy40MDIsMy4wNDdjMy44OTksMi4wMzMsNy4xODgsNC42NzIsOS44Nyw3LjkyDQoJCWMyLjY4LDMuMjUxLDQuNzA5LDcuMDY2LDYuMDkyLDExLjQ1MmMxLjM3OSw0LjM4NywyLjA3LDguODU2LDIuMDcsMTMuNDAydjQzLjYyYzAsMC45NzUtMC4zNjUsMS43ODktMS4wOTgsMi40MzgNCgkJYy0wLjcyOSwwLjY0Ni0xLjUwMywwLjk3Ni0yLjMxMiwwLjk3NmMtMi4yNzYsMC0zLjQxMi0xLjE0MS0zLjQxMi0zLjQxMnYtNDMuNjJjMC0zLjU3MS0wLjUyOS03LjEwNC0xLjU4NC0xMC42MDENCgkJYy0xLjA1OS0zLjQ5LTIuNjAyLTYuNjE3LTQuNjMtOS4zODJjLTIuMDMzLTIuNzYxLTQuNTkyLTQuOTUzLTcuNjc3LTYuNThjLTMuMDg4LTEuNjIxLTYuNjYyLTIuNDM2LTEwLjcyMy0yLjQzNg0KCQljLTUuMiwwLTkuNTg3LDEuMjE4LTEzLjE1OSwzLjY1NGMtMy41NzMsMi40MzgtNi40NTYsNS41NjUtOC42NDksOS4zODJjLTIuMTkzLDMuODE4LTMuODE4LDguMDQyLTQuODc0LDEyLjY3Mg0KCQljLTEuMDU5LDQuNjMtMS41ODQsOS4wNTgtMS41ODQsMTMuMjh2MzMuNjI5YzAsMC45NzUtMC4zNjUsMS43ODktMS4wOTYsMi40MzhjLTAuNzMxLDAuNjQ2LTEuNTA2LDAuOTc2LTIuMzE1LDAuOTc2DQoJCWMtMi4yNzYsMC0zLjQxMS0xLjE0MS0zLjQxMS0zLjQxMnYtNDMuNjJjMC0zLjU3MS0wLjUzLTcuMTA0LTEuNTg1LTEwLjYwMWMtMS4wNTgtMy40OS0yLjYwMS02LjYxNy00LjYyOS05LjM4Mg0KCQljLTIuMDM0LTIuNzYxLTQuNTkyLTQuOTUzLTcuNjc3LTYuNThjLTMuMDg3LTEuNjIxLTYuNjYzLTIuNDM2LTEwLjcyMy0yLjQzNmMtNS4wMzYsMC05LjM0NCwwLjg5NS0xMi45MTUsMi42OA0KCQljLTMuNTc0LDEuNzktNi41NDIsNC4yNjctOC44OTUsNy40MzRjLTIuMzU3LDMuMTY3LTQuMDYzLDYuOTQzLTUuMTE3LDExLjMzMWMtMS4wNTksNC4zODYtMS41ODQsOS4xLTEuNTg0LDE0LjEzNHYzLjg5OHYwLjI0Mw0KCQl2MzIuODk3YzAsMi4yNzEtMS4xMzgsMy40MTItMy40MTIsMy40MTJjLTIuMjc1LDAtMy40MTEtMS4xNDEtMy40MTEtMy40MTJ2LTc0LjU2N2MwLTIuMjcyLDEuMTM2LTMuNDExLDMuNDExLTMuNDExDQoJCWMyLjI3MywwLDMuNDEyLDEuMTM5LDMuNDEyLDMuNDExdjEyLjQyOGMyLjkyNC01LjE5Niw2Ljg2MS05LjM4MiwxMS44MTktMTIuNTVjNC45NTQtMy4xNjcsMTAuNTE3LTQuNzUyLDE2LjY5MS00Ljc1Mg0KCQljNi45ODMsMCwxMi45OTUsMS45OTEsMTguMDMyLDUuOTdjNS4wMzMsMy45ODMsOC42ODgsOS4yMjQsMTAuOTY2LDE1LjcyYzIuNzYxLTYuMzM2LDYuNzM5LTExLjUzMywxMS45NC0xNS41OTcNCgkJQzI5MS4xMjUsNDI5LjQ3NSwyOTcuMzgsNDI3LjQ0MSwzMDQuNjksNDI3LjQ0MXoiLz4NCgk8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMzc4Ljc1Myw0MjkuMzkyYzAuODExLDAsMS41ODQsMC4zNjUsMi4zMTMsMS4wOTdjMC43MzEsMC43MywxLjA5OCwxLjUwNCwxLjA5OCwyLjMxNHY3NC4wOA0KCQljMCwwLjgxMy0wLjM2NSwxLjU4NC0xLjA5OCwyLjMxNGMtMC43MjksMC43My0xLjUwNCwxLjA5OC0yLjMxMywxLjA5OGMtMC45NzYsMC0xLjc5LTAuMzY2LTIuNDM4LTEuMDk4DQoJCWMtMC42NDktMC43My0wLjk3NS0xLjUwMS0wLjk3NS0yLjMxNHYtNzQuMDhjMC0wLjgxMiwwLjMyNC0xLjU4NCwwLjk3NS0yLjMxNEMzNzYuOTYzLDQyOS43NTgsMzc3Ljc3OCw0MjkuMzkyLDM3OC43NTMsNDI5LjM5MnoiDQoJCS8+DQoJPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTQ3My4zNCw0MjguNjZjMi4yNzIsMCwzLjQxMiwxLjE0LDMuNDEyLDMuNDExbC0wLjQ4NywxLjk1bC0yNC4zNjgsMzUuMzM0bDI0LjM2OCwzNS41NzcNCgkJYzAuMzIzLDAuOTc2LDAuNDg3LDEuNjI2LDAuNDg3LDEuOTVjMCwyLjI3MS0xLjE0LDMuNDEyLTMuNDEyLDMuNDEyYy0xLjMwMywwLTIuMTkzLTAuNDg4LTIuNjgxLTEuNDY0bC0yMi45MDUtMzMuMzg0DQoJCWwtMjIuNjYzLDMzLjM4NGMtMC44MTQsMC45NzYtMS43OSwxLjQ2NC0yLjkyNSwxLjQ2NGMtMi4yNzYsMC0zLjQxLTEuMTQxLTMuNDEtMy40MTJjMC0wLjMyNCwwLjE1OC0wLjk3NiwwLjQ4NS0xLjk1DQoJCWwyNC4zNjktMzUuNTc3bC0yNC4zNjktMzUuMzM0bC0wLjQ4NS0xLjk1YzAtMi4yNzEsMS4xMzQtMy40MTEsMy40MS0zLjQxMWMxLjEzNSwwLDIuMTA5LDAuNDg3LDIuOTI1LDEuNDYybDIyLjY2MywzMy4xNDINCgkJbDIyLjkwNS0zMy4xNDJDNDcxLjE0Niw0MjkuMTQ3LDQ3Mi4wMzcsNDI4LjY2LDQ3My4zNCw0MjguNjZ6Ii8+DQo8L2c+DQo8Zz4NCgk8Zz4NCgkJPGcgb3BhY2l0eT0iMC40NSI+DQoJCQk8Zz4NCgkJCQk8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjE1MC43MzQsMTk2LjIxMiAyNTUuOTY5LDM0NC41MDkgMjU1Ljk2OSwyNTguMzg3IAkJCQkiLz4NCgkJCTwvZz4NCgkJPC9nPg0KCQk8ZyBvcGFjaXR5PSIwLjgiPg0KCQkJPGc+DQoJCQkJPHBvbHlnb24gZmlsbD0iI0ZGRkZGRiIgcG9pbnRzPSIyNTUuOTY5LDI1OC4zODcgMjU1Ljk2OSwzNDQuNTA5IDM2MS4yNjcsMTk2LjIxMiAJCQkJIi8+DQoJCQk8L2c+DQoJCTwvZz4NCgkJPGcgb3BhY2l0eT0iMC42Ij4NCgkJCTxnPg0KCQkJCTxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHBvaW50cz0iMjU1Ljk2OSwxMjYuNzgxIDE1MC43MzMsMTc0LjYxMSAyNTUuOTY5LDIzNi44MTggMzYxLjIwNCwxNzQuNjExIAkJCQkiLz4NCgkJCTwvZz4NCgkJPC9nPg0KCQk8ZyBvcGFjaXR5PSIwLjQ1Ij4NCgkJCTxnPg0KCQkJCTxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHBvaW50cz0iMTUwLjczNCwxNzQuNjEyIDI1NS45NjksMjM2LjgxOCAyNTUuOTY5LDEyNi43ODIgMjU1Ljk2OSwwLjAwMSAJCQkJIi8+DQoJCQk8L2c+DQoJCTwvZz4NCgkJPGcgb3BhY2l0eT0iMC44Ij4NCgkJCTxnPg0KCQkJCTxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHBvaW50cz0iMjU1Ljk2OSwwIDI1NS45NjksMTI2Ljc4MSAyNTUuOTY5LDIzNi44MTggMzYxLjIwNCwxNzQuNjExIAkJCQkiLz4NCgkJCTwvZz4NCgkJPC9nPg0KCTwvZz4NCjwvZz4NCjwvc3ZnPg0K')",
+      backgroundImage_Terminal: "url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxwYXRoIGZpbGw9IiM0MTQwNDIiIGQ9Ik03MC41ODIsNDI4LjkwNGMwLjgxMSwwLDEuNjIyLDAuMjg1LDIuNDM3LDAuODUzYzAuODExLDAuNTcxLDEuMjE4LDEuMzQsMS4yMTgsMi4zMTQNCgkJYzAsMi4yNzctMS4wNTksMy40OTYtMy4xNjgsMy42NTZjLTUuMDM4LDAuODE0LTkuMzgxLDIuMzU2LTEzLjAzNyw0LjYzYy0zLjY1NSwyLjI3Ni02LjY2Myw1LjExNy05LjAxNiw4LjUyOA0KCQljLTIuMzU3LDMuNDExLTQuMTA0LDcuMjcyLTUuMjM5LDExLjU3NWMtMS4xMzksNC4zMDctMS43MDYsOC44MTQtMS43MDYsMTMuNTI0djMyLjY1M2MwLDIuMjczLTEuMTM5LDMuNDExLTMuNDEyLDMuNDExDQoJCWMtMi4yNzcsMC0zLjQxMi0xLjEzOC0zLjQxMi0zLjQxMXYtNzQuMzIzYzAtMi4yNzMsMS4xMzUtMy40MTEsMy40MTItMy40MTFjMi4yNzMsMCwzLjQxMiwxLjEzOCwzLjQxMiwzLjQxMXYxNS4xMDgNCgkJYzEuNDYyLTIuNDM3LDMuMjA2LTQuNzUyLDUuMjM5LTYuOTQ1YzIuMDI5LTIuMTkzLDQuMjY0LTQuMTQzLDYuNzAxLTUuODQ4YzIuNDM3LTEuNzA2LDUuMDc2LTMuMDg1LDcuOTE5LTQuMTQzDQoJCUM2NC43NzEsNDI5LjQzMyw2Ny42NTgsNDI4LjkwNCw3MC41ODIsNDI4LjkwNHoiLz4NCgk8cGF0aCBmaWxsPSIjNDE0MDQyIiBkPSJNMTM3Ljc3Myw0MjcuMTk4YzUuNjg1LDAsMTAuOTY2LDEuMTgxLDE1LjgzOSwzLjUzNGM0Ljg3NCwyLjM1Niw5LjA1NSw1LjQ4MiwxMi41NSw5LjM4MQ0KCQljMy40OTIsMy44OTksNi4yMTQsOC40MDcsOC4xNjQsMTMuNTI0YzEuOTQ5LDUuMTE3LDIuOTI0LDEwLjQ0LDIuOTI0LDE1Ljk2MWMwLDAuOTc2LTAuMzY2LDEuNzktMS4wOTcsMi40MzgNCgkJYy0wLjczMSwwLjY1LTEuNTgzLDAuOTc1LTIuNTU5LDAuOTc1aC02Ny45ODdjMC40ODcsNC4yMjYsMS41ODQsOC4yODUsMy4yOSwxMi4xODRjMS43MDYsMy44OTksMy45MzcsNy4zMTIsNi43MDEsMTAuMjM0DQoJCWMyLjc2MSwyLjkyNSw2LjAwOCw1LjI4MSw5Ljc0OCw3LjA2N2MzLjczNSwxLjc4OSw3Ljg3NywyLjY4MSwxMi40MjgsMi42ODFjMTIuMDIxLDAsMjEuMzYtNC43OSwyOC4wMjMtMTQuMzc3DQoJCWMwLjY0Ny0xLjEzNiwxLjYyMi0xLjcwNiwyLjkyNC0xLjcwNmMyLjI3MywwLDMuNDEyLDEuMTM5LDMuNDEyLDMuNDEyYzAsMC4xNjMtMC4xNjQsMC43My0wLjQ4NywxLjcwNQ0KCQljLTMuNDEyLDYuMDEzLTguMjA1LDEwLjQ3OS0xNC4zNzcsMTMuNDAyYy02LjE3NiwyLjkyNC0xMi42NzEsNC4zODctMTkuNDk1LDQuMzg3Yy01LjY4OSwwLTEwLjkyOC0xLjE4MS0xNS43MTgtMy41MzMNCgkJYy00Ljc5My0yLjM1NC04LjkzNi01LjQ4My0xMi40MjgtOS4zODJjLTMuNDk1LTMuODk5LTYuMjE0LTguNDA3LTguMTYzLTEzLjUyNGMtMS45NS01LjExOC0yLjkyNC0xMC40MzctMi45MjQtMTUuOTYyDQoJCWMwLTUuNTIxLDAuOTc1LTEwLjg0NCwyLjkyNC0xNS45NjFjMS45NDktNS4xMTcsNC42NjgtOS42MjUsOC4xNjMtMTMuNTI0YzMuNDkyLTMuODk4LDcuNjM0LTcuMDI0LDEyLjQyOC05LjM4MQ0KCQlDMTI2Ljg0Niw0MjguMzc5LDEzMi4wODQsNDI3LjE5OCwxMzcuNzczLDQyNy4xOTh6IE0xNjkuOTQsNDY2LjE4OGMtMC4zMjgtNC4yMjMtMS4zNDEtOC4yODUtMy4wNDYtMTIuMTg0DQoJCWMtMS43MDYtMy44OTktMy45ODItNy4zMTItNi44MjMtMTAuMjM1Yy0yLjg0NC0yLjkyNC02LjE3NS01LjI3Ny05Ljk5MS03LjA2N2MtMy44MTktMS43ODUtNy45Mi0yLjY4LTEyLjMwNi0yLjY4DQoJCWMtNC41NSwwLTguNjkyLDAuODk1LTEyLjQyOCwyLjY4Yy0zLjczOSwxLjc5LTYuOTg3LDQuMTQ0LTkuNzQ4LDcuMDY3Yy0yLjc2NCwyLjkyNC00Ljk5NSw2LjMzNi02LjcwMSwxMC4yMzUNCgkJYy0xLjcwNiwzLjg5OC0yLjgwMiw3Ljk2MS0zLjI5LDEyLjE4NEgxNjkuOTR6Ii8+DQoJPHBhdGggZmlsbD0iIzQxNDA0MiIgZD0iTTMwNC42OSw0MjcuNDQxYzUuMDM0LDAsOS41MDQsMS4wMTgsMTMuNDAyLDMuMDQ3YzMuODk5LDIuMDMzLDcuMTg5LDQuNjcyLDkuODcsNy45Mg0KCQljMi42OCwzLjI1MSw0LjcwOSw3LjA2Niw2LjA5MiwxMS40NTJjMS4zNzksNC4zODcsMi4wNyw4Ljg1NiwyLjA3LDEzLjQwMnY0My42MmMwLDAuOTc1LTAuMzY1LDEuNzg5LTEuMDk3LDIuNDM4DQoJCWMtMC43MywwLjY0Ni0xLjUwMywwLjk3NS0yLjMxMywwLjk3NWMtMi4yNzYsMC0zLjQxMi0xLjE0LTMuNDEyLTMuNDEydi00My42MmMwLTMuNTcxLTAuNTI5LTcuMTA0LTEuNTg0LTEwLjYNCgkJYy0xLjA1OS0zLjQ5MS0yLjYwMi02LjYxOC00LjYzLTkuMzgyYy0yLjAzMy0yLjc2MS00LjU5Mi00Ljk1My03LjY3Ny02LjU4Yy0zLjA4OC0xLjYyMS02LjY2Mi0yLjQzNi0xMC43MjItMi40MzYNCgkJYy01LjIsMC05LjU4NywxLjIxOC0xMy4xNTksMy42NTRjLTMuNTc0LDIuNDM4LTYuNDU3LDUuNTY2LTguNjUsOS4zODJjLTIuMTkzLDMuODE5LTMuODE4LDguMDQyLTQuODc0LDEyLjY3Mg0KCQljLTEuMDU5LDQuNjMtMS41ODQsOS4wNTgtMS41ODQsMTMuMjh2MzMuNjI5YzAsMC45NzUtMC4zNjUsMS43ODktMS4wOTYsMi40MzhjLTAuNzMxLDAuNjQ2LTEuNTA1LDAuOTc1LTIuMzE1LDAuOTc1DQoJCWMtMi4yNzYsMC0zLjQxMS0xLjE0LTMuNDExLTMuNDEydi00My42MmMwLTMuNTcxLTAuNTMtNy4xMDQtMS41ODUtMTAuNmMtMS4wNTgtMy40OTEtMi42MDEtNi42MTgtNC42MjktOS4zODINCgkJYy0yLjAzNC0yLjc2MS00LjU5Mi00Ljk1My03LjY3Ny02LjU4Yy0zLjA4Ny0xLjYyMS02LjY2My0yLjQzNi0xMC43MjItMi40MzZjLTUuMDM3LDAtOS4zNDQsMC44OTUtMTIuOTE1LDIuNjgNCgkJYy0zLjU3NSwxLjc5LTYuNTQyLDQuMjY2LTguODk1LDcuNDMzYy0yLjM1NywzLjE2Ny00LjA2Myw2Ljk0NC01LjExNywxMS4zMzFjLTEuMDU5LDQuMzg2LTEuNTg0LDkuMS0xLjU4NCwxNC4xMzR2My44OTl2MC4yNDMNCgkJdjMyLjg5N2MwLDIuMjcyLTEuMTM4LDMuNDEyLTMuNDEyLDMuNDEyYy0yLjI3NiwwLTMuNDExLTEuMTQtMy40MTEtMy40MTJ2LTc0LjU2N2MwLTIuMjczLDEuMTM1LTMuNDExLDMuNDExLTMuNDExDQoJCWMyLjI3MywwLDMuNDEyLDEuMTM4LDMuNDEyLDMuNDExdjEyLjQyOGMyLjkyNC01LjE5Nyw2Ljg2MS05LjM4MiwxMS44MTktMTIuNTVjNC45NTQtMy4xNjcsMTAuNTE3LTQuNzUyLDE2LjY5Mi00Ljc1Mg0KCQljNi45ODMsMCwxMi45OTUsMS45OTEsMTguMDMyLDUuOTdjNS4wMzMsMy45ODMsOC42ODgsOS4yMjMsMTAuOTY2LDE1LjcxOWMyLjc2LTYuMzM2LDYuNzM5LTExLjUzMywxMS45NC0xNS41OTYNCgkJQzI5MS4xMjUsNDI5LjQ3NSwyOTcuMzgsNDI3LjQ0MSwzMDQuNjksNDI3LjQ0MXoiLz4NCgk8cGF0aCBmaWxsPSIjNDE0MDQyIiBkPSJNMzc4Ljc1Myw0MjkuMzkyYzAuODExLDAsMS41ODQsMC4zNjUsMi4zMTQsMS4wOTdjMC43MzEsMC43MywxLjA5NywxLjUwNCwxLjA5NywyLjMxNHY3NC4wOA0KCQljMCwwLjgxNC0wLjM2NSwxLjU4NC0xLjA5NywyLjMxNWMtMC43MywwLjczLTEuNTA0LDEuMDk3LTIuMzE0LDEuMDk3Yy0wLjk3NSwwLTEuNzktMC4zNjYtMi40MzgtMS4wOTcNCgkJYy0wLjY1LTAuNzMxLTAuOTc1LTEuNTAxLTAuOTc1LTIuMzE1di03NC4wOGMwLTAuODExLDAuMzI0LTEuNTg0LDAuOTc1LTIuMzE0QzM3Ni45NjMsNDI5Ljc1NywzNzcuNzc4LDQyOS4zOTIsMzc4Ljc1Myw0MjkuMzkyeiINCgkJLz4NCgk8cGF0aCBmaWxsPSIjNDE0MDQyIiBkPSJNNDczLjM0LDQyOC42NmMyLjI3MywwLDMuNDEyLDEuMTM5LDMuNDEyLDMuNDExbC0wLjQ4NywxLjk1bC0yNC4zNjgsMzUuMzM0bDI0LjM2OCwzNS41NzcNCgkJYzAuMzIzLDAuOTc2LDAuNDg3LDEuNjI2LDAuNDg3LDEuOTVjMCwyLjI3Mi0xLjEzOSwzLjQxMi0zLjQxMiwzLjQxMmMtMS4zMDIsMC0yLjE5My0wLjQ4OC0yLjY4LTEuNDYzbC0yMi45MDYtMzMuMzg0DQoJCWwtMjIuNjYzLDMzLjM4NGMtMC44MTQsMC45NzUtMS43OSwxLjQ2My0yLjkyNCwxLjQ2M2MtMi4yNzcsMC0zLjQxMS0xLjE0LTMuNDExLTMuNDEyYzAtMC4zMjQsMC4xNTktMC45NzUsMC40ODYtMS45NQ0KCQlsMjQuMzY5LTM1LjU3N2wtMjQuMzY5LTM1LjMzNGwtMC40ODYtMS45NWMwLTIuMjcyLDEuMTM0LTMuNDExLDMuNDExLTMuNDExYzEuMTM0LDAsMi4xMDksMC40ODcsMi45MjQsMS40NjJsMjIuNjYzLDMzLjE0MQ0KCQlsMjIuOTA2LTMzLjE0MUM0NzEuMTQ2LDQyOS4xNDcsNDcyLjAzOCw0MjguNjYsNDczLjM0LDQyOC42NnoiLz4NCjwvZz4NCjxnPg0KCTxnPg0KCQk8ZyBvcGFjaXR5PSIwLjQ1Ij4NCgkJCTxnPg0KCQkJCTxwb2x5Z29uIGZpbGw9IiMwMTAxMDEiIHBvaW50cz0iMTUwLjczNCwxOTYuMjEyIDI1NS45NjksMzQ0LjUwOCAyNTUuOTY5LDI1OC4zODcgCQkJCSIvPg0KCQkJPC9nPg0KCQk8L2c+DQoJCTxnIG9wYWNpdHk9IjAuOCI+DQoJCQk8Zz4NCgkJCQk8cG9seWdvbiBmaWxsPSIjMDEwMTAxIiBwb2ludHM9IjI1NS45NjksMjU4LjM4NyAyNTUuOTY5LDM0NC41MDggMzYxLjI2NywxOTYuMjEyIAkJCQkiLz4NCgkJCTwvZz4NCgkJPC9nPg0KCQk8ZyBvcGFjaXR5PSIwLjYiPg0KCQkJPGc+DQoJCQkJPHBvbHlnb24gZmlsbD0iIzAxMDEwMSIgcG9pbnRzPSIyNTUuOTY5LDEyNi43ODEgMTUwLjczMywxNzQuNjExIDI1NS45NjksMjM2LjgxOCAzNjEuMjA0LDE3NC42MTEgCQkJCSIvPg0KCQkJPC9nPg0KCQk8L2c+DQoJCTxnIG9wYWNpdHk9IjAuNDUiPg0KCQkJPGc+DQoJCQkJPHBvbHlnb24gZmlsbD0iIzAxMDEwMSIgcG9pbnRzPSIxNTAuNzM0LDE3NC42MTIgMjU1Ljk2OSwyMzYuODE4IDI1NS45NjksMTI2Ljc4MiAyNTUuOTY5LDAuMDAxIAkJCQkiLz4NCgkJCTwvZz4NCgkJPC9nPg0KCQk8ZyBvcGFjaXR5PSIwLjgiPg0KCQkJPGc+DQoJCQkJPHBvbHlnb24gZmlsbD0iIzAxMDEwMSIgcG9pbnRzPSIyNTUuOTY5LDAgMjU1Ljk2OSwxMjYuNzgxIDI1NS45NjksMjM2LjgxOCAzNjEuMjA0LDE3NC42MTEgCQkJCSIvPg0KCQkJPC9nPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=')",
+
       text_Primary: appProperties.mainText_Color,
       text_Secondary: appProperties.supportText_Color,
       text_RegularLog: appProperties.mainText_Color,
@@ -500,9 +491,9 @@ function styleGuide () {
                               RIGHT PANEL
     /* ------------------------------------------------------ */
     rightPanel: {
-      backgroundColor_Panel: appProperties.seventh_BackgroundColor,
-      backgroundColor_Tab: appProperties.seventh_BackgroundColor,
-      BackgroundColor_Pre: appProperties.dark_BackgroundColor,
+      backgroundColor_Panel: appProperties.fifth_BackgroundColor,
+      backgroundColor_Tab: appProperties.fifth_BackgroundColor,
+      BackgroundColor_Pre: appProperties.primary_BackgroundColor,
 
       text_Primary: appProperties.mainText_Color,
       text_Secondary: appProperties.supportText_Color,
@@ -672,7 +663,7 @@ function styleGuide () {
         }),
 
         button_Debugger: appProperties.uiElements.button({
-          BackgroundColor: appProperties.teriaryButton_BackgroundColor,
+          BackgroundColor: appProperties.secondaryButton_BackgroundColor,
           BorderColor: appProperties.secondaryButton_BorderColor,
           Color: appProperties.secondaryButton_TextColor
         }),
