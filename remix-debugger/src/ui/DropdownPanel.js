@@ -33,6 +33,9 @@ var css = csjs`
   .eyeButton:hover {
     color: ${styles.rightPanel.debuggerTab.button_Debugger_icon_HoverColor};
   }
+  .grayed {
+    color: gray;
+  }
 `
 
 function DropdownPanel (_name, _opts) {
@@ -69,7 +72,7 @@ DropdownPanel.prototype.setLoading = function () {
 
 DropdownPanel.prototype.setUpdating = function () {
   if (this.view) {
-    this.view.querySelector('.dropdownpanel .dropdowncontent').style.color = 'gray'
+    this.view.querySelector('.dropdownpanel .dropdowncontent').style.color = styles.appProperties.additionalText_Color
   }
 }
 
@@ -77,7 +80,7 @@ DropdownPanel.prototype.update = function (_data, _header) {
   if (this.view) {
     this.view.querySelector('.dropdownpanel .fa-refresh').style.display = 'none'
     this.view.querySelector('.dropdownpanel .dropdowncontent').style.display = 'block'
-    this.view.querySelector('.dropdownpanel .dropdowncontent').style.color = 'black'
+    this.view.querySelector('.dropdownpanel .dropdowncontent').style.color = styles.appProperties.mainText_Color
     this.view.querySelector('.dropdownpanel .dropdownrawcontent').innerText = JSON.stringify(_data, null, '\t')
     this.view.querySelector('.dropdownpanel button.btn').style.display = 'block'
     this.view.querySelector('.title span').innerText = _header || ' '
