@@ -4,7 +4,6 @@ var categories = require('./categories')
 var common = require('./staticAnalysisCommon')
 var fcallGraph = require('./functionCallGraph')
 var AbstractAst = require('./abstractAstView')
-var yo = require('yo-yo')
 
 function checksEffectsInteraction () {
   this.abstractAst = new AbstractAst()
@@ -34,10 +33,10 @@ function report (contracts, multipleContractsWithSameName) {
     contract.functions.forEach((func) => {
       if (isPotentialVulnerableFunction(func, getContext(callGraph, contract, func))) {
         var funcName = common.getFullQuallyfiedFuncDefinitionIdent(contract.node, func.node, func.parameters)
-        var comments = (hasModifiers) ? yo`<br/><i>Note:</i> Modifiers are currently not considered by this static analysis.` : ''
-        comments += (multipleContractsWithSameName) ? yo`<br/><i>Note:</i> Import aliases are currently not supported by this static analysis.` : ''
+        var comments = (hasModifiers) ? 'Note: Modifiers are currently not considered by this static analysis.' : ''
+        comments += (multipleContractsWithSameName) ? 'Note: Import aliases are currently not supported by this static analysis.' : ''
         warnings.push({
-          warning: yo`Potential Violation of Checks-Effects-Interaction pattern in <i>${funcName}</i>: Could potentially lead to re-entrancy vulnerability. ${comments}`,
+          warning: 'Potential Violation of Checks-Effects-Interaction pattern in ${funcName}: Could potentially lead to re-entrancy vulnerability. ${comments}',
           location: func.src,
           more: 'http://solidity.readthedocs.io/en/develop/security-considerations.html#re-entrancy'
         })
