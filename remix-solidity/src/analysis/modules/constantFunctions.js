@@ -49,13 +49,13 @@ function report (contracts, multipleContractsWithSameName) {
         comments += (multipleContractsWithSameName) ? 'Note: Import aliases are currently not supported by this static analysis.' : ''
         if (func.potentiallyshouldBeConst) {
           warnings.push({
-            warning: '${funcName} : Potentially should be constant but is not. ${comments}',
+            warning: `${funcName} : Potentially should be constant but is not. ${comments}`,
             location: func.src,
             more: 'http://solidity.readthedocs.io/en/develop/contracts.html#constant-functions'
           })
         } else {
           warnings.push({
-            warning: '${funcName} : Is constant but potentially should not be. ${comments}',
+            warning: `${funcName} : Is constant but potentially should not be. ${comments}`,
             location: func.src,
             more: 'http://solidity.readthedocs.io/en/develop/contracts.html#constant-functions'
           })
