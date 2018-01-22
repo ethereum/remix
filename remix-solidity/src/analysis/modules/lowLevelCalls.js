@@ -61,4 +61,3 @@ module.exports = {
   category: categories.SECURITY,
   Module: lowLevelCalls
 }
-

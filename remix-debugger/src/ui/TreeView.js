@@ -5,7 +5,6 @@ var remixLib = require('remix-lib')
 var ui = remixLib.helpers.ui
 
 class TreeView {
-
   constructor (opts) {
     this.extractData = opts.extractData || this.extractDataDefault
     this.formatSelf = opts.formatSelf || this.formatSelfDefault

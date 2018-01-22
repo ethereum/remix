@@ -6,7 +6,6 @@ var BN = require('ethereumjs-util').BN
 var RefType = require('./RefType')
 
 class ArrayType extends RefType {
-
   constructor (underlyingType, arraySize, location) {
     var storageSlots = null
     if (arraySize === 'dynamic') {

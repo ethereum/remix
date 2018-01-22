@@ -37,4 +37,3 @@ module.exports = {
   category: categories.SECURITY,
   Module: blockTimestamp
 }
-

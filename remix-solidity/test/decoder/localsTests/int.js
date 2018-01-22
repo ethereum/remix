@@ -109,4 +109,3 @@ module.exports = function (st, vm, privateKey, contractBytecode, compilationResu
     }
   })
 }
-

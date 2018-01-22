@@ -68,4 +68,3 @@ tape('util.escapeRegExp', function (t) {
   t.equal(util.escapeRegExp(original), 'function \\(uint256\\) returns \\(bool\\)', 'function string with regex')
   t.ok(new RegExp(util.escapeRegExp(original)).test(original), 'should still test for original string')
 })
-
