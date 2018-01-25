@@ -20,9 +20,9 @@ tape('CodeManager', function (t) {
       global.web3 = obj
       var traceManager = new TraceManager()
       codeManager = new CodeManager(traceManager)
-      global.web3.eth.getCode('0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5', function(_error, contractCode) {
+      global.web3.eth.getCode('0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5', function (_error, contractCode) {
         codeManager.codeResolver.cacheExecutingCode('0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5', contractCode) // so a call to web3 is not necessary
-        global.web3.eth.getTransaction('0x20ef65b8b186ca942fcccd634f37074dde49b541c27994fc7596740ef44cfd51', function(_error, tx) {
+        global.web3.eth.getTransaction('0x20ef65b8b186ca942fcccd634f37074dde49b541c27994fc7596740ef44cfd51', function (_error, tx) {
           traceManager.resolveTrace(tx, function (error, result) {
             if (error) {
               t.fail(' - traceManager.resolveTrace - failed ' + result)
@@ -30,8 +30,8 @@ tape('CodeManager', function (t) {
               continueTesting(t, codeManager)
             }
           })
-        });
-      });
+        })
+      })
     }
   })
 })
@@ -65,7 +65,7 @@ function continueTesting (t, codeManager) {
         }
       }
     })
-    global.web3.eth.getTransaction('0x20ef65b8b186ca942fcccd634f37074dde49b541c27994fc7596740ef44cfd51', function(_error, tx) {
+    global.web3.eth.getTransaction('0x20ef65b8b186ca942fcccd634f37074dde49b541c27994fc7596740ef44cfd51', function (_error, tx) {
       codeManager.resolveStep(0, tx)
       codeManager.resolveStep(70, tx)
     })
