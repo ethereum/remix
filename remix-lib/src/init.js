@@ -35,7 +35,7 @@ module.exports = {
     }
 
     if (!(web3.debug && web3.debug.traceTransaction)) {
-      methods.push(new web3.extend({
+      methods.push(web3.extend({
         methods: [{
           name: 'traceTransaction',
           call: 'debug_traceTransaction',
@@ -46,7 +46,7 @@ module.exports = {
     }
 
     if (!(web3.debug && web3.debug.storageRangeAt)) {
-      methods.push(new web3.extend({
+      methods.push(web3.extend({
         methods: [{
           name: 'storageRangeAt',
           call: 'debug_storageRangeAt',
