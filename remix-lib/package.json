@@ -23,7 +23,8 @@
     "web3": "^0.15.3",
     "solc": "^0.4.13",
     "standard": "^7.0.1",
-    "tape": "^4.6.0"
+    "tape": "^4.6.0",
+    "yo-yoify": "^4.3.0"
   },
   "scripts": {
     "test": "standard && tape ./test/tests.js"
