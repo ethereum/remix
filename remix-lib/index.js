@@ -22,7 +22,7 @@ var txExecution = require('./src/execution/txExecution')
 var txHelper = require('./src/execution/txHelper')
 var txFormat = require('./src/execution/txFormat')
 var txListener = require('./src/execution/txListener')
-var executionContext = require('./src/execution/execution-context')
+var ExecutionContext = require('./src/execution/execution-context')
 
 if (typeof (module) !== 'undefined' && typeof (module.exports) !== 'undefined') {
   module.exports = modules()
@@ -61,7 +61,7 @@ function modules () {
       EventsDecoder: EventsDecoder,
       txExecution: txExecution,
       txHelper: txHelper,
-      executionContext: executionContext,
+      ExecutionContext: ExecutionContext,
       txFormat: txFormat,
       txListener: txListener
     }

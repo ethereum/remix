@@ -223,5 +223,5 @@ function ExecutionContext () {
   this.setProviderFromEndpoint = setProviderFromEndpoint
 }
 
-module.exports = new ExecutionContext()
+module.exports = ExecutionContext
 
