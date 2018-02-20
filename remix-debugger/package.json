@@ -51,6 +51,9 @@
   },
   "scripts": {
     "build": "mkdirp build; browserify index.js > build/app.js",
+    "linkremixcore": "cd node_modules && rm -rf remix-core && ln -s ../../remix-core remix-core && cd ..",
+    "linkremixlib": "cd node_modules && rm -rf remix-lib && ln -s ../../remix-lib remix-lib && cd ..",
+    "linkremixsolidity": "cd node_modules && rm -rf remix-solidity && ln -s ../../remix-solidity remix-solidity && cd ..",
     "lint": "standard | notify-error",
     "nightwatch_local": "nightwatch --config nightwatch.js --env local",
     "nightwatch_remote_chrome": "nightwatch --config nightwatch.js --env chrome",
@@ -66,7 +69,7 @@
     "start_dev": "npm-run-all -lpr serve watch onchange",
     "start_eth": "npm run warning_message; eth -j --rpccorsdomain '*'",
     "start_geth": "npm run warning_message; geth --rpc --rpcapi 'web3,eth,debug' --rpcport 8545 --rpccorsdomain '*'",
-    "test": "standard && tape ./test/tests.js && ./ci/browser_tests.sh",
+    "test": "npm linkremixcore && npm linkremixlib && npm linkremixsolidity && standard && tape ./test/tests.js && ./ci/browser_tests.sh",
     "test-browser": "npm-run-all -lpr selenium serve waittest",
     "waittest": "sleep 5 && npm run nightwatch_local",
     "warning_message": "echo 'DO NOT DO THIS IF eth/geth STORES PRIVATE KEYS!! External system might be able to access your node through the RPC server.\n\n';",
