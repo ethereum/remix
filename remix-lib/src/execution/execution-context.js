@@ -202,9 +202,9 @@ function ExecutionContext () {
           } else {
             this.blockGasLimit = this.blockGasLimitDefault
           }
-        }, 15000)
+        })
       }
-    })
+    }, 15000)
   }
 
   // TODO: not used here anymore and needs to be moved
