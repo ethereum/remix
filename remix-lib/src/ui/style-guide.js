@@ -484,7 +484,10 @@ function styleGuide () {
         BackgroundColor: appProperties.quaternaryButton_BackgroundColor,
         BorderColor: appProperties.quaternaryButton_BorderColor,
         Color: appProperties.quaternaryButton_TextColor
-      })
+      }),
+
+      icon_Color: appProperties.icon_Color,
+      icon_HoverColor: appProperties.icon_HoverColor
 
     },
 
