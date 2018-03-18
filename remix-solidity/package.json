@@ -30,6 +30,8 @@
     "tape": "^4.6.0"
   },
   "scripts": {
+    "linkremixcore": "cd node_modules && rm -rf remix-core && ln -s ../../remix-core remix-core && cd ..",
+    "linkremixlib": "cd node_modules && rm -rf remix-lib && ln -s ../../remix-lib remix-lib && cd ..",
     "test": "standard && npm run downloadsolc && tape ./test/tests.js",
     "downloadsolc": "cd node_modules/solc && (test -e soljson.js || wget https://ethereum.github.io/solc-bin/soljson.js) && cd ..",
     "prepublish": "mkdirp build; npm-run-all -ls downloadsolc",
