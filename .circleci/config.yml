@@ -29,7 +29,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: cd remix-solidity && npm install && npm test
+      - run: cd remix-solidity && npm install && npm run linkremixcore && npm run linkremixlib && npm install && npm test
       
   remix-debugger:
     docker:
@@ -38,7 +38,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: cd remix-debugger && npm install && npm test
+      - run: cd remix-debugger && npm install && npm run linkremixlib && npm run linkremixcore && npm run linkremixsolidity && npm install &&  npm test
             
 workflows:
   version: 2

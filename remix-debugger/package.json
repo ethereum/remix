@@ -51,6 +51,9 @@
     "yo-yoify": "^3.1.0"
   },
   "scripts": {
+    "linkremixlib": "cd node_modules && rm -rf remix-lib && ln -s ../../remix-lib remix-lib && cd ..",
+    "linkremixcore": "cd node_modules && rm -rf remix-core && ln -s ../../remix-core remix-core && cd ..",
+    "linkremixsolidity": "cd node_modules && rm -rf remix-solidity && ln -s ../../remix-solidity remix-solidity && cd ..",
     "build": "mkdirp build; browserify index.js > build/app.js",
     "lint": "standard | notify-error",
     "nightwatch_local": "nightwatch --config nightwatch.js --env local",

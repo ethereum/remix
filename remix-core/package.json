@@ -24,7 +24,8 @@
     "tape": "^4.6.0"
   },
   "scripts": {
-    "test": "standard && tape ./test/tests.js"
+    "test": "standard && tape ./test/tests.js",
+    "linkremixlib": "cd node_modules && rm -rf remix-lib && ln -s ../../remix-lib remix-lib && cd .."
   },
   "standard": {
     "ignore": [
