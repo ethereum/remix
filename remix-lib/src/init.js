@@ -68,5 +68,6 @@ module.exports = {
 }
 
 var web3DebugNodes = {
-  'Main': 'https://mainnet.infura.io/remix'
+  'Main': 'https://mainnet.infura.io/remix',
+  'Ropsten': 'http://52.56.126.137:8545'
 }
