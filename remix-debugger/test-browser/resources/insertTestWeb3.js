@@ -74,4 +74,3 @@ loadJSON('/test-browser/resources/testWeb3.json', function (result) {
   var data = JSON.parse(result)
   waitForRemix(data)
 })
-

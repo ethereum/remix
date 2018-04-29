@@ -8,7 +8,6 @@ var StorageViewer = remixCore.storage.StorageViewer
 var yo = require('yo-yo')
 
 class SolidityLocals {
-
   constructor (_parent, _traceManager, _internalTreeCall) {
     this.parent = _parent
     this.internalTreeCall = _internalTreeCall

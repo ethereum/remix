@@ -37,7 +37,6 @@ var EventManager = remixLib.EventManager
  *  - trigger `nodeClick` and `leafClick`
  */
 class TreeView {
-
   constructor (opts) {
     this.event = new EventManager()
     this.extractData = opts.extractData || this.extractDataDefault
