@@ -75,9 +75,6 @@
         }
       ],
       [
-        "yo-yoify"
-      ],
-      [
         "babelify",
         {
           "presets": [
