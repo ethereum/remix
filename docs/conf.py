@@ -273,7 +273,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Remix', u'Remix Documentation',
-     author, 'Remix', 'One line description of project.',
+     author, 'Remix', 'Remix, Ethereum - IDE',
      'Miscellaneous'),
 ]
 
@@ -303,5 +303,3 @@ source_parsers = {'.md': CommonMarkParser}
 #         'enable_auto_doc_ref': True,
 #     }, True)
 #     app.add_transform(AutoStructify)
-
-http://
