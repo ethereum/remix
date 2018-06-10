@@ -870,6 +870,15 @@ function isTransfer (node) {
           undefined, exactMatch(basicTypes.ADDRESS), exactMatch(lowLevelCallTypes.TRANSFER.ident))
 }
 
+/**
+ * True if it is a 'for' loop
+ * @node {ASTNode} some AstNode
+ * @return {bool}
+ */
+function isForLoop (node) {
+  return nodeType(node, exactMatch(nodeTypes.FORSTATEMENT))
+}
+
 // #################### Complex Node Identification - Private
 
 function isMemberAccess (node, retType, accessor, accessorType, memberName) {
@@ -1013,6 +1022,7 @@ module.exports = {
   isAssertCall: isAssertCall,
   isRequireCall: isRequireCall,
   isIntDivision: isIntDivision,
+  isForLoop: isForLoop,
 
   // #################### Trivial Node Identification
   isDeleteUnaryOperation: isDeleteUnaryOperation,
