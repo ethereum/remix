@@ -610,9 +610,7 @@ function isPayableFunction (node) {
  * @return {bool}
  */
 function isConstructor (node) {
-  return isFunctionDefinition(node) && (
-    node.attributes.isConstructor === true
-  )
+  return isFunctionDefinition(node) && (node.attributes.isConstructor === true || node.attributes.constructor === true)
 }
 
 /**

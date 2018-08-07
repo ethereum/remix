@@ -1674,6 +1674,17 @@ test('staticAnalysisCommon.isConstantFunction', function (t) {
   t.notOk(common.isConstantFunction(node3), 'wrong node should not be const func definition')
 })
 
+test('staticAnalysisCommon.isConstructor', function (t) {
+  t.plan(3)
+  var node1 = { name: 'FunctionDefinition', attributes: { isConstructor: true } }
+  var node2 = { name: 'FunctionDefinition', attributes: { constructor: true } }
+  var node3 = { name: 'MemberAccess', attributes: { constant: true } }
+
+  t.ok(common.isConstructor(node1), 'should be ctor func definition')
+  t.ok(common.isConstructor(node2), 'should be ctor func definition')
+  t.notOk(common.isConstructor(node3), 'wrong node should not be const func definition')
+})
+
 test('staticAnalysisCommon.isPlusPlusUnaryOperation', function (t) {
   t.plan(3)
   var node1 = { name: 'UnaryOperation', attributes: { operator: '++' } }
