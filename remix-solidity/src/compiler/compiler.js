@@ -212,7 +212,6 @@ function Compiler (handleImportCall) {
     } else if (missingInputs !== undefined && missingInputs.length > 0) {
       // try compiling again with the new set of inputs
 
-      console.dir("compilationFinshed");
       internalCompile(source.sources, source.target, missingInputs)
     } else {
       data = updateInterface(data)
