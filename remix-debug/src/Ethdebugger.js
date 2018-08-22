@@ -56,7 +56,6 @@ function Ethdebugger (opts) {
 }
 
 Ethdebugger.prototype.setManagers = function () {
-  console.log("remix-debug: setManagers");
   this.traceManager = new TraceManager({web3: this.web3})
   this.codeManager = new CodeManager(this.traceManager)
   this.solidityProxy = new SolidityProxy(this.traceManager, this.codeManager)

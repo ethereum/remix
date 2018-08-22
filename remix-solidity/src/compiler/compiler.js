@@ -55,7 +55,6 @@ function Compiler (handleImportCall) {
   }
 
   var compile = function (files, target) {
-    console.dir("compile");
     self.event.trigger('compilationStarted', [])
     internalCompile(files, target)
   }
