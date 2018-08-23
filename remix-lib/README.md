@@ -21,4 +21,5 @@ Provides:
         ui: {
             styleGuide: styleGuide
         }
+        
     }
