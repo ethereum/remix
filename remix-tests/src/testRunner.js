@@ -38,8 +38,10 @@ function createRunList (jsonInterface) {
 }
 
 function runTest (testName, testObject, testCallback, resultsCallback) {
+  if (!testObject) {
+    return
+  }
   let runList = createRunList(testObject._jsonInterface)
-
   let passingNum = 0
   let failureNum = 0
   let timePassed = 0

@@ -25,7 +25,7 @@ const version = require('../package.json').version
 commander.version(version)
 
 commander.command('version').description('output the version number').action(function () {
-  console.log(version)
+  log.info(version)
 })
 
 commander.command('help').description('output usage information').action(function () {

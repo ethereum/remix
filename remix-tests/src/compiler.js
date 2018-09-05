@@ -92,7 +92,7 @@ function compileContractSources (sources, importFileCb, cb) {
     let errors = (result.errors || []).filter((e) => e.type === 'Error' || e.severity === 'error')
     if (errors.length > 0) {
       signale.fatal(errors)
-      return cb(new Error('errors compiling'))
+      return cb(errors)
     }
     cb(err, result.contracts)
   })

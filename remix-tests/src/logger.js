@@ -25,30 +25,29 @@ function addColor (str) {
 function getTimestamp () {
   return '[' + addColor(timestamp('HH:mm:ss')) + ']'
 }
+
 // create winston logger format
 const logFmt = winston.format.printf((info) => {
   return `${getTimestamp()} ${info.level}: ${info.message}`
 })
+const wfmt = winston.format.combine(
+    winston.format.colorize({ all: true }),
+    logFmt
+)
 
 class Log {
   constructor () {
     this.logger = winston.createLogger({
       level: 'error',
       transports: [new winston.transports.Console()],
-      format: winston.format.combine(
-        winston.format.colorize({ all: true }),
-        logFmt
-      )
+      format: wfmt
     })
   }
   setVerbosity (v) {
     this.logger.configure({
       level: v,
       transports: [new winston.transports.Console()],
-      format: winston.format.combine(
-        winston.format.colorize({ all: true }),
-        logFmt
-      )
+      format: wfmt
     })
   }
 }
