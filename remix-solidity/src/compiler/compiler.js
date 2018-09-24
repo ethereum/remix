@@ -177,6 +177,13 @@ function Compiler (handleImportCall) {
     return null
   }
 
+  this.ldCompilationResult = (file, source, languageVersion, data) => {
+    self.lastCompilationResult = {
+        "data": data,
+        "source": source,
+    }
+  }
+
   function compilationFinished (data, missingInputs, source) {
     var noFatalErrors = true // ie warnings are ok
 
