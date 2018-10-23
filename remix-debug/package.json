@@ -1,5 +1,5 @@
 {
-  "name": "remix-debug",
+  "name": "remix-debug-debugtest",
   "version": "0.2.9",
   "description": "Ethereum IDE and tools for the web",
   "contributors": [
@@ -27,7 +27,7 @@
     "fast-async": "^6.1.2",
     "notify-error": "^1.2.0",
     "npm-run-all": "^4.1.2",
-    "remix-lib": "../remix-lib",
+    "remix-lib-debugtest": "latest",
     "solc": "^0.4.25",
     "web3": "^0.20.6"
   },
