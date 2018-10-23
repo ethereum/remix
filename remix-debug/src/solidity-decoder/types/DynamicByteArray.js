@@ -1,6 +1,6 @@
 'use strict'
 var util = require('./util')
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var sha3256 = remixLib.util.sha3_256
 var BN = require('ethereumjs-util').BN
 var RefType = require('./RefType')

@@ -1,5 +1,5 @@
 'use strict'
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var util = remixLib.util
 var mappingPreimages = require('./mappingPreimages')
 

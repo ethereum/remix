@@ -1,5 +1,5 @@
 'use strict'
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var SourceLocationTracker = remixLib.SourceLocationTracker
 var AstWalker = remixLib.AstWalker
 var EventManager = remixLib.EventManager

@@ -1,12 +1,12 @@
 {
   "lerna": "2.10.2",
   "packages": [
-    "remix-debug",
-    "remix-lib",
-    "remix-solidity",
-    "remix-analyzer",
-    "remix-tests",
-    "remix-simulator"
+    "remix-debug-debugtest",
+    "remix-lib-debugtest",
+    "remix-solidity-debugtest",
+    "remix-analyzer-debugtest",
+    "remix-tests-debugtest",
+    "remix-simulator-debugtest"
   ],
   "version": "independent"
 }

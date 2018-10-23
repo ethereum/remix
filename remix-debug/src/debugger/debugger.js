@@ -1,6 +1,6 @@
 'use strict'
 var Ethdebugger = require('../Ethdebugger')
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var EventManager = remixLib.EventManager
 var traceHelper = remixLib.helpers.trace
 var OffsetToColumnConverter = remixLib.OffsetToColumnConverter

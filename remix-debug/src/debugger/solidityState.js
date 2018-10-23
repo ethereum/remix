@@ -1,4 +1,4 @@
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var EventManager = remixLib.EventManager
 var stateDecoder = require('../solidity-decoder/stateDecoder')
 var StorageViewer = require('../storage/storageViewer')

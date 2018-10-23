@@ -1,4 +1,4 @@
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var EventManager = remixLib.EventManager
 var ui = remixLib.helpers.ui
 var StorageResolver = require('../storage/storageResolver')

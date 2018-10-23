@@ -9,7 +9,7 @@ var stateDecoder = SolidityDecoder.stateDecoder
 var localDecoder = SolidityDecoder.localDecoder
 var InternalCallTree = SolidityDecoder.InternalCallTree
 
-var remixLib = require('remix-lib')
+var remixLib = require('remix-lib-debugtest')
 var TraceManager = remixLib.trace.TraceManager
 var CodeManager = remixLib.code.CodeManager
 var traceHelper = remixLib.helpers.trace
