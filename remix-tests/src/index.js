@@ -134,11 +134,24 @@ var runTestFiles = function (filepath, isDirectory, web3) {
     function determineTestContractsToRun (compilationResult, contracts, next) {
       let contractsToTest = []
       if (isDirectory) {
-        fs.readdirSync(filepath).forEach(filename => {
-          if (filename.indexOf('_test.sol') < 0) {
+        fs.walkSync = function (start, callback) {
+          fs.readdirSync(start).forEach(name => {
+            if (name === 'node_modules') {
+              return; // hack
+            }
+            var abspath = path.join(start, name);
+            if (fs.statSync(abspath).isDirectory()) {
+              fs.walkSync(abspath, callback);
+            } else {
+              callback(abspath);
+            }
+          });
+        };
+        fs.walkSync(filepath, foundpath => {
+          if (foundpath.indexOf('_test.sol') < 0) {
             return
           }
-          Object.keys(compilationResult[path.basename(filename)]).forEach(contractName => {
+          Object.keys(compilationResult[foundpath]).forEach(contractName => {
             contractsToTest.push(contractName)
           })
         })
