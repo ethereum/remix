@@ -5,5 +5,9 @@
 	"scripts": {
 		"bootstrap": "lerna bootstrap",
 		"publish": "lerna publish"
+	},
+	"dependencies": {
+		"browserify": "^16.2.3",
+		"yo-yoify": "^4.3.0"
 	}
 }
