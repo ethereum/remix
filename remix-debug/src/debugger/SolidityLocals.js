@@ -59,7 +59,6 @@ class DebuggerSolidityLocals {
         }
       })
   }
-
 }
 
 module.exports = DebuggerSolidityLocals
