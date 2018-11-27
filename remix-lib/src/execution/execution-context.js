@@ -67,7 +67,8 @@ var vm = new EthJSVM({
 vm.stateManager = stateManager
 vm.blockchain = stateManager.blockchain
 vm.trie = stateManager.trie
-vm.stateManager.checkpoint()
+// Not waiting for the callback as we are not relying on the checkpoint
+vm.stateManager.checkpoint(() => {})
 
 var web3VM = new Web3VMProvider()
 web3VM.setVM(vm)
@@ -171,11 +172,12 @@ function ExecutionContext () {
 
     if (context === 'vm') {
       executionContext = context
-      vm.stateManager.revert(function () {
-        vm.stateManager.checkpoint()
+      return vm.stateManager.revert(function () {
+        vm.stateManager.checkpoint(function () {
+          self.event.trigger('contextChanged', ['vm'])
+          cb()
+        })
       })
-      self.event.trigger('contextChanged', ['vm'])
-      return cb()
     }
 
     if (context === 'injected') {

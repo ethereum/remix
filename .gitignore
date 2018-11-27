@@ -3,6 +3,7 @@ node_modules
 npm-debug.log
 lint.xml
 .vscode
+.idea
 test-browser/reports/*
 babelify-src
 docs/_build
