@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "Solidity import resolver engine",
   "main": "./src/index.js",
-  "bin": {
-    "remix-resolve": "./bin/remix-resolve"
-  },
   "scripts": {
     "build": "tsc",
     "lint": "standard",
