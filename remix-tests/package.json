@@ -1,6 +1,6 @@
 {
   "name": "remix-tests",
-  "version": "0.0.21",
+  "version": "0.1.0",
   "description": "Tests for the Ethereum tool suite Remix",
   "main": "./src/index.js",
   "contributors": [
@@ -40,9 +40,9 @@
     "change-case": "^3.0.1",
     "colors": "^1.1.2",
     "commander": "^2.13.0",
-    "remix-lib": "0.3.13",
-    "remix-simulator": "0.0.8",
-    "remix-solidity": "0.2.14",
+    "remix-lib": "0.4.0",
+    "remix-simulator": "0.1.0",
+    "remix-solidity": "0.3.0",
     "signale": "^1.2.1",
     "web3": "1.0.0-beta.36",
     "winston": "^3.0.0"
@@ -51,8 +51,8 @@
     "yo-yoify": "latest"
   },
   "devDependencies": {
-    "mocha": "^5.1.0",
     "babel-preset-es2017": "^6.24.1",
+    "mocha": "^5.1.0",
     "standard": "^10.0.3"
   }
 }
