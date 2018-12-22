@@ -16,7 +16,28 @@ function SourceMappingDecoder () {
  * @param {Int} position     - cursor position
  * @return {Object} ast object given by the compiler
  */
-SourceMappingDecoder.prototype.nodesAtPosition = nodesAtPosition
+SourceMappingDecoder.prototype.nodesAtPosition = function(astNodeType, position, ast) {
+  var astWalker = new AstWalker()
+  var callback = {}
+  var found = []
+  callback['*'] = function (node) {
+    var nodeLocation = sourceLocationFromAstNode(node)
+    if (!nodeLocation) {
+      return
+    }
+    if (nodeLocation.start <= position && nodeLocation.start + nodeLocation.length >= position) {
+      if (!astNodeType || astNodeType === node.name) {
+        found.push(node)
+        if (astNodeType) return false
+      }
+      return true
+    } else {
+      return false
+    }
+  }
+  astWalker.walk(ast.legacyAST, callback)
+  return found
+}
 
 /**
  * Decode the source mapping for the given @arg index
@@ -25,7 +46,36 @@ SourceMappingDecoder.prototype.nodesAtPosition = nodesAtPosition
  * @param {String} mapping     - compressed source mapping given by solc-bin
  * @return {Object} returns the decompressed source mapping for the given index {start, length, file, jump}
  */
-SourceMappingDecoder.prototype.atIndex = atIndex
+SourceMappingDecoder.prototype.atIndex = function(index, mapping) {
+  var ret = {}
+  var map = mapping.split(';')
+  if (index >= map.length) {
+    index = map.length - 1
+  }
+  for (var k = index; k >= 0; k--) {
+    var current = map[k]
+    if (!current.length) {
+      continue
+    }
+    current = current.split(':')
+    if (ret.start === undefined && current[0] && current[0] !== '-1' && current[0].length) {
+      ret.start = parseInt(current[0])
+    }
+    if (ret.length === undefined && current[1] && current[1] !== '-1' && current[1].length) {
+      ret.length = parseInt(current[1])
+    }
+    if (ret.file === undefined && current[2] && current[2] !== '-1' && current[2].length) {
+      ret.file = parseInt(current[2])
+    }
+    if (ret.jump === undefined && current[3] && current[3].length) {
+      ret.jump = current[3]
+    }
+    if (ret.start !== undefined && ret.length !== undefined && ret.file !== undefined && ret.jump !== undefined) {
+      break
+    }
+  }
+  return ret
+}
 
 /**
  * Decode the given @arg value
@@ -109,7 +159,10 @@ SourceMappingDecoder.prototype.convertOffsetToLineColumn = function (sourceLocat
  * @param {String} sourceMap - source map given by the compilation result
  * @param {Object} ast - ast given by the compilation result
  */
-SourceMappingDecoder.prototype.findNodeAtInstructionIndex = findNodeAtInstructionIndex
+SourceMappingDecoder.prototype.findNodeAtInstructionIndex = function(astNodeType, instIndex, sourceMap, ast) {
+  var sourceLocation = atIndex(instIndex, sourceMap)
+  return findNodeAtSourceLocation(astNodeType, sourceLocation, ast)
+}
 
 function convertFromCharPosition (pos, lineBreakPositions) {
   var line = util.findLowerBound(pos, lineBreakPositions)
@@ -136,11 +189,6 @@ function sourceLocationFromAstNode (astNode) {
   return null
 }
 
-function findNodeAtInstructionIndex (astNodeType, instIndex, sourceMap, ast) {
-  var sourceLocation = atIndex(instIndex, sourceMap)
-  return findNodeAtSourceLocation(astNodeType, sourceLocation, ast)
-}
-
 function findNodeAtSourceLocation (astNodeType, sourceLocation, ast) {
   var astWalker = new AstWalker()
   var callback = {}
@@ -163,60 +211,6 @@ function findNodeAtSourceLocation (astNodeType, sourceLocation, ast) {
   }
   astWalker.walk(ast.legacyAST, callback)
   return found
-}
-
-function nodesAtPosition (astNodeType, position, ast) {
-  var astWalker = new AstWalker()
-  var callback = {}
-  var found = []
-  callback['*'] = function (node) {
-    var nodeLocation = sourceLocationFromAstNode(node)
-    if (!nodeLocation) {
-      return
-    }
-    if (nodeLocation.start <= position && nodeLocation.start + nodeLocation.length >= position) {
-      if (!astNodeType || astNodeType === node.name) {
-        found.push(node)
-        if (astNodeType) return false
-      }
-      return true
-    } else {
-      return false
-    }
-  }
-  astWalker.walk(ast.legacyAST, callback)
-  return found
-}
-
-function atIndex (index, mapping) {
-  var ret = {}
-  var map = mapping.split(';')
-  if (index >= map.length) {
-    index = map.length - 1
-  }
-  for (var k = index; k >= 0; k--) {
-    var current = map[k]
-    if (!current.length) {
-      continue
-    }
-    current = current.split(':')
-    if (ret.start === undefined && current[0] && current[0] !== '-1' && current[0].length) {
-      ret.start = parseInt(current[0])
-    }
-    if (ret.length === undefined && current[1] && current[1] !== '-1' && current[1].length) {
-      ret.length = parseInt(current[1])
-    }
-    if (ret.file === undefined && current[2] && current[2] !== '-1' && current[2].length) {
-      ret.file = parseInt(current[2])
-    }
-    if (ret.jump === undefined && current[3] && current[3].length) {
-      ret.jump = current[3]
-    }
-    if (ret.start !== undefined && ret.length !== undefined && ret.file !== undefined && ret.jump !== undefined) {
-      break
-    }
-  }
-  return ret
 }
 
 module.exports = SourceMappingDecoder
