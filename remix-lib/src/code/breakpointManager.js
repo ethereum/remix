@@ -67,11 +67,10 @@ class BreakpointManager {
         (sourceLocation.start <= previousSourceLocation.start &&
         sourceLocation.start + sourceLocation.length >= previousSourceLocation.start + previousSourceLocation.length)) {
         return false
-      } else {
-        self.jumpToCallback(currentStep)
-        self.event.trigger('breakpointHit', [sourceLocation, currentStep])
-        return true
       }
+      self.jumpToCallback(currentStep)
+      self.event.trigger('breakpointHit', [sourceLocation, currentStep])
+      return true
     }
 
     var sourceLocation
@@ -90,18 +89,12 @@ class BreakpointManager {
       if (this.previousLine !== lineColumn.start.line) {
         if (direction === -1 && lineHadBreakpoint) { // TODO : improve this when we will build the correct structure before hand
           lineHadBreakpoint = false
-          if (hitLine(currentStep + 1, previousSourceLocation, sourceLocation, this)) {
-            return
-          }
+          if (hitLine(currentStep + 1, previousSourceLocation, sourceLocation, this)) return
         }
         this.previousLine = lineColumn.start.line
         if (this.hasBreakpointAtLine(sourceLocation.file, lineColumn.start.line)) {
           lineHadBreakpoint = true
-          if (direction === 1) {
-            if (hitLine(currentStep, sourceLocation, previousSourceLocation, this)) {
-              return
-            }
-          }
+          if (direction === 1 && hitLine(currentStep, sourceLocation, previousSourceLocation, this)) return
         }
       }
       currentStep += direction

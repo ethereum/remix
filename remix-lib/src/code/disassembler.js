@@ -39,9 +39,8 @@ var toString = function (expr) {
     return expr.label + ':'
   } else if (expr.args) {
     return expr.name.toLowerCase() + '(' + expr.args.reverse().map(toString).join(', ') + ')'
-  } else {
-    return expr.name.toLowerCase()
   }
+  return expr.name.toLowerCase()
 }
 
 var disassemble = function (input) {

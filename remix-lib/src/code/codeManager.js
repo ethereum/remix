@@ -61,20 +61,18 @@ CodeManager.prototype.getCode = function (address, cb) {
   if (traceHelper.isContractCreation(address)) {
     var codes = this.codeResolver.getExecutingCodeFromCache(address)
     if (!codes) {
-      this.traceManager.getContractCreationCode(address, function (error, hexCode) {
+      return this.traceManager.getContractCreationCode(address, function (error, hexCode) {
         if (!error) {
           codes = self.codeResolver.cacheExecutingCode(address, hexCode)
           cb(null, codes)
         }
       })
-    } else {
-      cb(null, codes)
     }
-  } else {
-    this.codeResolver.resolveCode(address, function (address, code) {
-      cb(null, code)
-    })
+    return cb(null, codes)
   }
+  this.codeResolver.resolveCode(address, function (address, code) {
+    cb(null, code)
+  })
 }
 
 /**
@@ -91,16 +89,14 @@ CodeManager.prototype.getFunctionFromStep = function (stepIndex, sourceMap, ast)
     if (error) {
       console.log(error)
       return { error: 'Cannot retrieve current address for ' + stepIndex }
-    } else {
-      self.traceManager.getCurrentPC(stepIndex, function (error, pc) {
-        if (error) {
-          console.log(error)
-          return { error: 'Cannot retrieve current PC for ' + stepIndex }
-        } else {
-          return self.getFunctionFromPC(address, pc, sourceMap, ast)
-        }
-      })
     }
+    self.traceManager.getCurrentPC(stepIndex, function (error, pc) {
+      if (error) {
+        console.log(error)
+        return { error: 'Cannot retrieve current PC for ' + stepIndex }
+      }
+      return self.getFunctionFromPC(address, pc, sourceMap, ast)
+    })
   })
 }
 
@@ -116,11 +112,10 @@ CodeManager.prototype.getInstructionIndex = function (address, step, callback) {
   this.traceManager.getCurrentPC(step, function (error, pc) {
     if (error) {
       console.log(error)
-      callback('Cannot retrieve current PC for ' + step, null)
-    } else {
-      var itemIndex = self.codeResolver.getInstructionIndex(address, pc)
-      callback(null, itemIndex)
+      return callback('Cannot retrieve current PC for ' + step, null)
     }
+    var itemIndex = self.codeResolver.getInstructionIndex(address, pc)
+    callback(null, itemIndex)
   })
 }
 
@@ -140,21 +135,15 @@ CodeManager.prototype.getFunctionFromPC = function (address, pc, sourceMap, ast)
 
 function retrieveCodeAndTrigger (codeMananger, address, stepIndex, tx) {
   codeMananger.getCode(address, function (error, result) {
-    if (!error) {
-      retrieveIndexAndTrigger(codeMananger, address, stepIndex, result.instructions)
-    } else {
-      console.log(error)
-    }
+    if (error) return console.log(error)
+    retrieveIndexAndTrigger(codeMananger, address, stepIndex, result.instructions)
   })
 }
 
 function retrieveIndexAndTrigger (codeMananger, address, step, code) {
   codeMananger.getInstructionIndex(address, step, function (error, result) {
-    if (!error) {
-      codeMananger.event.trigger('changed', [code, address, result])
-    } else {
-      console.log(error)
-    }
+    if (error) return console.log(error)
+    codeMananger.event.trigger('changed', [code, address, result])
   })
 }
 

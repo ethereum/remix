@@ -17,10 +17,7 @@ CodeResolver.prototype.clear = function () {
 
 CodeResolver.prototype.resolveCode = function (address, callBack) {
   var cache = this.getExecutingCodeFromCache(address)
-  if (cache) {
-    callBack(address, cache)
-    return
-  }
+  if (cache) return callBack(address, cache)
 
   var self = this
   this.loadCode(address, function (code) {
@@ -30,11 +27,8 @@ CodeResolver.prototype.resolveCode = function (address, callBack) {
 
 CodeResolver.prototype.loadCode = function (address, callback) {
   this.web3.eth.getCode(address, function (error, result) {
-    if (error) {
-      console.log(error)
-    } else {
-      callback(result)
-    }
+    if (error) return console.log(error)
+    callback(result)
   })
 }
 
@@ -61,9 +55,8 @@ CodeResolver.prototype.getExecutingCodeFromCache = function (address) {
       instructionsIndexByBytesOffset: this.instructionsIndexByBytesOffset[address],
       bytecode: this.bytecodeByAddress[address]
     }
-  } else {
-    return null
   }
+  return null
 }
 
 CodeResolver.prototype.getInstructionIndex = function (address, pc) {
