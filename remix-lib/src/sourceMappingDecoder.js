@@ -16,7 +16,7 @@ function SourceMappingDecoder () {
  * @param {Int} position     - cursor position
  * @return {Object} ast object given by the compiler
  */
-SourceMappingDecoder.prototype.nodesAtPosition = function(astNodeType, position, ast) {
+SourceMappingDecoder.prototype.nodesAtPosition = function (astNodeType, position, ast) {
   var astWalker = new AstWalker()
   var callback = {}
   var found = []
@@ -45,7 +45,7 @@ SourceMappingDecoder.prototype.nodesAtPosition = function(astNodeType, position,
  * @param {String} mapping     - compressed source mapping given by solc-bin
  * @return {Object} returns the decompressed source mapping for the given index {start, length, file, jump}
  */
-SourceMappingDecoder.prototype.atIndex = function(index, mapping) {
+SourceMappingDecoder.prototype.atIndex = function (index, mapping) {
   var ret = {}
   var map = mapping.split(';')
   if (index >= map.length) {
@@ -153,8 +153,8 @@ SourceMappingDecoder.prototype.convertOffsetToLineColumn = function (sourceLocat
  * @param {String} sourceMap - source map given by the compilation result
  * @param {Object} ast - ast given by the compilation result
  */
-SourceMappingDecoder.prototype.findNodeAtInstructionIndex = function(astNodeType, instIndex, sourceMap, ast) {
-  var sourceLocation = atIndex(instIndex, sourceMap)
+SourceMappingDecoder.prototype.findNodeAtInstructionIndex = function (astNodeType, instIndex, sourceMap, ast) {
+  var sourceLocation = this.atIndex(instIndex, sourceMap)
   return findNodeAtSourceLocation(astNodeType, sourceLocation, ast)
 }
 
