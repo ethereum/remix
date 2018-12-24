@@ -207,10 +207,9 @@ web3VmProvider.prototype.traceTransaction = function (txHash, options, cb) {
       cb(null, this.vmTraces[txHash])
     }
     return this.vmTraces[txHash]
-  } else {
-    if (cb) {
-      cb('unable to retrieve traces ' + txHash, null)
-    }
+  }
+  if (cb) {
+    cb('unable to retrieve traces ' + txHash, null)
   }
 }
 
@@ -222,9 +221,8 @@ web3VmProvider.prototype.storageRangeAt = function (blockNumber, txIndex, addres
       storage: JSON.parse(JSON.stringify(storage)),
       nextKey: null
     })
-  } else {
-    cb('unable to retrieve storage ' + txIndex + ' ' + address)
   }
+  cb('unable to retrieve storage ' + txIndex + ' ' + address)
 }
 
 web3VmProvider.prototype.getBlockNumber = function (cb) { cb(null, 'vm provider') }
@@ -235,10 +233,9 @@ web3VmProvider.prototype.getTransaction = function (txHash, cb) {
       cb(null, this.txs[txHash])
     }
     return this.txs[txHash]
-  } else {
-    if (cb) {
-      cb('unable to retrieve tx ' + txHash, null)
-    }
+  }
+  if (cb) {
+    cb('unable to retrieve tx ' + txHash, null)
   }
 }
 
@@ -249,10 +246,9 @@ web3VmProvider.prototype.getTransactionReceipt = function (txHash, cb) {
       cb(null, this.txsReceipt[txHash])
     }
     return this.txsReceipt[txHash]
-  } else {
-    if (cb) {
-      cb('unable to retrieve txReceipt ' + txHash, null)
-    }
+  }
+  if (cb) {
+    cb('unable to retrieve txReceipt ' + txHash, null)
   }
 }
 

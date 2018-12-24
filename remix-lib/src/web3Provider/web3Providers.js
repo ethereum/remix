@@ -18,11 +18,10 @@ Web3Providers.prototype.addProvider = function (type, obj) {
 }
 
 Web3Providers.prototype.get = function (type, cb) {
-  if (this.modes[type]) {
-    cb(null, this.modes[type])
-  } else {
-    cb('error: this provider has not been setup (' + type + ')', null)
+  if (!this.modes[type]) {
+    return cb('error: this provider has not been setup (' + type + ')', null)
   }
+  cb(null, this.modes[type])
 }
 
 Web3Providers.prototype.addWeb3 = function (type, web3) {
