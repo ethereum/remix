@@ -52,11 +52,10 @@ module.exports = {
   isCallToPrecompiledContract: function (index, trace) {
     // if stack empty => this is not a precompiled contract
     var step = trace[index]
-    if (this.isCallInstruction(step)) {
-      return index + 1 < trace.length && trace[index + 1].stack.length !== 0
-    } else {
-      return false
+    if (!this.isCallInstruction(step)) {
+      return false;
     }
+    return index + 1 < trace.length && trace[index + 1].stack.length !== 0
   },
 
   contractCreationToken: function (index) {

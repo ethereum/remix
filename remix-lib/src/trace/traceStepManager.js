@@ -18,21 +18,19 @@ TraceStepManager.prototype.isReturnInstruction = function (index) {
 }
 
 TraceStepManager.prototype.findStepOverBack = function (currentStep) {
-  if (this.isReturnInstruction(currentStep)) {
-    var call = util.findCall(currentStep, this.traceAnalyser.traceCache.callsTree.call)
-    return call.start > 0 ? call.start - 1 : 0
-  } else {
+  if (!this.isReturnInstruction(currentStep)) {
     return currentStep > 0 ? currentStep - 1 : 0
   }
+  var call = util.findCall(currentStep, this.traceAnalyser.traceCache.callsTree.call)
+  return call.start > 0 ? call.start - 1 : 0
 }
 
 TraceStepManager.prototype.findStepOverForward = function (currentStep) {
-  if (this.isCallInstruction(currentStep)) {
-    var call = util.findCall(currentStep + 1, this.traceAnalyser.traceCache.callsTree.call)
-    return call.return + 1 < this.traceAnalyser.trace.length ? call.return + 1 : this.traceAnalyser.trace.length - 1
-  } else {
+  if (!this.isCallInstruction(currentStep)) {
     return this.traceAnalyser.trace.length >= currentStep + 1 ? currentStep + 1 : currentStep
   }
+  var call = util.findCall(currentStep + 1, this.traceAnalyser.traceCache.callsTree.call)
+  return call.return + 1 < this.traceAnalyser.trace.length ? call.return + 1 : this.traceAnalyser.trace.length - 1
 }
 
 TraceStepManager.prototype.findNextCall = function (currentStep) {
@@ -42,12 +40,10 @@ TraceStepManager.prototype.findNextCall = function (currentStep) {
     var callStart = util.findLowerBound(currentStep, subCalls) + 1
     if (subCalls.length > callStart) {
       return subCalls[callStart] - 1
-    } else {
-      return currentStep
     }
-  } else {
     return currentStep
   }
+  return currentStep
 }
 
 TraceStepManager.prototype.findStepOut = function (currentStep) {

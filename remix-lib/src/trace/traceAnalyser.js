@@ -66,9 +66,8 @@ TraceAnalyser.prototype.buildCalldata = function (index, step, tx, newContext) {
 }
 
 TraceAnalyser.prototype.buildMemory = function (index, step) {
-  if (step.memory) {
-    this.traceCache.pushMemoryChanges(index)
-  }
+  if (!step.memory) return
+  this.traceCache.pushMemoryChanges(index)
 }
 
 TraceAnalyser.prototype.buildStorage = function (index, step, context) {
