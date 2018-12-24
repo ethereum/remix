@@ -97,9 +97,8 @@ module.exports = {
         if (value.components) {
           let fullType = this.makeFullTypeDefinition(value)
           return fullType.replace(/tuple/g, '') // return of makeFullTypeDefinition might contain `tuple`, need to remove it cause `methodIdentifier` (fnName) does not include `tuple` keyword
-        } else {
-          return value.type
         }
+        return value.type
       }).join(',') + ')') {
         return fn
       }

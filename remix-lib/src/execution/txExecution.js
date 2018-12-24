@@ -79,10 +79,12 @@ module.exports = {
     if (exceptionError === errorCode.INVALID_OPCODE) {
       msg = `\t\n\tThe execution might have thrown.\n`
       ret.error = true
-    } else if (exceptionError === errorCode.OUT_OF_GAS) {
+    }
+    if (exceptionError === errorCode.OUT_OF_GAS) {
       msg = `\tThe transaction ran out of gas. Please increase the Gas Limit.\n`
       ret.error = true
-    } else if (exceptionError === errorCode.REVERT) {
+    }
+    if (exceptionError === errorCode.REVERT) {
       var returnData = txResult.result.vm.return
       // It is the hash of Error(string)
       if (returnData && (returnData.slice(0, 4).toString('hex') === '08c379a0')) {
@@ -93,7 +95,8 @@ module.exports = {
         msg = `\tThe transaction has been reverted to the initial state.\nNote: The constructor should be payable if you send value.`
       }
       ret.error = true
-    } else if (exceptionError === errorCode.STATIC_STATE_CHANGE) {
+    }
+    if (exceptionError === errorCode.STATIC_STATE_CHANGE) {
       msg = `\tState changes is not allowed in Static Call context\n`
       ret.error = true
     }

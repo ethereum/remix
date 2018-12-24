@@ -53,9 +53,8 @@ class TxListener {
 
       addExecutionCosts(txResult, call)
       this._resolveTx(call, call, (error, resolvedData) => {
-        if (!error) {
-          this.event.trigger('newCall', [call])
-        }
+        if (error) return
+        this.event.trigger('newCall', [call])
       })
     })
 
@@ -165,9 +164,8 @@ class TxListener {
 
   _manageBlock (blockNumber) {
     executionContext.web3().eth.getBlock(blockNumber, true, (error, result) => {
-      if (!error) {
-        this._newBlock(Object.assign({type: 'web3'}, result))
-      }
+      if (error) return
+      this._newBlock(Object.assign({type: 'web3'}, result))
     })
   }
 

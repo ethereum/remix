@@ -32,9 +32,8 @@ function stringify (v) {
         retObject[i] = stringify(v[i])
       }
       return retObject
-    } else {
-      return v
     }
+    return v
   } catch (e) {
     console.log(e)
     return v

@@ -25,9 +25,8 @@ module.exports = {
     }
     if (contractbyteCode) {
       return { data: '0x' + contractbyteCode + encodedHex.replace('0x', '') }
-    } else {
-      return { data: helper.encodeFunctionId(funABI) + encodedHex.replace('0x', '') }
     }
+    return { data: helper.encodeFunctionId(funABI) + encodedHex.replace('0x', '') }
   },
 
   /**
@@ -101,14 +100,12 @@ module.exports = {
     this.encodeParams(params, funAbi, (error, encodedParam) => {
       if (error) return callback(error)
       var bytecodeToDeploy = contract.evm.bytecode.object
-      if (bytecodeToDeploy.indexOf('_') >= 0) {
-        if (linkLibraries && linkReferences) {
-          for (var libFile in linkLibraries) {
-            for (var lib in linkLibraries[libFile]) {
-              var address = linkLibraries[libFile][lib]
-              if (!ethJSUtil.isValidAddress(address)) return callback(address + ' is not a valid address. Please check the provided address is valid.')
-              bytecodeToDeploy = this.linkLibraryStandardFromlinkReferences(lib, address.replace('0x', ''), bytecodeToDeploy, linkReferences)
-            }
+      if (bytecodeToDeploy.indexOf('_') >= 0 && linkLibraries && linkReferences) {
+        for (var libFile in linkLibraries) {
+          for (var lib in linkLibraries[libFile]) {
+            var address = linkLibraries[libFile][lib]
+            if (!ethJSUtil.isValidAddress(address)) return callback(address + ' is not a valid address. Please check the provided address is valid.')
+            bytecodeToDeploy = this.linkLibraryStandardFromlinkReferences(lib, address.replace('0x', ''), bytecodeToDeploy, linkReferences)
           }
         }
       }
@@ -148,9 +145,8 @@ module.exports = {
           }
         }, callbackStep, callbackDeployLibrary)
         return
-      } else {
-        dataHex = bytecodeToDeploy + encodedParam.dataHex
       }
+      dataHex = bytecodeToDeploy + encodedParam.dataHex
       callback(null, {dataHex: bytecodeToDeploy, funAbi, funArgs: encodedParam.funArgs, contractBytecode, contractName: contractName})
     })
   },
@@ -214,9 +210,8 @@ module.exports = {
           }
         }, callbackStep, callbackDeployLibrary)
         return
-      } else {
-        dataHex = bytecodeToDeploy + dataHex
       }
+      dataHex = bytecodeToDeploy + dataHex
     } else {
       dataHex = helper.encodeFunctionId(funAbi) + dataHex
     }
@@ -293,10 +288,9 @@ module.exports = {
       return callback(null, contract.evm.bytecode.object)
     }
     if (contract.evm.bytecode.linkReferences && Object.keys(contract.evm.bytecode.linkReferences).length) {
-      this.linkBytecodeStandard(contract, contracts, callback, callbackStep, callbackDeployLibrary)
-    } else {
-      this.linkBytecodeLegacy(contract, contracts, callback, callbackStep, callbackDeployLibrary)
+      return this.linkBytecodeStandard(contract, contracts, callback, callbackStep, callbackDeployLibrary)
     }
+    this.linkBytecodeLegacy(contract, contracts, callback, callbackStep, callbackDeployLibrary)
   },
 
   deployLibrary: function (libraryName, libraryShortName, library, contracts, callback, callbackStep, callbackDeployLibrary) {
@@ -306,22 +300,21 @@ module.exports = {
     }
     var bytecode = library.evm.bytecode.object
     if (bytecode.indexOf('_') >= 0) {
-      this.linkBytecode(library, contracts, (err, bytecode) => {
+      return this.linkBytecode(library, contracts, (err, bytecode) => {
         if (err) callback(err)
         else this.deployLibrary(libraryName, libraryShortName, library, contracts, callback, callbackStep, callbackDeployLibrary)
       }, callbackStep, callbackDeployLibrary)
-    } else {
-      callbackStep(`creation of library ${libraryName} pending...`)
-      var data = {dataHex: bytecode, funAbi: {type: 'constructor'}, funArgs: [], contractBytecode: bytecode, contractName: libraryShortName}
-      callbackDeployLibrary({ data: data, useCall: false }, (err, txResult) => {
-        if (err) {
-          return callback(err)
-        }
-        var address = txResult.result.createdAddress || txResult.result.contractAddress
-        library.address = address
-        callback(err, address)
-      })
     }
+    callbackStep(`creation of library ${libraryName} pending...`)
+    var data = {dataHex: bytecode, funAbi: {type: 'constructor'}, funArgs: [], contractBytecode: bytecode, contractName: libraryShortName}
+    callbackDeployLibrary({ data: data, useCall: false }, (err, txResult) => {
+      if (err) {
+        return callback(err)
+      }
+      var address = txResult.result.createdAddress || txResult.result.contractAddress
+      library.address = address
+      callback(err, address)
+    })
   },
 
   linkLibraryStandardFromlinkReferences: function (libraryName, address, bytecode, linkReferences) {
@@ -357,33 +350,32 @@ module.exports = {
 
   decodeResponse: function (response, fnabi) {
     // Only decode if there supposed to be fields
-    if (fnabi.outputs && fnabi.outputs.length > 0) {
-      try {
-        var i
+    if (!fnabi.outputs || fnabi.outputs.length <= 0) return {}
 
-        var outputTypes = []
-        for (i = 0; i < fnabi.outputs.length; i++) {
-          var type = fnabi.outputs[i].type
-          outputTypes.push(type.indexOf('tuple') === 0 ? helper.makeFullTypeDefinition(fnabi.outputs[i]) : type)
-        }
+    try {
+      var i
 
-        if (!response.length) response = new Uint8Array(32 * fnabi.outputs.length) // ensuring the data is at least filled by 0 cause `AbiCoder` throws if there's not engouh data
-        // decode data
-        var abiCoder = new ethers.utils.AbiCoder()
-        var decodedObj = abiCoder.decode(outputTypes, response)
-
-        var json = {}
-        for (i = 0; i < outputTypes.length; i++) {
-          var name = fnabi.outputs[i].name
-          json[i] = outputTypes[i] + ': ' + (name ? name + ' ' + decodedObj[i] : decodedObj[i])
-        }
-
-        return json
-      } catch (e) {
-        return { error: 'Failed to decode output: ' + e }
+      var outputTypes = []
+      for (i = 0; i < fnabi.outputs.length; i++) {
+        var type = fnabi.outputs[i].type
+        outputTypes.push(type.indexOf('tuple') === 0 ? helper.makeFullTypeDefinition(fnabi.outputs[i]) : type)
       }
+
+      if (!response.length) response = new Uint8Array(32 * fnabi.outputs.length) // ensuring the data is at least filled by 0 cause `AbiCoder` throws if there's not engouh data
+      // decode data
+      var abiCoder = new ethers.utils.AbiCoder()
+      var decodedObj = abiCoder.decode(outputTypes, response)
+
+      var json = {}
+      for (i = 0; i < outputTypes.length; i++) {
+        var name = fnabi.outputs[i].name
+        json[i] = outputTypes[i] + ': ' + (name ? name + ' ' + decodedObj[i] : decodedObj[i])
+      }
+
+      return json
+    } catch (e) {
+      return { error: 'Failed to decode output: ' + e }
     }
-    return {}
   }
 }
 

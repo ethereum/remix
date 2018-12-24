@@ -31,18 +31,17 @@ class TxRunner {
 
   _executeTx (tx, gasPrice, api, promptCb, callback) {
     if (gasPrice) tx.gasPrice = executionContext.web3().toHex(gasPrice)
-    if (api.personalMode()) {
-      promptCb(
-        (value) => {
-          this._sendTransaction(executionContext.web3().personal.sendTransaction, tx, value, callback)
-        },
-        () => {
-          return callback('Canceled by user.')
-        }
-      )
-    } else {
-      this._sendTransaction(executionContext.web3().eth.sendTransaction, tx, null, callback)
+    if (!api.personalMode()) {
+      return this._sendTransaction(executionContext.web3().eth.sendTransaction, tx, null, callback)
     }
+    promptCb(
+      (value) => {
+        this._sendTransaction(executionContext.web3().personal.sendTransaction, tx, value, callback)
+      },
+      () => {
+        return callback('Canceled by user.')
+      }
+    )
   }
 
   _sendTransaction (sendTx, tx, pass, callback) {
@@ -82,13 +81,12 @@ class TxRunner {
     }
 
     if (!executionContext.isVM()) {
-      self.runInNode(args.from, args.to, data, args.value, args.gasLimit, args.useCall, confirmationCb, gasEstimationForceSend, promptCb, callback)
-    } else {
-      try {
-        self.runInVm(args.from, args.to, data, args.value, args.gasLimit, args.useCall, args.timestamp, callback)
-      } catch (e) {
-        callback(e, null)
-      }
+      return self.runInNode(args.from, args.to, data, args.value, args.gasLimit, args.useCall, confirmationCb, gasEstimationForceSend, promptCb, callback)
+    }
+    try {
+      self.runInVm(args.from, args.to, data, args.value, args.gasLimit, args.useCall, args.timestamp, callback)
+    } catch (e) {
+      callback(e, null)
     }
   }
 
@@ -204,9 +202,8 @@ async function tryTillReceiptAvailable (txhash, done) {
         // Try again with a bit of delay if error or if result still null
         await pause()
         return resolve(await tryTillReceiptAvailable(txhash))
-      } else {
-        return resolve(receipt)
       }
+      return resolve(receipt)
     })
   })
 }
@@ -218,9 +215,8 @@ async function tryTillTxAvailable (txhash, done) {
         // Try again with a bit of delay if error or if result still null
         await pause()
         return resolve(await tryTillTxAvailable(txhash))
-      } else {
-        return resolve(tx)
       }
+      return resolve(tx)
     })
   })
 }
@@ -229,18 +225,17 @@ async function pause () { return new Promise((resolve, reject) => { setTimeout(r
 
 function run (self, tx, stamp, confirmationCb, gasEstimationForceSend, promptCb, callback) {
   if (!self.runAsync && Object.keys(self.pendingTxs).length) {
-    self.queusTxs.push({ tx, stamp, callback })
-  } else {
-    self.pendingTxs[stamp] = tx
-    self.execute(tx, confirmationCb, gasEstimationForceSend, promptCb, (error, result) => {
-      delete self.pendingTxs[stamp]
-      callback(error, result)
-      if (self.queusTxs.length) {
-        var next = self.queusTxs.pop()
-        run(self, next.tx, next.stamp, next.callback)
-      }
-    })
+    return self.queusTxs.push({ tx, stamp, callback })
   }
+  self.pendingTxs[stamp] = tx
+  self.execute(tx, confirmationCb, gasEstimationForceSend, promptCb, (error, result) => {
+    delete self.pendingTxs[stamp]
+    callback(error, result)
+    if (self.queusTxs.length) {
+      var next = self.queusTxs.pop()
+      run(self, next.tx, next.stamp, next.callback)
+    }
+  })
 }
 
 module.exports = TxRunner

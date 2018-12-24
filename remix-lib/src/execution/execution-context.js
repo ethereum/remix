@@ -120,44 +120,40 @@ function ExecutionContext () {
 
   this.detectNetwork = function (callback) {
     if (this.isVM()) {
-      callback(null, { id: '-', name: 'VM' })
-    } else {
-      this.web3().version.getNetwork((err, id) => {
-        var name = null
-        if (err) name = 'Unknown'
-        // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md
-        else if (id === '1') name = 'Main'
-        else if (id === '2') name = 'Morden (deprecated)'
-        else if (id === '3') name = 'Ropsten'
-        else if (id === '4') name = 'Rinkeby'
-        else if (id === '42') name = 'Kovan'
-        else name = 'Custom'
-
-        if (id === '1') {
-          this.web3().eth.getBlock(0, (error, block) => {
-            if (error) console.log('cant query first block')
-            if (block && block.hash !== mainNetGenesisHash) name = 'Custom'
-            callback(err, { id, name })
-          })
-        } else {
-          callback(err, { id, name })
-        }
-      })
+      return callback(null, { id: '-', name: 'VM' })
     }
+    this.web3().version.getNetwork((err, id) => {
+      var name = null
+      if (err) name = 'Unknown'
+      // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md
+      else if (id === '1') name = 'Main'
+      else if (id === '2') name = 'Morden (deprecated)'
+      else if (id === '3') name = 'Ropsten'
+      else if (id === '4') name = 'Rinkeby'
+      else if (id === '42') name = 'Kovan'
+      else name = 'Custom'
+
+      if (id === '1') {
+        return this.web3().eth.getBlock(0, (error, block) => {
+          if (error) console.log('cant query first block')
+          if (block && block.hash !== mainNetGenesisHash) name = 'Custom'
+          callback(err, { id, name })
+        })
+      }
+      callback(err, { id, name })
+    })
   }
 
   this.removeProvider = function (name) {
-    if (name && this.customNetWorks[name]) {
-      delete this.customNetWorks[name]
-      self.event.trigger('removeProvider', [name])
-    }
+    if (!name || !this.customNetWorks[name]) return
+    delete this.customNetWorks[name]
+    self.event.trigger('removeProvider', [name])
   }
 
   this.addProvider = function (network) {
-    if (network && network.name && network.url) {
-      this.customNetWorks[network.name] = network
-      self.event.trigger('addProvider', [network])
-    }
+    if (!network || !network.name || !network.url) return
+    this.customNetWorks[network.name] = network
+    self.event.trigger('addProvider', [network])
   }
 
   this.internalWeb3 = function () {
@@ -196,14 +192,13 @@ function ExecutionContext () {
         alertMsg += '(when recently activated you may have to reload the page).'
         infoCb(alertMsg)
         return cb()
-      } else {
-        self.askPermission()
-        executionContext = context
-        web3.setProvider(injectedProvider)
-        self._updateBlockGasLimit()
-        self.event.trigger('contextChanged', ['injected'])
-        return cb()
       }
+      self.askPermission()
+      executionContext = context
+      web3.setProvider(injectedProvider)
+      self._updateBlockGasLimit()
+      self.event.trigger('contextChanged', ['injected'])
+      return cb()
     }
 
     if (context === 'web3') {
@@ -226,16 +221,15 @@ function ExecutionContext () {
   }
 
   this._updateBlockGasLimit = function () {
-    if (this.getProvider() !== 'vm') {
-      web3.eth.getBlock('latest', (err, block) => {
-        if (!err) {
-          // we can't use the blockGasLimit cause the next blocks could have a lower limit : https://github.com/ethereum/remix/issues/506
-          this.blockGasLimit = (block && block.gasLimit) ? Math.floor(block.gasLimit - (5 * block.gasLimit) / 1024) : this.blockGasLimitDefault
-        } else {
-          this.blockGasLimit = this.blockGasLimitDefault
-        }
-      })
-    }
+    if (this.getProvider() === 'vm') return
+    web3.eth.getBlock('latest', (err, block) => {
+      if (!err) {
+        // we can't use the blockGasLimit cause the next blocks could have a lower limit : https://github.com/ethereum/remix/issues/506
+        this.blockGasLimit = (block && block.gasLimit) ? Math.floor(block.gasLimit - (5 * block.gasLimit) / 1024) : this.blockGasLimitDefault
+      } else {
+        this.blockGasLimit = this.blockGasLimitDefault
+      }
+    })
   }
 
   this.listenOnLastBlock = function () {
@@ -258,20 +252,18 @@ function ExecutionContext () {
       self._updateBlockGasLimit()
       self.event.trigger('contextChanged', ['web3'])
       self.event.trigger('web3EndpointChanged')
-      cb()
-    } else {
-      web3.setProvider(oldProvider)
-      var alertMsg = 'Not possible to connect to the Web3 provider. '
-      alertMsg += 'Make sure the provider is running and a connection is open (via IPC or RPC).'
-      cb(alertMsg)
+      return cb()
     }
+    web3.setProvider(oldProvider)
+    var alertMsg = 'Not possible to connect to the Web3 provider. '
+    alertMsg += 'Make sure the provider is running and a connection is open (via IPC or RPC).'
+    cb(alertMsg)
   }
   this.setProviderFromEndpoint = setProviderFromEndpoint
 
   this.txDetailsLink = function (network, hash) {
-    if (transactionDetailsLinks[network]) {
-      return transactionDetailsLinks[network] + hash
-    }
+    if (!transactionDetailsLinks[network]) return
+    return transactionDetailsLinks[network] + hash
   }
 }
 
