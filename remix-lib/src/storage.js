@@ -27,10 +27,8 @@ function Storage (prefix) {
   this.remove = function (name) {
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem(prefix + name)
-      return true
-    } else {
-      return true
     }
+    return true
   }
 
   this.rename = function (originalName, newName) {
@@ -46,9 +44,8 @@ function Storage (prefix) {
     // NOTE: this is a workaround for some browsers
     if (typeof window !== 'undefined') {
       return Object.keys(window.localStorage).filter(function (item) { return item !== null && item !== undefined })
-    } else {
-      return []
     }
+    return []
   }
 
   this.keys = function () {
@@ -62,11 +59,10 @@ function Storage (prefix) {
   // on startup, upgrade the old storage layout
   if (typeof window !== 'undefined') {
     safeKeys().forEach(function (name) {
-      if (name.indexOf('sol-cache-file-', 0) === 0) {
-        var content = window.localStorage.getItem(name)
-        window.localStorage.setItem(name.replace(/^sol-cache-file-/, 'sol:'), content)
-        window.localStorage.removeItem(name)
-      }
+      if (name.indexOf('sol-cache-file-', 0) !== 0) return
+      var content = window.localStorage.getItem(name)
+      window.localStorage.setItem(name.replace(/^sol-cache-file-/, 'sol:'), content)
+      window.localStorage.removeItem(name)
     })
   }
 

@@ -31,9 +31,8 @@ SourceMappingDecoder.prototype.nodesAtPosition = function(astNodeType, position,
         if (astNodeType) return false
       }
       return true
-    } else {
-      return false
     }
+    return false
   }
   astWalker.walk(ast.legacyAST, callback)
   return found
@@ -84,13 +83,12 @@ SourceMappingDecoder.prototype.atIndex = function(index, mapping) {
  * @return {Object} returns the decompressed source mapping {start, length, file}
  */
 SourceMappingDecoder.prototype.decode = function (value) {
-  if (value) {
-    value = value.split(':')
-    return {
-      start: parseInt(value[0]),
-      length: parseInt(value[1]),
-      file: parseInt(value[2])
-    }
+  if (!value) return
+  value = value.split(':')
+  return {
+    start: parseInt(value[0]),
+    length: parseInt(value[1]),
+    file: parseInt(value[2])
   }
 }
 
@@ -143,12 +141,8 @@ SourceMappingDecoder.prototype.convertOffsetToLineColumn = function (sourceLocat
       start: convertFromCharPosition(sourceLocation.start, lineBreakPositions),
       end: convertFromCharPosition(sourceLocation.start + sourceLocation.length, lineBreakPositions)
     }
-  } else {
-    return {
-      start: null,
-      end: null
-    }
   }
+  return { start: null, end: null }
 }
 
 /**
@@ -171,22 +165,13 @@ function convertFromCharPosition (pos, lineBreakPositions) {
   }
   var beginColumn = line === 0 ? 0 : (lineBreakPositions[line - 1] + 1)
   var column = pos - beginColumn
-  return {
-    line: line,
-    column: column
-  }
+  return { line: line, column: column }
 }
 
 function sourceLocationFromAstNode (astNode) {
-  if (astNode.src) {
-    var split = astNode.src.split(':')
-    return {
-      start: parseInt(split[0]),
-      length: parseInt(split[1]),
-      file: parseInt(split[2])
-    }
-  }
-  return null
+  if (!astNode.src) return null
+  var split = astNode.src.split(':')
+  return { start: parseInt(split[0]), length: parseInt(split[1]), file: parseInt(split[2]) }
 }
 
 function findNodeAtSourceLocation (astNodeType, sourceLocation, ast) {
@@ -198,16 +183,11 @@ function findNodeAtSourceLocation (astNodeType, sourceLocation, ast) {
     if (!nodeLocation) {
       return true
     }
-    if (nodeLocation.start <= sourceLocation.start && nodeLocation.start + nodeLocation.length >= sourceLocation.start + sourceLocation.length) {
-      if (astNodeType === node.name) {
-        found = node
-        return false
-      } else {
-        return true
-      }
-    } else {
+    if (nodeLocation.start <= sourceLocation.start && nodeLocation.start + nodeLocation.length >= sourceLocation.start + sourceLocation.length && astNodeType === node.name) {
+      found = node
       return false
     }
+    return false
   }
   astWalker.walk(ast.legacyAST, callback)
   return found

@@ -25,11 +25,8 @@ function SourceLocationTracker (_codeManager) {
 SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function (address, index, contracts, cb) {
   var self = this
   extractSourceMap(this, this.codeManager, address, contracts, function (error, sourceMap) {
-    if (error) {
-      cb(error)
-    } else {
-      cb(null, self.sourceMappingDecoder.atIndex(index, sourceMap))
-    }
+    if (error) return cb(error)
+    cb(null, self.sourceMappingDecoder.atIndex(index, sourceMap))
   })
 }
 
@@ -44,17 +41,11 @@ SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function
 SourceLocationTracker.prototype.getSourceLocationFromVMTraceIndex = function (address, vmtraceStepIndex, contracts, cb) {
   var self = this
   extractSourceMap(this, this.codeManager, address, contracts, function (error, sourceMap) {
-    if (!error) {
-      self.codeManager.getInstructionIndex(address, vmtraceStepIndex, function (error, index) {
-        if (error) {
-          cb(error)
-        } else {
-          cb(null, self.sourceMappingDecoder.atIndex(index, sourceMap))
-        }
-      })
-    } else {
-      cb(error)
-    }
+    if (error) return cb(error)
+    self.codeManager.getInstructionIndex(address, vmtraceStepIndex, function (error, index) {
+      if (error) return cb(error)
+      cb(null, self.sourceMappingDecoder.atIndex(index, sourceMap))
+    })
   })
 }
 
@@ -80,17 +71,13 @@ function extractSourceMap (self, codeManager, address, contracts, cb) {
   if (self.sourceMapByAddress[address]) return cb(null, self.sourceMapByAddress[address])
 
   codeManager.getCode(address, function (error, result) {
-    if (!error) {
-      var sourceMap = getSourceMap(address, result.bytecode, contracts)
-      if (sourceMap) {
-        if (!helper.isContractCreation(address)) self.sourceMapByAddress[address] = sourceMap
-        cb(null, sourceMap)
-      } else {
-        cb('no sourcemap associated with the code ' + address)
-      }
-    } else {
-      cb(error)
+    if (error) return cb(error)
+    var sourceMap = getSourceMap(address, result.bytecode, contracts)
+    if (sourceMap) {
+      if (!helper.isContractCreation(address)) self.sourceMapByAddress[address] = sourceMap
+      return cb(null, sourceMap)
     }
+    cb('no sourcemap associated with the code ' + address)
   })
 }
 

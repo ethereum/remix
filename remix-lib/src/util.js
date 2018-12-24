@@ -125,12 +125,12 @@ module.exports = {
     var index = this.findLowerBound(target, array)
     if (index < 0) {
       return 0
-    } else if (index >= array.length - 1) {
-      return array.length - 1
-    } else {
-      var middle = (array[index] + array[index + 1]) / 2
-      return target <= middle ? index : index + 1
     }
+    if (index >= array.length - 1) {
+      return array.length - 1
+    }
+    var middle = (array[index] + array[index + 1]) / 2
+    return target <= middle ? index : index + 1
   },
 
   /**
@@ -200,10 +200,7 @@ module.exports = {
     }
     code1 = code1.replace(this.swarmHashExtraction(), '')
     code2 = code2.replace(this.swarmHashExtraction(), '')
-    if (code1 && code2 && code1.indexOf(code2) === 0) {
-      return true
-    }
-    return false
+    return (code1 && code2 && code1.indexOf(code2) === 0)
   },
   groupBy: groupBy,
   concatWithSeperator: concatWithSeperator,
