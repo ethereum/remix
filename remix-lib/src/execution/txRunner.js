@@ -140,10 +140,9 @@ class TxRunner {
 
   runInNode (from, to, data, value, gasLimit, useCall, confirmCb, gasEstimationForceSend, promptCb, callback) {
     const self = this
-    var tx = { from: from, to: to, data: data, value: value }
+    var tx = { from: from, to: to, data: data, value: value, gas: gasLimit }
 
     if (useCall) {
-      tx.gas = gasLimit
       return executionContext.web3().eth.call(tx, function (error, result) {
         callback(error, {
           result: result,
@@ -153,9 +152,6 @@ class TxRunner {
     }
     executionContext.web3().eth.estimateGas(tx, function (err, gasEstimation) {
       gasEstimationForceSend(err, () => {
-        // callback is called whenever no error
-        tx.gas = !gasEstimation ? gasLimit : gasEstimation
-
         if (self._api.config.getUnpersistedProperty('doNotShowTransactionConfirmationAgain')) {
           return self._executeTx(tx, null, self._api, promptCb, callback)
         }
