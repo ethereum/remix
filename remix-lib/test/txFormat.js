@@ -98,7 +98,6 @@ function testLinkLibrary2 (st, callbackDeployLibraries) {
   }
 
   var data = '608060405234801561001057600080fd5b50610265806100206000396000f3fe60806040526004361061003b576000357c0100000000000000000000000000000000000000000000000000000000900480636d4ce63c14610040575b600080fd5b34801561004c57600080fd5b50610055610057565b005b73f7a10e525d4b168f45f74db1b61f63d3e7619e116344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b1580156100b757600080fd5b505af41580156100cb573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e336344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b15801561012f57600080fd5b505af4158015610143573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e336344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b1580156101a757600080fd5b505af41580156101bb573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e116344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b15801561021f57600080fd5b505af4158015610233573d6000803e3d6000fd5b5050505056fea165627a7a723058205e9e996af607b71801d51adf6eed43d4eb1d878cf7370a6029d9312a8fb40e150029'
-
   var deployMsg = ['creation of library test.sol:lib1 pending...',
   'creation of library test.sol:lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2 pending...']
   txFormat.encodeConstructorCallAndLinkLibraries(context.contract, '', context.contract.abi[0], librariesReference, context.contract.evm.bytecode.linkReferences, (error, result) => {
@@ -235,7 +234,7 @@ library lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_li
     }
 }
 
-contract testContractLinkLibrary { 
+contract testContractLinkLibrary {
     function get () public {
         lib1.getEmpty();
         lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2.getEmpty();
@@ -246,17 +245,17 @@ contract testContractLinkLibrary {
 
 var encodeFunctionCall = `pragma solidity ^0.5.0;
 
-contract testContractLinkLibrary { 
+contract testContractLinkLibrary {
     function get (uint _p, string memory _o) public {
     }
  }`
 
 var fallbackFunction = `pragma solidity ^0.5.0;
 
-contract fallbackFunctionContract { 
+contract fallbackFunctionContract {
     function get (uint _p, string memory _o) public {
     }
-    
+
     function () external {}
  }`
 
@@ -271,7 +270,7 @@ contract test {
     function t (p memory _p, uint _i) public returns (p memory) {
         return _p;
     }
-    
+
      function t () public returns (p memory) {
         p memory mm;
         mm.a = 123;
@@ -282,17 +281,17 @@ contract test {
 
 var abiEncoderV2ArrayOfTuple = `pragma experimental ABIEncoderV2;
 contract test {
-    
+
     struct MyStruct {uint256 num; string  _string;}
-    
+
     constructor (MyStruct[] memory _structs, string memory _str) public {
-        
+
     }
-    
+
     function addStructs(MyStruct[] memory _structs) public returns (MyStruct[] memory strucmts) {
        strucmts = _structs;
     }
-    
+
     function addStructs(MyStruct memory _structs) public returns (MyStruct memory _strucmts) {
       _strucmts = _structs;
     }
