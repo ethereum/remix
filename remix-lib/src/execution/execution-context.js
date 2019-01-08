@@ -68,7 +68,7 @@ function createVm(hardfork) {
   })
   var web3vm = new Web3VMProvider()
   web3vm.setVM(vm)
-  return { vms, web3vm }
+  return { vm, web3vm, stateManager }
 }
 
 var vms = {
@@ -108,7 +108,7 @@ function ExecutionContext () {
   }
 
   this.web3 = function () {
-    return this.isVM() ? web3VM : web3
+    return this.isVM() ? vms.constantinople.web3vm : web3
   }
 
   this.detectNetwork = function (callback) {
@@ -162,7 +162,7 @@ function ExecutionContext () {
   }
 
   this.vm = function () {
-    return vm
+    return vms.constantinople.vm
   }
 
   this.setContext = function (context, endPointUrl, confirmCb, infoCb) {
@@ -175,8 +175,8 @@ function ExecutionContext () {
 
     if (context === 'vm') {
       executionContext = context
-      vm.stateManager.revert(function () {
-        vm.stateManager.checkpoint(() => {})
+      vms.constantinople.stateManager.revert(() => {
+        vms.constantinople.stateManager.checkpoint(() => {})
       })
       self.event.trigger('contextChanged', ['vm'])
       return cb()
