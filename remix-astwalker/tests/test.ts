@@ -1,17 +1,16 @@
-import * as tape from 'tape'
+import tape from 'tape'
 import { AstWalker, Node } from '../src/'
 import node from './resources/ast'
 
-tape('ASTWalker', (t) => {
+tape("ASTWalker", (t: tape.Test) => {
   t.test('ASTWalker.walk', (st) => {
-    st.plan(24)
-    let astwalker = new AstWalker()
-    console.log("Walking test")
-    astwalker.walk(node.ast.legacyAST)
-    astwalker.on('node', node => {
+    st.plan(1)
+    const astWalker = new AstWalker()
+    console.log("Hello test logging")
+    astWalker.walk(node.ast)
+    astWalker.on('node', node => {
       console.log(node)
     })
-    st.true(5 > 2 + 2);
-    st.ok("Tested Ok")
+    st.end()
   })
-})
+});
