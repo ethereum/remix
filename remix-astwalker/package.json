@@ -5,14 +5,24 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "ts-node node_modules/tape/bin/tape ./tests/**/*.ts"
+    "test": "nyc --reporter=lcov --require ts-node/register tape ./tests/*.ts | tap-spec; nyc report ---reporter=text"
   },
   "author": "0mkara",
   "license": "MIT",
   "devDependencies": {
     "@types/tape": "^4.2.33",
+    "nyc": "^13.3.0",
+    "tap-spec": "^5.0.0",
     "tape": "^4.10.1",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.3333"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ]
   }
 }
