@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import { AstNode } from 'index'
 export declare interface AstWalker {
   new(): EventEmitter;
 }
@@ -16,7 +17,7 @@ export declare interface AstWalker {
   * If no event for the current type, children are visited.
   */
 export class AstWalker extends EventEmitter {
-   walk(ast) {
+   walk(ast: AstNode) {
      //this.emit('node', ast);
      for(let k in ast.children) {
        let child = ast.children[k];
