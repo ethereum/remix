@@ -57,7 +57,7 @@ class StateManagerCommonStorageDump extends StateManager {
   }
 }
 
-function createVm(hardfork) {
+function createVm (hardfork) {
   var stateManager = new StateManagerCommonStorageDump({})
   stateManager.checkpoint(() => {})
   var vm = new EthJSVM({
