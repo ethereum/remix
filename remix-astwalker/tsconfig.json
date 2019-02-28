@@ -22,5 +22,6 @@
     ],
     /* Experimental Options */
     "experimentalDecorators": true,           /* Enables experimental support for ES7 decorators. */
+    "allowSyntheticDefaultImports": true
   }
 }
