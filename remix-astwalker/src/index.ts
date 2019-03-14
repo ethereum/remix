@@ -1,2 +1,2 @@
-export * from './astWalker'
 export * from './types'
+export * from './astWalker'
