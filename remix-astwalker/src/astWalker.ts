@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { AstNode } from 'index'
+import { AstNode, Node, AstNodeAtt } from 'index'
 export declare interface AstWalker {
   new(): EventEmitter;
 }
@@ -17,17 +17,32 @@ export declare interface AstWalker {
   * If no event for the current type, children are visited.
   */
 export class AstWalker extends EventEmitter {
-   walk(ast: AstNode) {
-     //this.emit('node', ast);
-     for(let k in ast.children) {
-       let child = ast.children[k];
-       this.emit('node', child);
-       this.walk(child);
+  manageCallback(node: AstNode, callback: Object | Function) : any {
+    if (node.name in callback){
+      return callback[node.name](node)
+    } else {
+      return callback['*'](node)
+    }
+  }
+   walk(ast: AstNode, callback: Function) {
+     if(callback instanceof Function){
+      callback = Object({'*': callback})
+     }
+     if(!('*' in callback)){
+       callback['*'] = function () {return true}
+     }
+     if(this.manageCallback(ast, callback) && ast.children && ast.children.length > 0){
+       for(let k in ast.children) {
+         let child = ast.children[k];
+         this.emit('node', child);
+         this.walk(child, callback);
+       }
+
      }
    }
-   walkAstList(sourcesList) {
+   walkAstList(sourcesList: Node, cb: Function) {
      for (var k in sourcesList) {
-       this.walk(sourcesList[k].legacyAST)
+       this.walk(sourcesList[k].legacyAST, cb)
      }
    }
 }

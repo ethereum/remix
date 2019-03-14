@@ -4,7 +4,7 @@ import node from './resources/ast'
 
 tape("ASTWalker", (t: tape.Test) => {
   t.test('ASTWalker.walk', (st: tape.Test) => {
-    st.plan(23)
+    st.plan(24)
     const astWalker = new AstWalker()
     astWalker.on('node', node => {
       if(node.name === 'ContractDefinition') {
@@ -15,7 +15,13 @@ tape("ASTWalker", (t: tape.Test) => {
         checkGetFunction(st, node)
       }
     })
-    astWalker.walk(node.ast.legacyAST)
+    astWalker.walk(node.ast, (children)=> {
+      console.log(children)
+      st.equal(children.name, 'FunctionDefinition')
+      st.equal(children.attributes.name === 'set' || children.attributes.name === 'get', true)
+      
+      return true;
+    })
     st.end()
   })
 });
