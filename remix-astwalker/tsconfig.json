@@ -22,6 +22,8 @@
     ],
     /* Experimental Options */
     "experimentalDecorators": true,           /* Enables experimental support for ES7 decorators. */
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    // Disables strictNullChecks
+    "strictNullChecks": false
   }
 }
