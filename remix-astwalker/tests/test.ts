@@ -1,11 +1,15 @@
 import tape from 'tape'
 import { AstWalker, AstNode } from '../src/'
 import node from './resources/ast'
+import { strict } from 'assert';
+import { ast } from '../../remix-lib/test/resources/ast';
 
 tape("ASTWalker", (t: tape.Test) => {
   t.test('ASTWalker.walk', (st: tape.Test) => {
-    st.plan(23)
+    st.plan(50)
+    // New Ast Object
     const astWalker = new AstWalker()
+    // EventListener
     astWalker.on('node', node => {
       if(node.name === 'ContractDefinition') {
         checkContract(st, node)
@@ -19,9 +23,40 @@ tape("ASTWalker", (t: tape.Test) => {
         checkGetFunction(st, node)
       }
     })
-    astWalker.walk(node.ast.legacyAST, (children)=> {
-      console.log(children)
+
+    // Callback pattern 
+    astWalker.walk(node.ast.legacyAST, (node)=> {
+      if(node.name === 'ContractDefinition') {
+        checkContract(st, node)
+      }
+      if (node.name === 'FunctionDefinition') {
+        checkSetFunction(st, node)
+        checkGetFunction(st, node)
+      }
+      if (node.name === 'VariableDeclaration') {
+        checkSetFunction(st, node)
+        checkGetFunction(st, node)
+      }
+    })
+
+    // Callback Object
+    var callback: any = {};
+    callback.FunctionDefinition = function (node): boolean {
+      st.equal(node.name, 'FunctionDefinition')
+      st.equal(node.attributes.name === 'set' || node.attributes.name === 'get', true)
+      return true
+    }
+    // Calling walk function with cb
+    astWalker.walk(node.ast.legacyAST, callback)
     
+    // Calling walk function without cb
+    astWalker.walk(node.ast.legacyAST)
+
+    // Calling WALKASTLIST function
+    astWalker.walkAstList(node)
+
+    // Calling WALKASTLIST function with cb
+    astWalker.walkAstList(node, (node) => {
       return true;
     })
     st.end()
