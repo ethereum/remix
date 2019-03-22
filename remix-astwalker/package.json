@@ -2,7 +2,7 @@
   "name": "remix-astwalker",
   "version": "0.0.1",
   "description": "Remix sub-module for walking through ast",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "test": "nyc --reporter=lcov --require ts-node/register tape ./tests/*.ts | tap-spec; nyc report ---reporter=text"
