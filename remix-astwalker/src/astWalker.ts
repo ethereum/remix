@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
-import { AstNode, Node, AstNodeAtt } from "index";
+import { AstNodeLegacy, Node, AstNodeAtt } from "index";
 export declare interface AstWalker {
-  new (): EventEmitter;
+  new(): EventEmitter;
 }
 /**
  * Crawl the given AST through the function walk(ast, callback)
@@ -17,14 +17,14 @@ export declare interface AstWalker {
  * If no event for the current type, children are visited.
  */
 export class AstWalker extends EventEmitter {
-  manageCallback(node: AstNode, callback: Object | Function): any {
+  manageCallback(node: AstNodeLegacy, callback: Object | Function): any {
     if (node.name in callback) {
       return callback[node.name](node);
     } else {
       return callback["*"](node);
     }
   }
-  walk(ast: AstNode, callback?: Function | Object) {
+  walk(ast: AstNodeLegacy, callback?: Function | Object) {
     if (callback) {
       if (callback instanceof Function) {
         callback = Object({ "*": callback });
@@ -56,11 +56,10 @@ export class AstWalker extends EventEmitter {
   }
   walkAstList(sourcesList: Node, cb?: Function) {
     if (cb) {
-        this.walk(sourcesList.ast.legacyAST, cb);
-      
+      this.walk(sourcesList.ast.legacyAST, cb);
     } else {
       this.walk(sourcesList.ast.legacyAST);
-      
+
     }
   }
 }

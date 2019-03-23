@@ -4,6 +4,9 @@ export interface Node {
 }
 
 export interface AstNode {
+}
+
+export interface AstNodeLegacy {
   id: number
   name: string
   src: string
