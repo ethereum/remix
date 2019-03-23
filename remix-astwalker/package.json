@@ -14,8 +14,8 @@
     "nyc": "^13.3.0",
     "tap-spec": "^5.0.0",
     "tape": "^4.10.1",
-    "ts-node": "^8.0.2",
-    "typescript": "^3.3.3333"
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4000"
   },
   "nyc": {
     "include": [
