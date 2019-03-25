@@ -1,6 +1,8 @@
 const log = require('./utils/logs.js')
 const merge = require('merge')
+var remixLib = require('remix-lib')
 
+var executionContext = remixLib.execution.executionContext
 const Accounts = require('./methods/accounts.js')
 const Blocks = require('./methods/blocks.js')
 const Misc = require('./methods/misc.js')
@@ -9,8 +11,9 @@ const Transactions = require('./methods/transactions.js')
 const Whisper = require('./methods/whisper.js')
 
 var Provider = function () {
-  this.Accounts = new Accounts()
+  executionContext.setContext('vm', null, () => {}, (msg) => { console.log(msg) })
 
+  this.Accounts = new Accounts()
   this.methods = {}
   this.methods = merge(this.methods, this.Accounts.methods())
   this.methods = merge(this.methods, (new Blocks()).methods())
