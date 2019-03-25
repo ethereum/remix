@@ -8,15 +8,17 @@ let TestRunner = require('./testRunner.js')
 const Web3 = require('web3')
 const Provider = require('remix-simulator').Provider
 
-var createWeb3Provider = function () {
+var createWeb3Provider = async function () {
   let web3 = new Web3()
-  web3.setProvider(new Provider())
+  const provider = new Provider()
+  await provider.init()
+  web3.setProvider(provider)
   return web3
 }
 
-const runTestSources = function (contractSources, testCallback, resultCallback, finalCallback, importFileCb, opts) {
+const runTestSources = async function (contractSources, testCallback, resultCallback, finalCallback, importFileCb, opts) {
   opts = opts || {}
-  let web3 = opts.web3 || createWeb3Provider()
+  let web3 = opts.web3 || await createWeb3Provider()
   let accounts = opts.accounts || null
   async.waterfall([
     function getAccountList (next) {

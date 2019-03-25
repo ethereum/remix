@@ -7,9 +7,11 @@ let Deployer = require('../src/deployer.js')
 let TestRunner = require('../src/testRunner.js')
 const Provider = require('remix-simulator').Provider
 
-function compileAndDeploy (filename, callback) {
+async function compileAndDeploy (filename, callback) {
   let web3 = new Web3()
-  web3.setProvider(new Provider())
+  const provider = new Provider()
+  await provider.init()
+  web3.setProvider(provider)
   let compilationData
   let accounts
   async.waterfall([

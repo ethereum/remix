@@ -35,7 +35,7 @@ commander.command('help').description('output usage information').action(functio
 // get current version
 commander
   .option('-v, --verbose <level>', 'run with verbosity', mapVerbosity)
-  .action(function (filename) {
+  .action(async function (filename) {
     // Console message
     console.log(('\n\t👁 :: Running remix-tests - Unit testing for solidity :: 👁\t\n').white)
     // set logger verbosity
@@ -45,7 +45,9 @@ commander
     }
     let web3 = new Web3()
     // web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))
-    web3.setProvider(new Provider())
+    const provider = new Provider()
+    await provider.init()
+    web3.setProvider(provider)
     // web3.setProvider(new web3.providers.WebsocketProvider('ws://localhost:8546'))
 
     if (!fs.existsSync(filename)) {
