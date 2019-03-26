@@ -23,8 +23,6 @@ export class AstWalker extends EventEmitter {
     callback: Object | Function
   ): any {
     if (<AstNodeLegacy>node) {
-      console.log("Legacy");
-      
       if ((<AstNodeLegacy>node).name in callback) {
         return callback[(<AstNodeLegacy>node).name](node);
       } else {
@@ -32,11 +30,11 @@ export class AstWalker extends EventEmitter {
       }
     }
     if (<AstNode>node) {
-      console.log("new");
-      
       if ((<AstNode>node).nodeType in callback) {
+        /* istanbul ignore next */
         return callback[(<AstNode>node).nodeType](node);
       } else {
+        /* istanbul ignore next */
         return callback["*"](node);
       }
     }
@@ -87,7 +85,8 @@ export class AstWalker extends EventEmitter {
             this.walk(child);
           }
         }
-      } else {
+      }
+      if (<AstNode>ast) {
         if ((<AstNode>ast).nodes && (<AstNode>ast).nodes.length > 0) {
           for (let k in (<AstNode>ast).nodes) {
             let child = (<AstNode>ast).nodes[k];

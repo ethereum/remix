@@ -1,12 +1,11 @@
 import tape from "tape";
-import { AstWalker, AstNode, AstNodeLegacy } from "../src/";
-import node from "./resources/newAST";
-// import { strict } from 'assert';
-// import { ast } from '../../remix-lib/test/resources/ast';
+import { AstWalker,  AstNodeLegacy } from "../src";
+import node from "./resources/legacyAST";
+
 
 tape("ASTWalker Legacy", (t: tape.Test) => {
   t.test("ASTWalker.walk && .walkAST", (st: tape.Test) => {
-    st.plan(9);
+    st.plan(19);
     // New Ast Object
     const astWalker = new AstWalker();
     // EventListener
