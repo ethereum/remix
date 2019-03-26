@@ -2,7 +2,7 @@ export interface Node {
   ast?: AstNode;
   legacyAST?: AstNodeLegacy;
   source?: string | null;
-  id: number;
+  id?: number;
 }
 
 export interface AstNode {
