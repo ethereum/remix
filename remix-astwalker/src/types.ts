@@ -1,7 +1,7 @@
 export interface Node {
   ast?: AstNode;
   legacyAST?: AstNodeLegacy;
-  source?: string | null;
+  source?: string;
   id?: number;
 }
 
