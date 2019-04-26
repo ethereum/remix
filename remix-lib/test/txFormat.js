@@ -6,22 +6,31 @@ var util = require('../src/util')
 var compiler = require('solc')
 var compilerInput = require('../src/helpers/compilerHelper').compilerInput
 var executionContext = require('../src/execution/execution-context')
+var solidityVersion = 'v0.5.4+commit.9549d8ff'
 
 /* tape *********************************************************** */
+tape('load compiler ' + solidityVersion, function (t) {
+  compiler.loadRemoteVersion(solidityVersion, (error, solcSnapshot) => {
+    if (error) console.log(error)
+    console.warn('testing *txFormat* against', solidityVersion)
+    compiler = solcSnapshot
+    t.end()
+  })
+})
 
 var context
 tape('ContractParameters - (TxFormat.buildData) - format input parameters', function (t) {
-  var output = compiler.compileStandardWrapper(compilerInput(uintContract))
+  var output = compiler.compile(compilerInput(uintContract))
   output = JSON.parse(output)
   var contract = output.contracts['test.sol']['uintContractTest']
   context = { output, contract }
-  var bytecode = '608060405234801561001057600080fd5b50610111806100206000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680634b521953146044575b600080fd5b348015604f57600080fd5b50609660048036038101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803590602001909291905050506098565b005b8260008190555081600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505050505600a165627a7a7230582028c4b7d4bd450fb198ccfdf15510df1721e4f8abda2487d4b452c533bed8880b0029'
+
   t.test('(TxFormat.buildData)', function (st) {
     st.plan(3)
-    testWithInput(st, '123123, "0xf7a10e525d4b168f45f74db1b61f63d3e7619ea8", "34"', bytecode + '000000000000000000000000000000000000000000000000000000000001e0f3000000000000000000000000f7a10e525d4b168f45f74db1b61f63d3e7619ea80000000000000000000000000000000000000000000000000000000000000022')
-    testWithInput(st, '"123123" , 0xf7a10e525d4b168f45f74db1b61f63d3e7619ea8,   654   ', bytecode + '000000000000000000000000000000000000000000000000000000000001e0f3000000000000000000000000f7a10e525d4b168f45f74db1b61f63d3e7619ea8000000000000000000000000000000000000000000000000000000000000028e')
+    testWithInput(st, '123123, "0xf7a10e525d4b168f45f74db1b61f63d3e7619ea8", "34"', '000000000000000000000000000000000000000000000000000000000001e0f3000000000000000000000000f7a10e525d4b168f45f74db1b61f63d3e7619ea80000000000000000000000000000000000000000000000000000000000000022')
+    testWithInput(st, '"123123" , 0xf7a10e525d4b168f45f74db1b61f63d3e7619ea8,   654   ', '000000000000000000000000000000000000000000000000000000000001e0f3000000000000000000000000f7a10e525d4b168f45f74db1b61f63d3e7619ea8000000000000000000000000000000000000000000000000000000000000028e')
     // parsing this as javascript number should overflow
-    testWithInput(st, '90071992547409910000, 0xf7a10e525d4b168f45f74db1b61f63d3e7619ea8, 0', bytecode + '000000000000000000000000000000000000000000000004e1ffffffffffd8f0000000000000000000000000f7a10e525d4b168f45f74db1b61f63d3e7619ea80000000000000000000000000000000000000000000000000000000000000000')
+    testWithInput(st, '90071992547409910000, 0xf7a10e525d4b168f45f74db1b61f63d3e7619ea8, 0', '000000000000000000000000000000000000000000000004e1ffffffffffd8f0000000000000000000000000f7a10e525d4b168f45f74db1b61f63d3e7619ea80000000000000000000000000000000000000000000000000000000000000000')
   })
 })
 
@@ -29,7 +38,11 @@ function testWithInput (st, params, expected) {
   txFormat.buildData('uintContractTest', context.contract, context.output.contracts, true, context.contract.abi[0], params, (error, data) => {
     if (error) { return st.fails(error) }
     console.log(data)
-    st.equal(data.dataHex, expected)
+    if (!data.dataHex.endsWith(expected)) {
+      st.fail(`result of buildData ${data.dataHex} should end with ${expected} . `)
+    } else {
+      st.pass(`testWithInput. result of buildData ${data.dataHex} ends with correct data`)
+    }
   }, () => {}, () => {})
 }
 
@@ -37,7 +50,7 @@ function testWithInput (st, params, expected) {
 
 tape('ContractParameters - (TxFormat.buildData) - link Libraries', function (t) {
   executionContext.setContext('vm')
-  var compileData = compiler.compileStandardWrapper(compilerInput(deploySimpleLib))
+  var compileData = compiler.compile(compilerInput(deploySimpleLib))
 
   var fakeDeployedContracts = {
     lib1: '0xf7a10e525d4b168f45f74db1b61f63d3e7619e11',
@@ -96,7 +109,8 @@ function testLinkLibrary2 (st, callbackDeployLibraries) {
       'lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2': '0xf7a10e525d4b168f45f74db1b61f63d3e7619e33'
     }
   }
-  var data = '608060405234801561001057600080fd5b5061026b806100206000396000f300608060405260043610610041576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636d4ce63c14610046575b600080fd5b34801561005257600080fd5b5061005b61005d565b005b73f7a10e525d4b168f45f74db1b61f63d3e7619e116344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b1580156100bd57600080fd5b505af41580156100d1573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e336344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b15801561013557600080fd5b505af4158015610149573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e336344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b1580156101ad57600080fd5b505af41580156101c1573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e116344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b15801561022557600080fd5b505af4158015610239573d6000803e3d6000fd5b505050505600a165627a7a7230582007a22a440570c53944d704e68b3fd4ba3ba4a0fba71c4abd66b195d87f065bcd0029'
+
+  var data = '608060405234801561001057600080fd5b50610265806100206000396000f3fe608060405234801561001057600080fd5b5060043610610048576000357c0100000000000000000000000000000000000000000000000000000000900480636d4ce63c1461004d575b600080fd5b610055610057565b005b73f7a10e525d4b168f45f74db1b61f63d3e7619e116344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b1580156100b757600080fd5b505af41580156100cb573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e336344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b15801561012f57600080fd5b505af4158015610143573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e336344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b1580156101a757600080fd5b505af41580156101bb573d6000803e3d6000fd5b5050505073f7a10e525d4b168f45f74db1b61f63d3e7619e116344733ae16040518163ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040160006040518083038186803b15801561021f57600080fd5b505af4158015610233573d6000803e3d6000fd5b5050505056fea165627a7a72305820de710906b1469945168cc4ab673a539fd4378ef8d16f7d010bf1d14f11efb7ca0029'
 
   var deployMsg = ['creation of library test.sol:lib1 pending...',
   'creation of library test.sol:lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2 pending...']
@@ -140,7 +154,7 @@ tape('EncodeParameter', function (t) {
 })
 
 function encodeFunctionCallTest (st) {
-  var output = compiler.compileStandardWrapper(compilerInput(encodeFunctionCall))
+  var output = compiler.compile(compilerInput(encodeFunctionCall))
   output = JSON.parse(output)
   var contract = output.contracts['test.sol']['testContractLinkLibrary']
   txFormat.encodeFunctionCall('123, "test string"', contract.abi[0], (error, encoded) => {
@@ -154,7 +168,7 @@ function encodeFunctionCallTest (st) {
 tape('test fallback function', function (t) {
   t.test('(fallback)', function (st) {
     st.plan(2)
-    var output = compiler.compileStandardWrapper(compilerInput(fallbackFunction))
+    var output = compiler.compile(compilerInput(fallbackFunction))
     output = JSON.parse(output)
     var contract = output.contracts['test.sol']['fallbackFunctionContract']
     st.equal(txHelper.encodeFunctionId(contract.abi[0]), '0x805da4ad')
@@ -171,7 +185,7 @@ tape('test abiEncoderV2', function (t) {
   var decodedData = `[${value1}, ${value2}, "${value3}"], 23`
   t.test('(abiEncoderV2)', function (st) {
     st.plan(2)
-    var output = compiler.compileStandardWrapper(compilerInput(abiEncoderV2))
+    var output = compiler.compile(compilerInput(abiEncoderV2))
     output = JSON.parse(output)
     var contract = output.contracts['test.sol']['test']
     txFormat.encodeFunctionCall(decodedData, contract.abi[0], (error, encoded) => {
@@ -194,7 +208,7 @@ tape('test abiEncoderV2 array of tuple', function (t) {
     */
     st.plan(2)
 
-    var output = compiler.compileStandardWrapper(compilerInput(abiEncoderV2ArrayOfTuple))
+    var output = compiler.compile(compilerInput(abiEncoderV2ArrayOfTuple))
     output = JSON.parse(output)
     var contract = output.contracts['test.sol']['test']
     txFormat.encodeParams('[34, "test"]', contract.abi[0], (error, encoded) => {
@@ -216,26 +230,26 @@ tape('test abiEncoderV2 array of tuple', function (t) {
 var uintContract = `contract uintContractTest {
     uint _tp;
     address _ap;
-    function test(uint _t, address _a, uint _i) {
+    function test(uint _t, address _a, uint _i) public {
         _tp = _t;
         _ap = _a;
     }
 }`
 
-var deploySimpleLib = `pragma solidity ^0.4.4;
+var deploySimpleLib = `pragma solidity ^0.5.0;
 
 library lib1 {
-    function getEmpty () {
+    function getEmpty () public {
     }
 }
 
 library lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2 {
-    function getEmpty () {
+    function getEmpty () public {
     }
 }
 
-contract testContractLinkLibrary { 
-    function get () {
+contract testContractLinkLibrary {
+    function get () public {
         lib1.getEmpty();
         lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2.getEmpty();
         lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2_lib2.getEmpty();
@@ -243,22 +257,20 @@ contract testContractLinkLibrary {
  }
  }`
 
-var encodeFunctionCall = `pragma solidity ^0.4.4;
+var encodeFunctionCall = `pragma solidity ^0.5.0;
 
-contract testContractLinkLibrary { 
-    function get (uint _p, string _o) {
-        
- }
- }`
-
-var fallbackFunction = `pragma solidity ^0.4.4;
-
-contract fallbackFunctionContract { 
-    function get (uint _p, string _o) {
-        
+contract testContractLinkLibrary {
+    function get (uint _p, string memory _o) public {
     }
-    
-    function () {}
+ }`
+
+var fallbackFunction = `pragma solidity ^0.5.0;
+
+contract fallbackFunctionContract {
+    function get (uint _p, string memory _o) public {
+    }
+
+    function () external {}
  }`
 
 var abiEncoderV2 = `pragma experimental ABIEncoderV2;
@@ -269,12 +281,12 @@ contract test {
         uint b;
         string s;
     }
-    function t (p _p, uint _i) returns (p) {
+    function t (p memory _p, uint _i) public returns (p memory) {
         return _p;
     }
-    
-     function t () returns (p) {
-        p mm;
+
+     function t () public returns (p memory) {
+        p memory mm;
         mm.a = 123;
         mm.b = 133;
         return mm;
@@ -283,18 +295,18 @@ contract test {
 
 var abiEncoderV2ArrayOfTuple = `pragma experimental ABIEncoderV2;
 contract test {
-    
-    struct MyStruct {uint256 num; string _string;}
-    
-    constructor (MyStruct[] _structs, string _str) {
-        
+
+    struct MyStruct {uint256 num; string  _string;}
+
+    constructor (MyStruct[] memory _structs, string memory _str) public {
+
     }
-    
-    function addStructs(MyStruct[] _structs) public returns (MyStruct[] strucmts) { 
+
+    function addStructs(MyStruct[] memory _structs) public returns (MyStruct[] memory strucmts) {
        strucmts = _structs;
     }
-    
-    function addStructs(MyStruct _structs) public returns (MyStruct _strucmts) { 
+
+    function addStructs(MyStruct memory _structs) public returns (MyStruct memory _strucmts) {
       _strucmts = _structs;
     }
 }`

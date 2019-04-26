@@ -6,7 +6,18 @@
     "remix-solidity",
     "remix-analyzer",
     "remix-tests",
-    "remix-simulator"
+    "remix-simulator",
+    "remix-url-resolver",
+    "remix-astwalker"
   ],
+  "command": {
+    "init": {
+      "exact": true
+    },
+    "publish": {
+      "exact": true,
+      "skipGit": true
+    }
+  },
   "version": "independent"
 }

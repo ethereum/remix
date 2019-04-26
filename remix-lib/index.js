@@ -5,6 +5,7 @@ var uiHelper = require('./src/helpers/uiHelper')
 var compilerHelper = require('./src/helpers/compilerHelper')
 var SourceMappingDecoder = require('./src/sourceMappingDecoder')
 var SourceLocationTracker = require('./src/sourceLocationTracker')
+var OffsetToColumnConverter = require('./src/offsetToLineColumnConverter')
 var init = require('./src/init')
 var util = require('./src/util')
 var Web3Providers = require('./src/web3Provider/web3Providers')
@@ -25,6 +26,8 @@ var typeConversion = require('./src/execution/typeConversion')
 var CodeManager = require('./src/code/codeManager')
 var BreakpointManager = require('./src/code/breakpointManager')
 var TraceManager = require('./src/trace/traceManager')
+
+var UniversalDApp = require('./src/universalDapp')
 
 if (typeof (module) !== 'undefined' && typeof (module.exports) !== 'undefined') {
   module.exports = modules()
@@ -56,6 +59,7 @@ function modules () {
     },
     SourceMappingDecoder: SourceMappingDecoder,
     SourceLocationTracker: SourceLocationTracker,
+    OffsetToColumnConverter: OffsetToColumnConverter,
     Storage: Storage,
     init: init,
     util: util,
@@ -69,6 +73,7 @@ function modules () {
       txListener: txListener,
       txRunner: txRunner,
       typeConversion: typeConversion
-    }
+    },
+    UniversalDApp: UniversalDApp
   }
 }

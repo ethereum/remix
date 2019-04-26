@@ -67,7 +67,6 @@ async function extractHexValue (location, storageResolver, byteLength) {
   try {
     slotvalue = await readFromStorage(location.slot, storageResolver)
   } catch (e) {
-    console.log(e)
     return '0x'
   }
   return extractHexByteSlice(slotvalue, byteLength, location.offset)
@@ -76,8 +75,8 @@ async function extractHexValue (location, storageResolver, byteLength) {
 function toBN (value) {
   if (value instanceof BN) {
     return value
-  } else if (value.indexOf && value.indexOf('0x') === 0) {
-    value = ethutil.unpad(value.replace('Ox', ''))
+  } else if (value.match && value.match(/^(0x)?([a-f0-9]*)$/)) {
+    value = ethutil.unpad(value.replace(/^(0x)/, ''))
     value = new BN(value === '' ? '0' : value, 16)
   } else if (!isNaN(value)) {
     value = new BN(value)

@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/ethereum/remix-tests.svg?branch=master)](https://travis-ci.org/ethereum/remix-tests)
-
 Remix-Tests
 ---
 
@@ -43,6 +41,8 @@ contract MyTest {
 }
 ```
 
+See also: example [Su Squares contract](https://github.com/su-squares/ethereum-contract/tree/e542f37d4f8f6c7b07d90a6554424268384a4186) and [https://travis-ci.org/su-squares/ethereum-contract/builds/446186067](Travis build) that uses remix-tests for continuous integration testing.
+
 Available special functions:
 * `beforeEach()` - runs before each test
 * `beforeAll()` - runs before all tests
@@ -56,6 +56,13 @@ Available special functions:
 | `Assert.notEqual()` | `uint`, `int`, `bool`, `address`, `bytes32`, `string`  |
 | `Assert.greaterThan()` | `uint`, `int` |
 | `Assert.lesserThan()` | `uint`, `int` |
+
+#### Use a different sender `msg.sender`
+
+It is quite common that a contract need to be tested in different situation.
+Especially being able to set before hand the sender account (`msg.sender`) used for a specific tests suite enable quite a lot a new test use cases.
+please checkout https://github.com/ethereum/remix/blob/master/remix-tests/tests/various_sender/sender_test.sol for an example.
+note that `TestsAccounts` is filled with all the accounts available in `web3.eth.accounts()`.
 
 ### Command Line
 

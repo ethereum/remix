@@ -1,3 +1,4 @@
+/* global ethereum */
 'use strict'
 var Web3 = require('web3')
 var EventManager = require('../eventManager')
@@ -57,20 +58,24 @@ class StateManagerCommonStorageDump extends StateManager {
   }
 }
 
-var stateManager = new StateManagerCommonStorageDump({})
-var vm = new EthJSVM({
-  enableHomestead: true,
-  activatePrecompiles: true
-})
+function createVm (hardfork) {
+  var stateManager = new StateManagerCommonStorageDump({})
+  stateManager.checkpoint(() => {})
+  var vm = new EthJSVM({
+    activatePrecompiles: true,
+    blockchain: stateManager.blockchain,
+    stateManager: stateManager,
+    hardfork: hardfork
+  })
+  var web3vm = new Web3VMProvider()
+  web3vm.setVM(vm)
+  return { vm, web3vm, stateManager }
+}
 
-// FIXME: move state manager in EthJSVM ctr
-vm.stateManager = stateManager
-vm.blockchain = stateManager.blockchain
-vm.trie = stateManager.trie
-vm.stateManager.checkpoint()
-
-var web3VM = new Web3VMProvider()
-web3VM.setVM(vm)
+var vms = {
+  byzantium: createVm('byzantium'),
+  constantinople: createVm('constantinople')
+}
 
 var mainNetGenesisHash = '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3'
 
@@ -92,7 +97,13 @@ function ExecutionContext () {
       executionContext = 'vm'
     } else {
       executionContext = injectedProvider ? 'injected' : 'vm'
+      if (executionContext === 'injected') this.askPermission()
     }
+  }
+
+  this.askPermission = function () {
+    // metamask
+    if (ethereum && typeof ethereum.enable === 'function') ethereum.enable()
   }
 
   this.getProvider = function () {
@@ -104,7 +115,7 @@ function ExecutionContext () {
   }
 
   this.web3 = function () {
-    return this.isVM() ? web3VM : web3
+    return this.isVM() ? vms.constantinople.web3vm : web3
   }
 
   this.detectNetwork = function (callback) {
@@ -158,7 +169,7 @@ function ExecutionContext () {
   }
 
   this.vm = function () {
-    return vm
+    return vms.constantinople.vm
   }
 
   this.setContext = function (context, endPointUrl, confirmCb, infoCb) {
@@ -171,8 +182,8 @@ function ExecutionContext () {
 
     if (context === 'vm') {
       executionContext = context
-      vm.stateManager.revert(function () {
-        vm.stateManager.checkpoint()
+      vms.constantinople.stateManager.revert(() => {
+        vms.constantinople.stateManager.checkpoint(() => {})
       })
       self.event.trigger('contextChanged', ['vm'])
       return cb()
@@ -186,6 +197,7 @@ function ExecutionContext () {
         infoCb(alertMsg)
         return cb()
       } else {
+        self.askPermission()
         executionContext = context
         web3.setProvider(injectedProvider)
         self._updateBlockGasLimit()

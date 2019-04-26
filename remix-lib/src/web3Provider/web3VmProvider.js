@@ -88,7 +88,8 @@ web3VmProvider.prototype.txWillProcess = function (self, data) {
   self.txsReceipt[self.processingHash] = tx
   self.storageCache[self.processingHash] = {}
   if (tx.to) {
-    self.vm.stateManager.dumpStorage(tx.to, function (storage) {
+    const account = ethutil.toBuffer(tx.to)
+    self.vm.stateManager.dumpStorage(account, function (storage) {
       self.storageCache[self.processingHash][tx.to] = storage
     })
   }
@@ -122,6 +123,7 @@ web3VmProvider.prototype.txProcessed = function (self, data) {
   }
   self.txsReceipt[self.processingHash].logs = logs
   self.txsReceipt[self.processingHash].transactionHash = self.processingHash
+  self.txsReceipt[self.processingHash].status = '0x' + data.vm.exception.toString(16)
 
   if (data.createdAddress) {
     var address = util.hexConvert(data.createdAddress)
@@ -171,7 +173,8 @@ web3VmProvider.prototype.pushTrace = function (self, data) {
     } else {
       this.processingAddress = uiutil.normalizeHexAddress(step.stack[step.stack.length - 2])
       if (!self.storageCache[self.processingHash][this.processingAddress]) {
-        self.vm.stateManager.dumpStorage(this.processingAddress, function (storage) {
+        const account = ethutil.toBuffer(this.processingAddress)
+        self.vm.stateManager.dumpStorage(account, function (storage) {
           self.storageCache[self.processingHash][self.processingAddress] = storage
         })
       }
@@ -190,7 +193,8 @@ web3VmProvider.prototype.pushTrace = function (self, data) {
 }
 
 web3VmProvider.prototype.getCode = function (address, cb) {
-  this.vm.stateManager.getContractCode(address, function (error, result) {
+  const account = ethutil.toBuffer(address)
+  this.vm.stateManager.getContractCode(account, function (error, result) {
     cb(error, util.hexConvert(result))
   })
 }
