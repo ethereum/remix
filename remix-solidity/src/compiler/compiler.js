@@ -12,6 +12,14 @@ var EventManager = remixLib.EventManager
 
 var txHelper = require('./txHelper')
 
+const semver = require('semver')
+
+const fork = {
+  'Petersburg': '0.5.5',
+  'Byzantium': '0.4.21',
+  'Homestead': '0.1.0'
+}
+
 /*
   trigger compilationFinished, compilerLoaded, compilationStarted, compilationDuration
 */
@@ -107,6 +115,13 @@ function Compiler (handleImportCall) {
   this.lastCompilationResult = {
     data: null,
     source: null
+  }
+
+  this.defaultEvmVersion = () => {
+    Object.keys(fork, (value) => {
+      if (semver.gte(fork[value], currentVersion)) return value
+    })
+    return 'Homestead'
   }
 
   /**
