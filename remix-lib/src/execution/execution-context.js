@@ -69,12 +69,13 @@ function createVm (hardfork) {
   })
   var web3vm = new Web3VMProvider()
   web3vm.setVM(vm)
-  return { vm, web3vm, stateManager }
+  return { vm, web3vm, stateManager, hardfork }
 }
 
 var vms = {
-  byzantium: createVm('byzantium'),
-  constantinople: createVm('constantinople')
+  // byzantium: createVm('byzantium'),
+  // constantinople: createVm('constantinople'),
+  petersburg: createVm('petersburg')
 }
 
 var mainNetGenesisHash = '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3'
@@ -115,7 +116,7 @@ function ExecutionContext () {
   }
 
   this.web3 = function () {
-    return this.isVM() ? vms.constantinople.web3vm : web3
+    return this.isVM() ? vms.petersburg.web3vm : web3
   }
 
   this.detectNetwork = function (callback) {
@@ -169,8 +170,12 @@ function ExecutionContext () {
     return blankWeb3
   }
 
+  this.vmDescription = function () {
+    return vms.petersburg
+  }
+
   this.vm = function () {
-    return vms.constantinople.vm
+    return vms.petersburg.vm
   }
 
   this.setContext = function (context, endPointUrl, confirmCb, infoCb) {
@@ -183,8 +188,8 @@ function ExecutionContext () {
 
     if (context === 'vm') {
       executionContext = context
-      vms.constantinople.stateManager.revert(() => {
-        vms.constantinople.stateManager.checkpoint(() => {})
+      vms.petersburg.stateManager.revert(() => {
+        vms.petersburg.stateManager.checkpoint(() => {})
       })
       self.event.trigger('contextChanged', ['vm'])
       return cb()
