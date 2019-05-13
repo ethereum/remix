@@ -2,13 +2,14 @@
 
 module.exports = (sources, opts) => {
   return JSON.stringify({
-    language: 'Solidity',
+    language: opts.language ? opts.language : 'Solidity',
     sources: sources,
     settings: {
       optimizer: {
         enabled: opts.optimize === true || opts.optimize === 1,
         runs: 200
       },
+      evmVersion: opts.evmVersion ? opts.evmVersion : undefined,
       libraries: opts.libraries,
       outputSelection: {
         '*': {

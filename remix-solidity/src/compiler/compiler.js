@@ -33,10 +33,20 @@ function Compiler (handleImportCall) {
 
   var currentVersion
 
-  var optimize = false
+  let optimize = false
+  let evmVersion = null
+  let language = 'Solidity'
 
   this.setOptimize = function (_optimize) {
     optimize = _optimize
+  }
+
+  this.setEvmVersion = function (_evmVersion) {
+    evmVersion = _evmVersion
+  }
+
+  this.setLanguage = function (_language) {
+    language = _language
   }
 
   var compilationStartTime = null
@@ -57,12 +67,12 @@ function Compiler (handleImportCall) {
         self.lastCompilationResult = null
         self.event.trigger('compilationFinished', [false, {'error': { formattedMessage: error, severity: 'error' }}, files])
       } else {
-        compileJSON(input, optimize ? 1 : 0)
+        compileJSON(input, optimize ? 1 : 0, evmVersion, language)
       }
     })
   }
 
-  var compile = function (files, target) {
+  var compile = function (files, target, opt) {
     self.event.trigger('compilationStarted', [])
     internalCompile(files, target)
   }
@@ -81,14 +91,13 @@ function Compiler (handleImportCall) {
   function onInternalCompilerLoaded () {
     if (worker === null) {
       var compiler
-      var userAgent = (typeof (navigator) !== 'undefined') && navigator.userAgent ? navigator.userAgent.toLowerCase() : '-'
       if (typeof (window) === 'undefined') {
         compiler = require('solc')
       } else {
         compiler = solc(window.Module)
       }
 
-      compileJSON = function (source, optimize, cb) {
+      compileJSON = function (source, optimize, evmVersion, language) {
         var missingInputs = []
         var missingInputsCallback = function (path) {
           missingInputs.push(path)
@@ -97,7 +106,7 @@ function Compiler (handleImportCall) {
 
         var result
         try {
-          var input = compilerInput(source.sources, {optimize: optimize, target: source.target})
+          var input = compilerInput(source.sources, {optimize, evmVersion, language, target: source.target})
           result = compiler.compile(input, missingInputsCallback)
           result = JSON.parse(result)
         } catch (exception) {
@@ -308,9 +317,9 @@ function Compiler (handleImportCall) {
     worker.addEventListener('error', function (msg) {
       compilationFinished({ error: 'Worker error: ' + msg.data })
     })
-    compileJSON = function (source, optimize) {
+    compileJSON = function (source, optimize, evmVersion, language) {
       jobs.push({sources: source})
-      worker.postMessage({cmd: 'compile', job: jobs.length - 1, input: compilerInput(source.sources, {optimize: optimize, target: source.target})})
+      worker.postMessage({cmd: 'compile', job: jobs.length - 1, input: compilerInput(source.sources, {optimize, evmVersion, language, target: source.target})})
     }
     worker.postMessage({cmd: 'loadVersion', data: url})
   }
