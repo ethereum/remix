@@ -99,6 +99,7 @@ function ExecutionContext () {
 
   this.reloadVMWithFork = function (fork) {
     vmInstance = createVm(fork)
+    this._resetJavaScriptVM()
   }
 
   this.askPermission = function () {
@@ -161,6 +162,13 @@ function ExecutionContext () {
     }
   }
 
+  this._resetJavaScriptVM = function () {
+    vmInstance.stateManager.revert(() => {
+      vmInstance.stateManager.checkpoint(() => {})
+    })
+    self.event.trigger('contextChanged', ['vm'])
+  }
+
   this.internalWeb3 = function () {
     return web3
   }
@@ -187,10 +195,7 @@ function ExecutionContext () {
 
     if (context === 'vm') {
       executionContext = context
-      vmInstance.stateManager.revert(() => {
-        vmInstance.stateManager.checkpoint(() => {})
-      })
-      self.event.trigger('contextChanged', ['vm'])
+      this._resetJavaScriptVM()
       return cb()
     }
 

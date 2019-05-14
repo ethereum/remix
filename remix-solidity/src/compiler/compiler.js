@@ -15,9 +15,9 @@ var txHelper = require('./txHelper')
 const semver = require('semver')
 
 const fork = {
-  'Petersburg': '0.5.5',
-  'Byzantium': '0.4.21',
-  'Homestead': '0.1.0'
+  'petersburg': '0.5.5',
+  'byzantium': '0.4.21',
+  'homestead': '0.1.0'
 }
 
 /*
@@ -43,6 +43,10 @@ function Compiler (handleImportCall) {
 
   this.setEvmVersion = function (_evmVersion) {
     evmVersion = _evmVersion
+  }
+
+  this.setToUseDefaultEvmVersion = function () {
+    evmVersion = undefined
   }
 
   this.setLanguage = function (_language) {
@@ -72,7 +76,7 @@ function Compiler (handleImportCall) {
     })
   }
 
-  var compile = function (files, target, opt) {
+  var compile = function (files, target) {
     self.event.trigger('compilationStarted', [])
     internalCompile(files, target)
   }
@@ -127,10 +131,15 @@ function Compiler (handleImportCall) {
   }
 
   this.defaultEvmVersion = () => {
-    Object.keys(fork, (value) => {
-      if (semver.gte(fork[value], currentVersion)) return value
-    })
-    return 'Homestead'
+    if (!currentVersion) throw new Error('no compiler loaded')
+    let forkName = 'Homestead'
+    for (let f in fork) {
+      if (semver.lte(fork[f], truncateVersion(currentVersion))) {
+        forkName = f
+        break
+      }
+    }
+    return forkName
   }
 
   /**
