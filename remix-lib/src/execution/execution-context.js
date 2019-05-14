@@ -71,12 +71,7 @@ function createVm (hardfork) {
   web3vm.setVM(vm)
   return { vm, web3vm, stateManager, hardfork }
 }
-
-var vms = {
-  // byzantium: createVm('byzantium'),
-  // constantinople: createVm('constantinople'),
-  petersburg: createVm('petersburg')
-}
+let vmInstance = createVm('petersburg')
 
 var mainNetGenesisHash = '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3'
 
@@ -102,6 +97,10 @@ function ExecutionContext () {
     }
   }
 
+  this.reloadVMWithFork = function (fork) {
+    vmInstance = createVm(fork)
+  }
+
   this.askPermission = function () {
     // metamask
     if (ethereum && typeof ethereum.enable === 'function') ethereum.enable()
@@ -116,7 +115,7 @@ function ExecutionContext () {
   }
 
   this.web3 = function () {
-    return this.isVM() ? vms.petersburg.web3vm : web3
+    return this.isVM() ? vmInstance.web3vm : web3
   }
 
   this.detectNetwork = function (callback) {
@@ -171,11 +170,11 @@ function ExecutionContext () {
   }
 
   this.vmDescription = function () {
-    return vms.petersburg
+    return vmInstance
   }
 
   this.vm = function () {
-    return vms.petersburg.vm
+    return vmInstance.vm
   }
 
   this.setContext = function (context, endPointUrl, confirmCb, infoCb) {
@@ -188,8 +187,8 @@ function ExecutionContext () {
 
     if (context === 'vm') {
       executionContext = context
-      vms.petersburg.stateManager.revert(() => {
-        vms.petersburg.stateManager.checkpoint(() => {})
+      vmInstance.stateManager.revert(() => {
+        vmInstance.stateManager.checkpoint(() => {})
       })
       self.event.trigger('contextChanged', ['vm'])
       return cb()
