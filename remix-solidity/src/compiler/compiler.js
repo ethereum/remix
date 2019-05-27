@@ -73,7 +73,8 @@ function Compiler (handleImportCall) {
   function onInternalCompilerLoaded () {
     if (worker === null) {
       var compiler
-      if (typeof (window) === 'undefined') {
+      var userAgent = (typeof (navigator) !== 'undefined') && navigator.userAgent ? navigator.userAgent.toLowerCase() : '-'
+      if (typeof (window) === 'undefined' || userAgent.indexOf(' electron/') > -1) {
         compiler = require('solc')
       } else {
         compiler = solc(window.Module)
@@ -89,10 +90,10 @@ function Compiler (handleImportCall) {
         var result
         try {
           var input = compilerInput(source.sources, {optimize: optimize, target: source.target})
-          result = compiler.compileStandardWrapper(input, missingInputsCallback)
+          result = compiler.compile(input, missingInputsCallback)
           result = JSON.parse(result)
         } catch (exception) {
-          result = { error: 'Uncaught JavaScript exception:\n' + exception }
+          result = { error: { formattedMessage: 'Uncaught JavaScript exception:\n' + exception, severity: 'error', mode: 'panic' } }
         }
 
         compilationFinished(result, missingInputs, source)
@@ -312,7 +313,7 @@ function Compiler (handleImportCall) {
       while ((match = importRegex.exec(files[fileName].content))) {
         var importFilePath = match[1]
         if (importFilePath.startsWith('./')) {
-          var path = /(.*\/).*/.exec(target)
+          var path = /(.*\/).*/.exec(fileName)
           if (path !== null) {
             importFilePath = importFilePath.replace('./', path[1])
           } else {

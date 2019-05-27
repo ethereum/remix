@@ -1,25 +1,47 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
+const expressWs = require('express-ws')
 const Provider = require('./provider')
 const log = require('./utils/logs.js')
 
-var provider = new Provider()
+class Server {
+  constructor () {
+    this.provider = new Provider()
+  }
 
-app.use(bodyParser.urlencoded({extended: true}))
-app.use(bodyParser.json())
+  start (port) {
+    expressWs(app)
 
-app.get('/', (req, res) => {
-  res.send('Welcome to remix-simulator')
-})
+    app.use(bodyParser.urlencoded({extended: true}))
+    app.use(bodyParser.json())
 
-app.use(function (req, res) {
-  provider.sendAsync(req.body, (err, jsonResponse) => {
-    if (err) {
-      res.send({error: err})
-    }
-    res.send(jsonResponse)
-  })
-})
+    app.get('/', (req, res) => {
+      res.send('Welcome to remix-simulator')
+    })
 
-app.listen(8545, () => log('Remix Simulator listening on port 8545!'))
+    app.use((req, res) => {
+      this.provider.sendAsync(req.body, (err, jsonResponse) => {
+        if (err) {
+          return res.send(JSON.stringify({error: err}))
+        }
+        res.send(jsonResponse)
+      })
+    })
+
+    app.ws('/', (ws, req) => {
+      ws.on('message', function (msg) {
+        this.provider.sendAsync(JSON.parse(msg), (err, jsonResponse) => {
+          if (err) {
+            return ws.send(JSON.stringify({error: err}))
+          }
+          ws.send(JSON.stringify(jsonResponse))
+        })
+      })
+    })
+
+    app.listen(port, () => log('Remix Simulator listening on port ' + port))
+  }
+}
+
+module.exports = Server

@@ -2,10 +2,10 @@
 var ethers = require('ethers')
 
 module.exports = {
-  makeFullTupleTypeDefinition: function (typeDef) {
-    if (typeDef && typeDef.type === 'tuple' && typeDef.components) {
-      var innerTypes = typeDef.components.map((innerType) => innerType.type)
-      return 'tuple(' + innerTypes.join(',') + ')'
+  makeFullTypeDefinition: function (typeDef) {
+    if (typeDef && typeDef.type.indexOf('tuple') === 0 && typeDef.components) {
+      var innerTypes = typeDef.components.map((innerType) => { return this.makeFullTypeDefinition(innerType) })
+      return `tuple(${innerTypes.join(',')})${this.extractSize(typeDef.type)}`
     }
     return typeDef.type
   },
@@ -15,7 +15,7 @@ module.exports = {
     if (funABI.inputs && funABI.inputs.length) {
       for (var i = 0; i < funABI.inputs.length; i++) {
         var type = funABI.inputs[i].type
-        types.push(type === 'tuple' ? this.makeFullTupleTypeDefinition(funABI.inputs[i]) : type)
+        types.push(type.indexOf('tuple') === 0 ? this.makeFullTypeDefinition(funABI.inputs[i]) : type)
         if (args.length < types.length) {
           args.push('')
         }
@@ -76,10 +76,32 @@ module.exports = {
     return funABI
   },
 
+  serializeInputs: function (fnAbi) {
+    var serialized = '('
+    if (fnAbi.inputs && fnAbi.inputs.length) {
+      serialized += fnAbi.inputs.map((input) => { return input.type }).join(',')
+    }
+    serialized += ')'
+    return serialized
+  },
+
+  extractSize: function (type) {
+    var size = type.match(/([a-zA-Z0-9])(\[.*\])/)
+    return size ? size[2] : ''
+  },
+
   getFunction: function (abi, fnName) {
     for (var i = 0; i < abi.length; i++) {
-      if (abi[i].name === fnName) {
-        return abi[i]
+      var fn = abi[i]
+      if (fn.type === 'function' && fnName === fn.name + '(' + fn.inputs.map((value) => {
+        if (value.components) {
+          let fullType = this.makeFullTypeDefinition(value)
+          return fullType.replace(/tuple/g, '') // return of makeFullTypeDefinition might contain `tuple`, need to remove it cause `methodIdentifier` (fnName) does not include `tuple` keyword
+        } else {
+          return value.type
+        }
+      }).join(',') + ')') {
+        return fn
       }
     }
     return null

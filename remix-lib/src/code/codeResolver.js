@@ -29,7 +29,6 @@ CodeResolver.prototype.resolveCode = function (address, callBack) {
 }
 
 CodeResolver.prototype.loadCode = function (address, callback) {
-  console.log('loading new code from web3 ' + address)
   this.web3.eth.getCode(address, function (error, result) {
     if (error) {
       console.log(error)
@@ -48,7 +47,7 @@ CodeResolver.prototype.cacheExecutingCode = function (address, hexCode) {
 }
 
 CodeResolver.prototype.formatCode = function (hexCode) {
-  var code = codeUtils.nameOpCodes(new Buffer(hexCode.substring(2), 'hex'))
+  var code = codeUtils.nameOpCodes(Buffer.from(hexCode.substring(2), 'hex'))
   return {
     code: code[0],
     instructionsIndexByBytesOffset: code[1]

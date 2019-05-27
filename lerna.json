@@ -4,7 +4,19 @@
     "remix-debug",
     "remix-lib",
     "remix-solidity",
-    "remix-analyzer"
+    "remix-analyzer",
+    "remix-tests",
+    "remix-simulator",
+    "remix-url-resolver"
   ],
+  "command": {
+    "init": {
+      "exact": true
+    },
+    "publish": {
+      "exact": true,
+      "skipGit": true
+    }
+  },
   "version": "independent"
 }

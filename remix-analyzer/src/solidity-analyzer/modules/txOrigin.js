@@ -1,6 +1,7 @@
 var name = 'Transaction origin: '
 var desc = 'Warn if tx.origin is used'
 var categories = require('./categories')
+var algo = require('./algorithmCategories')
 
 function txOrigin () {
   this.txOriginNodes = []
@@ -9,7 +10,7 @@ function txOrigin () {
 txOrigin.prototype.visit = function (node) {
   if (node.name === 'MemberAccess' &&
   node.attributes.member_name === 'origin' &&
-  node.attributes.type === 'address' &&
+  (node.attributes.type === 'address' || node.attributes.type === 'address payable') &&
   node.children && node.children.length &&
   node.children[0].attributes.type === 'tx' &&
   node.children[0].attributes.value === 'tx') {
@@ -31,5 +32,6 @@ module.exports = {
   name: name,
   description: desc,
   category: categories.SECURITY,
+  algorithm: algo.EXACT,
   Module: txOrigin
 }

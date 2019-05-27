@@ -25,13 +25,15 @@ var nodeTypes = {
   IFSTATEMENT: 'IfStatement',
   FORSTATEMENT: 'ForStatement',
   WHILESTATEMENT: 'WhileStatement',
-  DOWHILESTATEMENT: 'DoWhileStatement'
+  DOWHILESTATEMENT: 'DoWhileStatement',
+  ELEMENTARYTYPENAMEEXPRESSION: 'ElementaryTypeNameExpression'
 }
 
 var basicTypes = {
   UINT: 'uint256',
   BOOL: 'bool',
   ADDRESS: 'address',
+  PAYABLE_ADDRESS: 'address payable',
   BYTES32: 'bytes32',
   STRING_MEM: 'string memory',
   BYTES_MEM: 'bytes memory',
@@ -51,7 +53,9 @@ var basicRegex = {
 var basicFunctionTypes = {
   SEND: buildFunctionSignature([basicTypes.UINT], [basicTypes.BOOL], false),
   CALL: buildFunctionSignature([], [basicTypes.BOOL], true),
+  'CALL-v0.5': buildFunctionSignature([basicTypes.BYTES_MEM], [basicTypes.BOOL, basicTypes.BYTES_MEM], true),
   DELEGATECALL: buildFunctionSignature([], [basicTypes.BOOL], false),
+  'DELEGATECALL-v0.5': buildFunctionSignature([basicTypes.BYTES_MEM], [basicTypes.BOOL, basicTypes.BYTES_MEM], false),
   TRANSFER: buildFunctionSignature([basicTypes.UINT], [], false)
 }
 
@@ -64,19 +68,23 @@ var builtinFunctions = {
   'addmod(uint256,uint256,uint256)': true,
   'mulmod(uint256,uint256,uint256)': true,
   'selfdestruct(address)': true,
+  'selfdestruct(address payable)': true,
   'revert()': true,
   'revert(string memory)': true,
   'assert(bool)': true,
   'require(bool)': true,
   'require(bool,string memory)': true,
   'gasleft()': true,
-  'blockhash(uint)': true
+  'blockhash(uint)': true,
+  'address(address)': true
 }
 
 var lowLevelCallTypes = {
   CALL: { ident: 'call', type: basicFunctionTypes.CALL },
+  'CALL-v0.5': { ident: 'call', type: basicFunctionTypes['CALL-v0.5'] },
   CALLCODE: { ident: 'callcode', type: basicFunctionTypes.CALL },
   DELEGATECALL: { ident: 'delegatecall', type: basicFunctionTypes.DELEGATECALL },
+  'DELEGATECALL-v0.5': { ident: 'delegatecall', type: basicFunctionTypes['DELEGATECALL-v0.5'] },
   SEND: { ident: 'send', type: basicFunctionTypes.SEND },
   TRANSFER: { ident: 'transfer', type: basicFunctionTypes.TRANSFER }
 }
@@ -266,6 +274,18 @@ function getDeclaredVariableName (varDeclNode) {
 }
 
 /**
+ * Returns the type of a variable definition, Throws on wrong node.
+ * Example:
+ *   var x = 10; => x
+ * @varDeclNode {ASTNode} Variable declaration node
+ * @return {string} variable type
+ */
+function getDeclaredVariableType (varDeclNode) {
+  if (!isVariableDeclaration(varDeclNode)) throw new Error('staticAnalysisCommon.js: not a variable declaration')
+  return varDeclNode.attributes.type
+}
+
+/**
  * Returns state variable declaration nodes for a contract, Throws on wrong node.
  * Example:
  * contract foo {
@@ -396,6 +416,14 @@ function isFunctionDefinition (node) {
   return nodeType(node, exactMatch(nodeTypes.FUNCTIONDEFINITION))
 }
 
+function isStatement (node) {
+  return nodeType(node, 'Statement$') || isBlock(node) || isReturn(node)
+}
+
+function isBlock (node) {
+  return nodeType(node, exactMatch(nodeTypes.BLOCK))
+}
+
 function isModifierDefinition (node) {
   return nodeType(node, exactMatch(nodeTypes.MODIFIERDEFINITION))
 }
@@ -480,6 +508,24 @@ function isDynamicArrayAccess (node) {
 }
 
 /**
+ * True if node is a delete instruction for an element from a dynamic array
+ * @node {ASTNode} node to check for
+ * @return {bool}
+ */
+function isDeleteFromDynamicArray (node) {
+  return isDeleteUnaryOperation(node) && isIndexAccess(node.children[0])
+}
+
+/**
+ * True if node is the access of an index
+ * @node {ASTNode} node to check for
+ * @return {bool}
+ */
+function isIndexAccess (node) {
+  return node && node.name === 'IndexAccess'
+}
+
+/**
  * True if call to code within the current contracts context including (delegate) library call
  * @node {ASTNode} some AstNode
  * @return {bool}
@@ -548,7 +594,7 @@ function isStorageVariableDeclaration (node) {
  * @return {bool}
  */
 function isInteraction (node) {
-  return isLLCall(node) || isLLSend(node) || isExternalDirectCall(node) || isTransfer(node)
+  return isLLCall(node) || isLLSend(node) || isExternalDirectCall(node) || isTransfer(node) || isLLCall050(node) || isLLSend050(node)
 }
 
 /**
@@ -749,7 +795,7 @@ function isBlockTimestampAccess (node) {
  * @return {bool}
  */
 function isBlockBlockHashAccess (node) {
-  return isSpecialVariableAccess(node, specialVariables.BLOCKHASH)
+  return isSpecialVariableAccess(node, specialVariables.BLOCKHASH) || isBuiltinFunctionCall(node) && getLocalCallName(node) === 'blockhash'
 }
 
 /**
@@ -793,11 +839,25 @@ function isLowLevelCall (node) {
   return isLLCall(node) ||
           isLLCallcode(node) ||
           isLLDelegatecall(node) ||
-          isLLSend(node)
+          isLLSend(node) ||
+          isLLSend050(node) ||
+          isLLCall050(node) ||
+          isLLDelegatecall050(node)
 }
 
 /**
- * True if low level send
+ * True if low level send (solidity >= 0.5)
+ * @node {ASTNode} some AstNode
+ * @return {bool}
+ */
+function isLLSend050 (node) {
+  return isMemberAccess(node,
+          exactMatch(util.escapeRegExp(lowLevelCallTypes.SEND.type)),
+          undefined, exactMatch(basicTypes.PAYABLE_ADDRESS), exactMatch(lowLevelCallTypes.SEND.ident))
+}
+
+/**
+ * True if low level send (solidity < 0.5)
  * @node {ASTNode} some AstNode
  * @return {bool}
  */
@@ -816,6 +876,17 @@ function isLLCall (node) {
   return isMemberAccess(node,
           exactMatch(util.escapeRegExp(lowLevelCallTypes.CALL.type)),
           undefined, exactMatch(basicTypes.ADDRESS), exactMatch(lowLevelCallTypes.CALL.ident))
+}
+
+/**
+ * True if low level payable call (solidity >= 0.5)
+ * @node {ASTNode} some AstNode
+ * @return {bool}
+ */
+function isLLCall050 (node) {
+  return isMemberAccess(node,
+          exactMatch(util.escapeRegExp(lowLevelCallTypes['CALL-v0.5'].type)),
+          undefined, exactMatch(basicTypes.PAYABLE_ADDRESS), exactMatch(lowLevelCallTypes['CALL-v0.5'].ident))
 }
 
 /**
@@ -841,6 +912,17 @@ function isLLDelegatecall (node) {
 }
 
 /**
+ * True if low level delegatecall (solidity >= 0.5)
+ * @node {ASTNode} some AstNode
+ * @return {bool}
+ */
+function isLLDelegatecall050 (node) {
+  return isMemberAccess(node,
+          exactMatch(util.escapeRegExp(lowLevelCallTypes['DELEGATECALL-v0.5'].type)),
+          undefined, matches(basicTypes.PAYABLE_ADDRESS, basicTypes.ADDRESS), exactMatch(lowLevelCallTypes['DELEGATECALL-v0.5'].ident))
+}
+
+/**
  * True if transfer call
  * @node {ASTNode} some AstNode
  * @return {bool}
@@ -848,7 +930,30 @@ function isLLDelegatecall (node) {
 function isTransfer (node) {
   return isMemberAccess(node,
           exactMatch(util.escapeRegExp(lowLevelCallTypes.TRANSFER.type)),
-          undefined, exactMatch(basicTypes.ADDRESS), exactMatch(lowLevelCallTypes.TRANSFER.ident))
+          undefined, matches(basicTypes.ADDRESS, basicTypes.PAYABLE_ADDRESS), exactMatch(lowLevelCallTypes.TRANSFER.ident))
+}
+
+function isStringToBytesConversion (node) {
+  return isExplicitCast(node, util.escapeRegExp('string *'), util.escapeRegExp('bytes'))
+}
+
+function isExplicitCast (node, castFromType, castToType) {
+  return nodeType(node, exactMatch(nodeTypes.FUNCTIONCALL)) && nrOfChildren(node, 2) &&
+          nodeType(node.children[0], exactMatch(nodeTypes.ELEMENTARYTYPENAMEEXPRESSION)) && name(node.children[0], castToType) &&
+          nodeType(node.children[1], exactMatch(nodeTypes.IDENTIFIER)) && expressionType(node.children[1], castFromType)
+}
+
+function isBytesLengthCheck (node) {
+  return isMemberAccess(node, exactMatch(util.escapeRegExp(basicTypes.UINT)), undefined, util.escapeRegExp('bytes *'), 'length')
+}
+
+/**
+ * True if it is a 'for' loop
+ * @node {ASTNode} some AstNode
+ * @return {bool}
+ */
+function isForLoop (node) {
+  return nodeType(node, exactMatch(nodeTypes.FORSTATEMENT))
 }
 
 // #################### Complex Node Identification - Private
@@ -899,6 +1004,14 @@ function exactMatch (regexStr) {
   return '^' + regexStr + '$'
 }
 
+function matches () {
+  var args = []
+  for (var k = 0; k < arguments.length; k++) {
+    args.push(arguments[k])
+  }
+  return '(' + args.join('|') + ')'
+}
+
 /**
  * Builds an function signature as used in the AST of the solc-json AST
  * @param {Array} paramTypes
@@ -909,6 +1022,10 @@ function exactMatch (regexStr) {
  */
 function buildFunctionSignature (paramTypes, returnTypes, isPayable, additionalMods) {
   return 'function (' + util.concatWithSeperator(paramTypes, ',') + ')' + ((isPayable) ? ' payable' : '') + ((additionalMods) ? ' ' + additionalMods : '') + ((returnTypes.length) ? ' returns (' + util.concatWithSeperator(returnTypes, ',') + ')' : '')
+}
+
+function buildAbiSignature (funName, paramTypes) {
+  return funName + '(' + util.concatWithSeperator(paramTypes, ',') + ')'
 }
 
 /**
@@ -940,6 +1057,7 @@ module.exports = {
   getContractName: getContractName,
   getEffectedVariableName: getEffectedVariableName,
   getDeclaredVariableName: getDeclaredVariableName,
+  getDeclaredVariableType: getDeclaredVariableType,
   getLocalCallName: getLocalCallName,
   getInheritsFromName: getInheritsFromName,
   getExternalDirectCallContractName: getExternalDirectCallContractName,
@@ -958,9 +1076,11 @@ module.exports = {
 
   // #################### Complex Node Identification
   isDeleteOfDynamicArray: isDeleteOfDynamicArray,
+  isDeleteFromDynamicArray: isDeleteFromDynamicArray,
   isAbiNamespaceCall: isAbiNamespaceCall,
   isSpecialVariableAccess: isSpecialVariableAccess,
   isDynamicArrayAccess: isDynamicArrayAccess,
+  isIndexAccess: isIndexAccess,
   isSubScopeWithTopLevelUnAssignedBinOp: isSubScopeWithTopLevelUnAssignedBinOp,
   hasFunctionBody: hasFunctionBody,
   isInteraction: isInteraction,
@@ -978,6 +1098,9 @@ module.exports = {
   isTransfer: isTransfer,
   isLowLevelCall: isLowLevelCall,
   isLowLevelCallInst: isLLCall,
+  isLowLevelCallInst050: isLLCall050,
+  isLowLevelSendInst050: isLLSend050,
+  isLLDelegatecallInst050: isLLDelegatecall050,
   isLowLevelCallcodeInst: isLLCallcode,
   isLowLevelDelegatecallInst: isLLDelegatecall,
   isLowLevelSendInst: isLLSend,
@@ -992,6 +1115,9 @@ module.exports = {
   isAssertCall: isAssertCall,
   isRequireCall: isRequireCall,
   isIntDivision: isIntDivision,
+  isStringToBytesConversion: isStringToBytesConversion,
+  isBytesLengthCheck: isBytesLengthCheck,
+  isForLoop: isForLoop,
 
   // #################### Trivial Node Identification
   isDeleteUnaryOperation: isDeleteUnaryOperation,
@@ -1009,6 +1135,8 @@ module.exports = {
   isInlineAssembly: isInlineAssembly,
   isNewExpression: isNewExpression,
   isReturn: isReturn,
+  isStatement: isStatement,
+  isBlock: isBlock,
 
   // #################### Constants
   nodeTypes: nodeTypes,
@@ -1023,6 +1151,7 @@ module.exports = {
     nodeType: nodeType,
     name: name,
     operator: operator,
-    buildFunctionSignature: buildFunctionSignature
+    buildFunctionSignature: buildFunctionSignature,
+    buildAbiSignature: buildAbiSignature
   }
 }

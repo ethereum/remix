@@ -1,7 +1,9 @@
 build
+dist
 node_modules
 npm-debug.log
 lint.xml
+.idea
 .vscode
 test-browser/reports/*
 babelify-src
@@ -9,3 +11,6 @@ docs/_build
 package-lock.json
 .DS_Store
 .tern-port
+TODO
+soljson.js
+lerna-debug.log

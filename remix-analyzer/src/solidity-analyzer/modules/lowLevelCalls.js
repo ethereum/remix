@@ -2,6 +2,7 @@ var name = 'Low level calls: '
 var desc = 'Semantics maybe unclear'
 var categories = require('./categories')
 var common = require('./staticAnalysisCommon')
+var algo = require('./algorithmCategories')
 
 function lowLevelCalls () {
   this.llcNodes = []
@@ -10,12 +11,18 @@ function lowLevelCalls () {
 lowLevelCalls.prototype.visit = function (node) {
   if (common.isLowLevelCallInst(node)) {
     this.llcNodes.push({node: node, type: common.lowLevelCallTypes.CALL})
+  } else if (common.isLowLevelCallInst050(node)) {
+    this.llcNodes.push({node: node, type: common.lowLevelCallTypes.CALL})
   } else if (common.isLowLevelCallcodeInst(node)) {
     this.llcNodes.push({node: node, type: common.lowLevelCallTypes.CALLCODE})
   } else if (common.isLowLevelDelegatecallInst(node)) {
     this.llcNodes.push({node: node, type: common.lowLevelCallTypes.DELEGATECALL})
   } else if (common.isLowLevelSendInst(node)) {
     this.llcNodes.push({node: node, type: common.lowLevelCallTypes.SEND})
+  } else if (common.isLowLevelSendInst050(node)) {
+    this.llcNodes.push({node: node, type: common.lowLevelCallTypes.SEND})
+  } else if (common.isLLDelegatecallInst050(node)) {
+    this.llcNodes.push({node: node, type: common.lowLevelCallTypes.DELEGATECALL})
   }
 }
 
@@ -59,6 +66,7 @@ module.exports = {
   name: name,
   description: desc,
   category: categories.SECURITY,
+  algorithm: algo.EXACT,
   Module: lowLevelCalls
 }
 
