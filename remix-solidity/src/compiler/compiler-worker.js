@@ -8,6 +8,7 @@ var missingInputs = []
 module.exports = function (self) {
   self.addEventListener('message', function (e) {
     var data = e.data
+    console.log('data---------', data)
     switch (data.cmd) {
       case 'loadVersion':
         delete self.Module
@@ -15,9 +16,9 @@ module.exports = function (self) {
         self.Module = undefined
 
         compileJSON = null
-
+        console.log('self-------', self)
         self.importScripts(data.data)
-
+        console.log('self module', self.module)
         var compiler = solc(self.Module)
 
         compileJSON = function (input) {

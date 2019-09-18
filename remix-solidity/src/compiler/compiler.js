@@ -237,13 +237,14 @@ function Compiler (handleImportCall) {
 
   // TODO: needs to be changed to be more node friendly
   this.loadVersion = function (usingWorker, url) {
-    console.log('Loading ' + url + ' ' + (usingWorker ? 'with worker' : 'without worker'))
+    console.log('Loading ' + url + ' ' + (usingWorker ? 'with worker only' : 'with worker here too'))
     self.event.trigger('loadingCompiler', [url, usingWorker])
 
     if (usingWorker) {
       loadWorker(url)
     } else {
-      loadInternal(url)
+      // loadInternal(url)
+      loadWorker(url)
     }
   }
 
