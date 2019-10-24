@@ -130,26 +130,15 @@ function getVarsInLine(localVars, contractVars, globalVars, line) {
   if (!line) return {}
   let foundVars = {}
 
-  Object.keys(localVars).forEach((varName) => {
-    if (line.indexOf(varName) >= 0) {
-      const value = localVars[varName];
-      foundVars[varName] = value;
-    }
-  });
-
-  Object.keys(contractVars).forEach((varName) => {
-    if (line.indexOf(varName) >= 0) {
-      const value = contractVars[varName];
-      foundVars[varName] = value;
-    }
-  });
-
-  Object.keys(globalVars).forEach((varName) => {
-    if (line.indexOf(varName) >= 0) {
-      const value = globalVars[varName];
-      globalVars[varName] = value;
-    }
-  });
+  let varList = [localVars, contractVars, globalVars]
+  varList.forEach((variables) => {
+    Object.keys(variables).forEach((varName) => {
+      if (line.indexOf(varName) >= 0) {
+        const value = variables[varName]
+        foundVars[varName] = value
+      }
+    });
+  })
 
   return foundVars
 }
