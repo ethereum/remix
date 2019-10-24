@@ -5,7 +5,7 @@ const version = require('../package.json').version
 
 program
   .command('version')
-  .description("outputs version number")
+  .description('outputs version number')
   .action(() => {
     console.log(version)
     process.exit(0)
@@ -13,7 +13,7 @@ program
 
 program
   .command('help')
-  .description("outputs usage information")
+  .description('outputs usage information')
   .action(() => {
     program.help()
     process.exit(0)
@@ -26,12 +26,12 @@ program
   .parse(process.argv)
 
 if (!program.tx) {
-  console.error("no tx specified. please specify with --tx <txHash>")
+  console.error('no tx specified. please specify with --tx <txHash>')
   process.exit(1)
 }
 
 if (!program.file) {
-  console.error("no file specified. please specify with --file <filepath>")
+  console.error('no file specified. please specify with --file <filepath>')
   process.exit(1)
 }
 
@@ -75,7 +75,7 @@ compilation.source = { sources: inputJson.sources }
 
 let url = (program.node || 'http://localhost:8545')
 
-console.log("connecting to... " + url)
+console.log('connecting to... ' + url)
 
 var cmdLine = new CmdLine()
 cmdLine.connect('http', url)
@@ -92,41 +92,41 @@ cmdLine.events.on('source', () => {
 
 const repl = require('repl')
 
-function showActions() {
-  const actions = [];
-  actions.push("actions: ");
+function showActions () {
+  const actions = []
+  actions.push('actions: ')
 
   if (cmdLine.canGoPrevious()) {
-    actions.push("(p)revious");
+    actions.push('(p)revious')
   }
   if (cmdLine.canGoNext()) {
-    actions.push("(n)ext");
+    actions.push('(n)ext')
   }
 
-  actions.push("(vl) var local");
-  actions.push("(vg) var global");
-  actions.push("(vc) var contract");
+  actions.push('(vl) var local')
+  actions.push('(vg) var global')
+  actions.push('(vc) var contract')
 
-  console.log("");
-  console.log(actions.join(" | "));
+  console.log('')
+  console.log(actions.join(' | '))
 }
 
-function simplifyVars(data) {
-  if (!data) return;
-  const newData = {};
+function simplifyVars (data) {
+  if (!data) return
+  const newData = {}
 
   Object.keys(data).forEach((key) => {
-    const field = data[key];
-    newData[`${key} (${field.type})`] = field.value;
-  });
+    const field = data[key]
+    newData[`${key} (${field.type})`] = field.value
+  })
 
   for (const debugVar of Object.keys(newData)) {
-    const value = newData[debugVar];
-    console.log(`${debugVar}: ` + `${value}`);
+    const value = newData[debugVar]
+    console.log(`${debugVar}: ` + `${value}`)
   }
 }
 
-function getVarsInLine(localVars, contractVars, globalVars, line) {
+function getVarsInLine (localVars, contractVars, globalVars, line) {
   if (!line) return {}
   let foundVars = {}
 
@@ -137,31 +137,31 @@ function getVarsInLine(localVars, contractVars, globalVars, line) {
         const value = variables[varName]
         foundVars[varName] = value
       }
-    });
+    })
   })
 
   return foundVars
 }
 
-async function getGlobals(txHash) {
+async function getGlobals (txHash) {
   const globals = {}
 
-  let tx = await cmdLine.web3.eth.getTransaction(txHash);
-  let block = await cmdLine.web3.eth.getBlock(tx.blockHash);
+  let tx = await cmdLine.web3.eth.getTransaction(txHash)
+  let block = await cmdLine.web3.eth.getBlock(tx.blockHash)
 
-  globals["block.blockHash"] = {type: 'bytes32', value: tx.blockHash};
-  globals["block.number"] = {type: 'uint256', value: tx.blockNumber};
-  globals["block.coinbase"] = {type: 'address payable', value: block.miner};
-  globals["block.difficulty"] = {type: 'uint256', value: block.difficulty.toString()};
-  globals["block.gaslimit"] = {type: 'uint256', value: block.gasLimit};
-  globals["block.timestamp"] = {type: 'uint256', value: block.timestamp};
-  globals["msg.sender"] = {type: 'address payable', value: tx.from};
-  globals["msg.gas"] = {type: 'uint256', value: tx.gas};
-  globals["msg.gasPrice"] = {type: 'uint256', value: tx.gasPrice.toString()};
-  globals["msg.value"] = {type: 'uint256', value: tx.value.toString()};
-  globals["now"] = {type: 'uint256', value: block.timestamp};
+  globals['block.blockHash'] = {type: 'bytes32', value: tx.blockHash}
+  globals['block.number'] = {type: 'uint256', value: tx.blockNumber}
+  globals['block.coinbase'] = {type: 'address payable', value: block.miner}
+  globals['block.difficulty'] = {type: 'uint256', value: block.difficulty.toString()}
+  globals['block.gaslimit'] = {type: 'uint256', value: block.gasLimit}
+  globals['block.timestamp'] = {type: 'uint256', value: block.timestamp}
+  globals['msg.sender'] = {type: 'address payable', value: tx.from}
+  globals['msg.gas'] = {type: 'uint256', value: tx.gas}
+  globals['msg.gasPrice'] = {type: 'uint256', value: tx.gasPrice.toString()}
+  globals['msg.value'] = {type: 'uint256', value: tx.value.toString()}
+  globals['now'] = {type: 'uint256', value: block.timestamp}
 
-  return globals;
+  return globals
 }
 
 repl.start({
@@ -171,20 +171,20 @@ repl.start({
     if (command === 'next' || command === 'n') {
       cmdLine.stepOverForward(true)
 
-      let globals = await getGlobals(cmdLine.txHash);
-      let vars = cmdLine.getVars();
-      let line = cmdLine.getCurrentLine();
-      let foundVars = await getVarsInLine(vars.locals, vars.contract, globals, line);
-      simplifyVars(foundVars);
+      let globals = await getGlobals(cmdLine.txHash)
+      let vars = cmdLine.getVars()
+      let line = cmdLine.getCurrentLine()
+      let foundVars = await getVarsInLine(vars.locals, vars.contract, globals, line)
+      simplifyVars(foundVars)
     }
     if (command === 'previous' || command === 'p' || command === 'prev') {
       cmdLine.stepOverBack(true)
 
-      let globals = await getGlobals(cmdLine.txHash);
-      let vars = cmdLine.getVars();
-      let line = cmdLine.getCurrentLine();
-      let foundVars = getVarsInLine(vars.locals, vars.contract, globals, line);
-      simplifyVars(foundVars);
+      let globals = await getGlobals(cmdLine.txHash)
+      let vars = cmdLine.getVars()
+      let line = cmdLine.getCurrentLine()
+      let foundVars = getVarsInLine(vars.locals, vars.contract, globals, line)
+      simplifyVars(foundVars)
     }
     if (command === 'step' || command === 's') {
       cmdLine.stepIntoForward(true)
@@ -196,24 +196,24 @@ repl.start({
       process.exit(0)
     }
     if (command === 'var local' || command === 'v l' || command === 'vl') {
-      let vars = cmdLine.getVars();
-      simplifyVars(vars.locals);
+      let vars = cmdLine.getVars()
+      simplifyVars(vars.locals)
       // cmdLine.displayLocals()
     }
     if (command === 'var contract' || command === 'v c' || command === 'vc') {
-      let vars = cmdLine.getVars();
-      simplifyVars(vars.contract);
+      let vars = cmdLine.getVars()
+      simplifyVars(vars.contract)
       // cmdLine.displayGlobals()
     }
     if (command === 'var global' || command === 'v g' || command === 'vg') {
-      let globals = await getGlobals(cmdLine.txHash);
-      simplifyVars(globals);
+      let globals = await getGlobals(cmdLine.txHash)
+      simplifyVars(globals)
     }
     if (command.split(' ')[0] === 'jump') {
       let stepIndex = parseInt(command.split(' ')[1], 10)
       cmdLine.jumpTo(stepIndex)
     }
-    showActions();
+    showActions()
     cb(null, '')
   }
 })
