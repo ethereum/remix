@@ -144,27 +144,57 @@ function getVarsInLine(localVars, contractVars, globalVars, line) {
     }
   });
 
+  Object.keys(globalVars).forEach((varName) => {
+    if (line.indexOf(varName) >= 0) {
+      const value = globalVars[varName];
+      globalVars[varName] = value;
+    }
+  });
+
   return foundVars
+}
+
+async function getGlobals(txHash) {
+  const globals = {}
+
+  let tx = await cmdLine.web3.eth.getTransaction(txHash);
+  let block = await cmdLine.web3.eth.getBlock(tx.blockHash);
+
+  globals["block.blockHash"] = {type: 'bytes32', value: tx.blockHash};
+  globals["block.number"] = {type: 'uint256', value: tx.blockNumber};
+  globals["block.coinbase"] = {type: 'address payable', value: block.miner};
+  globals["block.difficulty"] = {type: 'uint256', value: block.difficulty.toString()};
+  globals["block.gaslimit"] = {type: 'uint256', value: block.gasLimit};
+  globals["block.timestamp"] = {type: 'uint256', value: block.timestamp};
+  globals["msg.sender"] = {type: 'address payable', value: tx.from};
+  globals["msg.gas"] = {type: 'uint256', value: tx.gas};
+  globals["msg.gasPrice"] = {type: 'uint256', value: tx.gasPrice.toString()};
+  globals["msg.value"] = {type: 'uint256', value: tx.value.toString()};
+  globals["now"] = {type: 'uint256', value: block.timestamp};
+
+  return globals;
 }
 
 repl.start({
   prompt: '> ',
-  eval: (cmd, context, filename, cb) => {
+  eval: async (cmd, context, filename, cb) => {
     let command = cmd.trim()
     if (command === 'next' || command === 'n') {
       cmdLine.stepOverForward(true)
 
+      let globals = await getGlobals(cmdLine.txHash);
       let vars = cmdLine.getVars();
       let line = cmdLine.getCurrentLine();
-      let foundVars = getVarsInLine(vars.locals, vars.contract, {}, line);
+      let foundVars = await getVarsInLine(vars.locals, vars.contract, globals, line);
       simplifyVars(foundVars);
     }
     if (command === 'previous' || command === 'p' || command === 'prev') {
       cmdLine.stepOverBack(true)
 
+      let globals = await getGlobals(cmdLine.txHash);
       let vars = cmdLine.getVars();
       let line = cmdLine.getCurrentLine();
-      let foundVars = getVarsInLine(vars.locals, vars.contract, {}, line);
+      let foundVars = getVarsInLine(vars.locals, vars.contract, globals, line);
       simplifyVars(foundVars);
     }
     if (command === 'step' || command === 's') {
@@ -187,9 +217,8 @@ repl.start({
       // cmdLine.displayGlobals()
     }
     if (command === 'var global' || command === 'v g' || command === 'vg') {
-      let vars = cmdLine.getVars();
-      simplifyVars(vars.global);
-      // cmdLine.displayGlobals()
+      let globals = await getGlobals(cmdLine.txHash);
+      simplifyVars(globals);
     }
     if (command.split(' ')[0] === 'jump') {
       let stepIndex = parseInt(command.split(' ')[1], 10)
