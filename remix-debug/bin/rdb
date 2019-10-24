@@ -98,21 +98,11 @@ repl.start({
     let command = cmd.trim()
     if (command === 'next' || command === 'n') {
       cmdLine.stepOverForward(true)
-
-      let globals = await cmdLine.getGlobals(cmdLine.txHash)
-      let vars = cmdLine.getVars()
-      let line = cmdLine.getCurrentLine()
-      let foundVars = await cmdLine.getVarsInLine(vars.locals, vars.contract, globals, line)
-      cmdLine.simplifyVars(foundVars)
+      await cmdLine.displayVarsInCurrentLine()
     }
     if (command === 'previous' || command === 'p' || command === 'prev') {
       cmdLine.stepOverBack(true)
-
-      let globals = await cmdLine.getGlobals(cmdLine.txHash)
-      let vars = cmdLine.getVars()
-      let line = cmdLine.getCurrentLine()
-      let foundVars = cmdLine.getVarsInLine(vars.locals, vars.contract, globals, line)
-      cmdLine.simplifyVars(foundVars)
+      await cmdLine.displayVarsInCurrentLine()
     }
     if (command === 'step' || command === 's') {
       cmdLine.stepIntoForward(true)
@@ -124,18 +114,13 @@ repl.start({
       process.exit(0)
     }
     if (command === 'var local' || command === 'v l' || command === 'vl') {
-      let vars = cmdLine.getVars()
-      cmdLine.simplifyVars(vars.locals)
-      // cmdLine.displayLocals()
+      cmdLine.displayLocals()
     }
     if (command === 'var contract' || command === 'v c' || command === 'vc') {
-      let vars = cmdLine.getVars()
-      cmdLine.simplifyVars(vars.contract)
-      // cmdLine.displayGlobals()
+      cmdLine.displayContractVariables()
     }
     if (command === 'var global' || command === 'v g' || command === 'vg') {
-      let globals = await getGlobals(cmdLine.txHash)
-      cmdLine.simplifyVars(globals)
+      await cmdLine.displayGlobals()
     }
     if (command.split(' ')[0] === 'jump') {
       let stepIndex = parseInt(command.split(' ')[1], 10)

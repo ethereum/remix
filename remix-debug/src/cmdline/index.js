@@ -228,8 +228,12 @@ class CmdLine {
       newData[`${key} (${field.type})`] = field.value
     })
 
-    for (const debugVar of Object.keys(newData)) {
-      const value = newData[debugVar]
+    return newData
+  }
+
+  displayVars(vars) {
+    for (const debugVar of Object.keys(vars)) {
+      const value = vars[debugVar]
       console.log(`${debugVar}: ` + `${value}`)
     }
   }
@@ -273,13 +277,30 @@ class CmdLine {
   }
 
   displayLocals () {
-    console.dir('= displayLocals')
-    console.dir(this.solidityLocals)
+    let vars = this.getVars()
+    let localVars = this.simplifyVars(vars.locals)
+    this.displayVars(localVars)
   }
 
-  displayGlobals () {
-    console.dir('= displayGlobals')
-    console.dir(this.solidityState)
+  async displayGlobals () {
+    let globals = await this.getGlobals(this.txHash)
+    let globalVars = this.simplifyVars(globals)
+    this.displayVars(globalVars)
+  }
+
+  displayContractVariables () {
+    let vars = this.getVars()
+    let contractVars = this.simplifyVars(vars.contract)
+    this.displayVars(contractVars)
+  }
+
+  async displayVarsInCurrentLine() {
+    let globals = await this.getGlobals(this.txHash)
+    let vars = this.getVars()
+    let line = this.getCurrentLine()
+    let foundVars = await this.getVarsInLine(vars.locals, vars.contract, globals, line)
+    let lineVars = this.simplifyVars(foundVars)
+    this.displayVars(lineVars)
   }
 
 }
