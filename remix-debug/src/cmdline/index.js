@@ -200,25 +200,6 @@ class CmdLine {
     return this.debugger.unload()
   }
 
-  showActions() {
-    const actions = []
-    actions.push('actions: ')
-
-    if (this.canGoPrevious()) {
-      actions.push('(p)revious')
-    }
-    if (this.canGoNext()) {
-      actions.push('(n)ext')
-    }
-
-    actions.push('(vl) var local')
-    actions.push('(vg) var global')
-    actions.push('(vc) var contract')
-
-    console.log('')
-    console.log(actions.join(' | '))
-  }
-
   simplifyVars(data) {
     if (!data) return
     const newData = {}
@@ -229,13 +210,6 @@ class CmdLine {
     })
 
     return newData
-  }
-
-  displayVars(vars) {
-    for (const debugVar of Object.keys(vars)) {
-      const value = vars[debugVar]
-      console.log(`${debugVar}: ` + `${value}`)
-    }
   }
 
   getVarsInLine(localVars, contractVars, globalVars, line) {
@@ -255,7 +229,7 @@ class CmdLine {
     return foundVars
   }
 
-  async getGlobals(txHash) {
+  async getBlockAndTransactionVariables(txHash) {
     const globals = {}
 
     let tx = await this.web3.eth.getTransaction(txHash)
@@ -276,31 +250,31 @@ class CmdLine {
     return globals
   }
 
-  displayLocals () {
+  getLocals () {
     let vars = this.getVars()
     let localVars = this.simplifyVars(vars.locals)
-    this.displayVars(localVars)
+    return localVars
   }
 
-  async displayGlobals () {
-    let globals = await this.getGlobals(this.txHash)
+  async getGlobals () {
+    let globals = await this.getBlockAndTransactionVariables(this.txHash)
     let globalVars = this.simplifyVars(globals)
-    this.displayVars(globalVars)
+    return globalVars
   }
 
-  displayContractVariables () {
+  getContractVariables () {
     let vars = this.getVars()
     let contractVars = this.simplifyVars(vars.contract)
-    this.displayVars(contractVars)
+    return contractVars
   }
 
-  async displayVarsInCurrentLine() {
-    let globals = await this.getGlobals(this.txHash)
+  async getVarsInCurrentLine() {
+    let globals = await this.getBlockAndTransactionVariables(this.txHash)
     let vars = this.getVars()
     let line = this.getCurrentLine()
     let foundVars = await this.getVarsInLine(vars.locals, vars.contract, globals, line)
     let lineVars = this.simplifyVars(foundVars)
-    this.displayVars(lineVars)
+    return lineVars
   }
 
 }

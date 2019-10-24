@@ -90,6 +90,32 @@ cmdLine.events.on('source', () => {
   cmdLine.getSource().forEach(console.dir)
 })
 
+function displayVars(vars) {
+  for (const debugVar of Object.keys(vars)) {
+    const value = vars[debugVar]
+    console.log(`${debugVar}: ` + `${value}`)
+  }
+}
+
+function showActions() {
+  const actions = []
+  actions.push('actions: ')
+
+  if (cmdLine.canGoPrevious()) {
+    actions.push('(p)revious')
+  }
+  if (cmdLine.canGoNext()) {
+    actions.push('(n)ext')
+  }
+
+  actions.push('(vl) var local')
+  actions.push('(vg) var global')
+  actions.push('(vc) var contract')
+
+  console.log('')
+  console.log(actions.join(' | '))
+}
+
 const repl = require('repl')
 
 repl.start({
@@ -98,11 +124,13 @@ repl.start({
     let command = cmd.trim()
     if (command === 'next' || command === 'n') {
       cmdLine.stepOverForward(true)
-      await cmdLine.displayVarsInCurrentLine()
+      let vars = await cmdLine.getVarsInCurrentLine()
+      displayVars(vars)
     }
     if (command === 'previous' || command === 'p' || command === 'prev') {
       cmdLine.stepOverBack(true)
-      await cmdLine.displayVarsInCurrentLine()
+      let vars = await cmdLine.getVarsInCurrentLine()
+      displayVars(vars)
     }
     if (command === 'step' || command === 's') {
       cmdLine.stepIntoForward(true)
@@ -114,19 +142,22 @@ repl.start({
       process.exit(0)
     }
     if (command === 'var local' || command === 'v l' || command === 'vl') {
-      cmdLine.displayLocals()
+      let vars = cmdLine.getLocals()
+      displayVars(vars)
     }
     if (command === 'var contract' || command === 'v c' || command === 'vc') {
-      cmdLine.displayContractVariables()
+      let vars = cmdLine.getContractVariables()
+      displayVars(vars)
     }
     if (command === 'var global' || command === 'v g' || command === 'vg') {
-      await cmdLine.displayGlobals()
+      let vars = await cmdLine.getGlobals()
+      displayVars(vars)
     }
     if (command.split(' ')[0] === 'jump') {
       let stepIndex = parseInt(command.split(' ')[1], 10)
       cmdLine.jumpTo(stepIndex)
     }
-    cmdLine.showActions()
+    showActions()
     cb(null, '')
   }
 })
