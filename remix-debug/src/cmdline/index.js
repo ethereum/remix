@@ -200,6 +200,78 @@ class CmdLine {
     return this.debugger.unload()
   }
 
+  showActions() {
+    const actions = []
+    actions.push('actions: ')
+
+    if (this.canGoPrevious()) {
+      actions.push('(p)revious')
+    }
+    if (this.canGoNext()) {
+      actions.push('(n)ext')
+    }
+
+    actions.push('(vl) var local')
+    actions.push('(vg) var global')
+    actions.push('(vc) var contract')
+
+    console.log('')
+    console.log(actions.join(' | '))
+  }
+
+  simplifyVars(data) {
+    if (!data) return
+    const newData = {}
+
+    Object.keys(data).forEach((key) => {
+      const field = data[key]
+      newData[`${key} (${field.type})`] = field.value
+    })
+
+    for (const debugVar of Object.keys(newData)) {
+      const value = newData[debugVar]
+      console.log(`${debugVar}: ` + `${value}`)
+    }
+  }
+
+  getVarsInLine(localVars, contractVars, globalVars, line) {
+    if (!line) return {}
+    let foundVars = {}
+
+    let varList = [localVars, contractVars, globalVars]
+    varList.forEach((variables) => {
+      Object.keys(variables).forEach((varName) => {
+        if (line.indexOf(varName) >= 0) {
+          const value = variables[varName]
+          foundVars[varName] = value
+        }
+      })
+    })
+
+    return foundVars
+  }
+
+  async getGlobals(txHash) {
+    const globals = {}
+
+    let tx = await this.web3.eth.getTransaction(txHash)
+    let block = await this.web3.eth.getBlock(tx.blockHash)
+
+    globals['block.blockHash'] = { type: 'bytes32', value: tx.blockHash }
+    globals['block.number'] = { type: 'uint256', value: tx.blockNumber }
+    globals['block.coinbase'] = { type: 'address payable', value: block.miner }
+    globals['block.difficulty'] = { type: 'uint256', value: block.difficulty.toString() }
+    globals['block.gaslimit'] = { type: 'uint256', value: block.gasLimit }
+    globals['block.timestamp'] = { type: 'uint256', value: block.timestamp }
+    globals['msg.sender'] = { type: 'address payable', value: tx.from }
+    globals['msg.gas'] = { type: 'uint256', value: tx.gas }
+    globals['msg.gasPrice'] = { type: 'uint256', value: tx.gasPrice.toString() }
+    globals['msg.value'] = { type: 'uint256', value: tx.value.toString() }
+    globals['now'] = { type: 'uint256', value: block.timestamp }
+
+    return globals
+  }
+
   displayLocals () {
     console.dir('= displayLocals')
     console.dir(this.solidityLocals)
@@ -209,6 +281,7 @@ class CmdLine {
     console.dir('= displayGlobals')
     console.dir(this.solidityState)
   }
+
 }
 
 module.exports = CmdLine
