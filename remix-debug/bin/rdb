@@ -92,15 +92,80 @@ cmdLine.events.on('source', () => {
 
 const repl = require('repl')
 
+function showActions() {
+  const actions = [];
+  actions.push("actions: ");
+
+  if (cmdLine.canGoPrevious()) {
+    actions.push("(p)revious");
+  }
+  if (cmdLine.canGoNext()) {
+    actions.push("(n)ext");
+  }
+
+  actions.push("(vl) var local");
+  actions.push("(vg) var global");
+  actions.push("(vc) var contract");
+
+  console.log("");
+  console.log(actions.join(" | "));
+}
+
+function simplifyVars(data) {
+  if (!data) return;
+  const newData = {};
+
+  Object.keys(data).forEach((key) => {
+    const field = data[key];
+    newData[`${key} (${field.type})`] = field.value;
+  });
+
+  for (const debugVar of Object.keys(newData)) {
+    const value = newData[debugVar];
+    console.log(`${debugVar}: ` + `${value}`);
+  }
+}
+
+function getVarsInLine(localVars, contractVars, globalVars, line) {
+  if (!line) return {}
+  let foundVars = {}
+
+  Object.keys(localVars).forEach((varName) => {
+    if (line.indexOf(varName) >= 0) {
+      const value = localVars[varName];
+      foundVars[varName] = value;
+    }
+  });
+
+  Object.keys(contractVars).forEach((varName) => {
+    if (line.indexOf(varName) >= 0) {
+      const value = contractVars[varName];
+      foundVars[varName] = value;
+    }
+  });
+
+  return foundVars
+}
+
 repl.start({
   prompt: '> ',
   eval: (cmd, context, filename, cb) => {
     let command = cmd.trim()
     if (command === 'next' || command === 'n') {
       cmdLine.stepOverForward(true)
+
+      let vars = cmdLine.getVars();
+      let line = cmdLine.getCurrentLine();
+      let foundVars = getVarsInLine(vars.locals, vars.contract, {}, line);
+      simplifyVars(foundVars);
     }
     if (command === 'previous' || command === 'p' || command === 'prev') {
       cmdLine.stepOverBack(true)
+
+      let vars = cmdLine.getVars();
+      let line = cmdLine.getCurrentLine();
+      let foundVars = getVarsInLine(vars.locals, vars.contract, {}, line);
+      simplifyVars(foundVars);
     }
     if (command === 'step' || command === 's') {
       cmdLine.stepIntoForward(true)
@@ -108,19 +173,29 @@ repl.start({
     if (command === 'stepback' || command === 'sb') {
       cmdLine.stepIntoBack(true)
     }
-    if (command === 'exit' || command === 'quit') {
+    if (command === 'exit' || command === 'quit' || command === 'q') {
       process.exit(0)
     }
     if (command === 'var local' || command === 'v l' || command === 'vl') {
-      cmdLine.displayLocals()
+      let vars = cmdLine.getVars();
+      simplifyVars(vars.locals);
+      // cmdLine.displayLocals()
+    }
+    if (command === 'var contract' || command === 'v c' || command === 'vc') {
+      let vars = cmdLine.getVars();
+      simplifyVars(vars.contract);
+      // cmdLine.displayGlobals()
     }
     if (command === 'var global' || command === 'v g' || command === 'vg') {
-      cmdLine.displayGlobals()
+      let vars = cmdLine.getVars();
+      simplifyVars(vars.global);
+      // cmdLine.displayGlobals()
     }
     if (command.split(' ')[0] === 'jump') {
       let stepIndex = parseInt(command.split(' ')[1], 10)
       cmdLine.jumpTo(stepIndex)
     }
+    showActions();
     cb(null, '')
   }
 })
