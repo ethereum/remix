@@ -12,6 +12,12 @@ remix-debug wrap other remix-* libraries and can be used to debug Ethereum trans
 npm install remix-debug
 ```
 
+## Command Line Usage
+
+```bash
+rdb --tx 0xd03f88eaf500a18752c311a62b6bfdd07978679620886329620c115fd9de85a8 -f contract.sol --node http://localhost:8545
+```
+
 ## Development
 
 ```javascript
