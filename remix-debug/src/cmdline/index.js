@@ -200,7 +200,7 @@ class CmdLine {
     return this.debugger.unload()
   }
 
-  simplifyVars(data) {
+  simplifyVars (data) {
     if (!data) return
     const newData = {}
 
@@ -212,7 +212,7 @@ class CmdLine {
     return newData
   }
 
-  getVarsInLine(localVars, contractVars, globalVars, line) {
+  getVarsInLine (localVars, contractVars, globalVars, line) {
     if (!line) return {}
     let foundVars = {}
 
@@ -229,7 +229,7 @@ class CmdLine {
     return foundVars
   }
 
-  async getBlockAndTransactionVariables(txHash) {
+  async getBlockAndTransactionVariables (txHash) {
     const globals = {}
 
     let tx = await this.web3.eth.getTransaction(txHash)
@@ -268,7 +268,7 @@ class CmdLine {
     return contractVars
   }
 
-  async getVarsInCurrentLine() {
+  async getVarsInCurrentLine () {
     let globals = await this.getBlockAndTransactionVariables(this.txHash)
     let vars = this.getVars()
     let line = this.getCurrentLine()
@@ -280,4 +280,3 @@ class CmdLine {
 }
 
 module.exports = CmdLine
-
