@@ -298,8 +298,9 @@ function addParams (parameterList, tree, scopeId, states, contractName, sourceLo
     if (stackDepth >= 0) {
       var location = typesUtil.extractLocationFromAstVariable(param)
       location = location === 'default' ? 'memory' : location
-      tree.scopes[scopeId].locals[param.attributes.name] = {
-        name: param.attributes.name,
+      var attributesName = param.attributes.name === '' ? `$${inputParam}` : param.attributes.name
+      tree.scopes[scopeId].locals[attributesName] = {
+        name: attributesName,
         type: decodeInfo.parseType(param.attributes.type, states, contractName, location),
         stackDepth: stackDepth,
         sourceLocation: sourceLocation

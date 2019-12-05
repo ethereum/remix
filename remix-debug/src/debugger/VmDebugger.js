@@ -165,7 +165,7 @@ class VmDebuggerLogic {
       })
     })
 
-    self.debugger.event.register('indexChanged', this, function (index) {
+    self.event.register('indexChanged', this, function (index) {
       if (index < 0) return
       if (self.stepManager.currentStepIndex !== index) return
       if (!self.storageResolver) return
