@@ -252,6 +252,10 @@ module.exports = class UniversalDApp {
   getFallbackInterface (contractABI) {
     return txHelper.getFallbackInterface(contractABI)
   }
+  
+  getReceiveInterface (contractABI) {
+    return txHelper.getReceiveInterface(contractABI)
+  }
 
   getInputs (funABI) {
     if (!funABI.inputs) {
