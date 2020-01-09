@@ -123,6 +123,14 @@ module.exports = {
       }
     }
   },
+  
+  getReceiveInterface: function (abi) {
+    for (let i = 0; i < abi.length; i++) {
+      if (abi[i].type === 'receive') {
+        return abi[i]
+      }
+    }
+  },
 
   /**
     * return the contract obj of the given @arg name. Uses last compilation result.
