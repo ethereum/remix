@@ -1,5 +1,5 @@
 const RemixLib = require('remix-lib')
-const executionContext = RemixLib.execution.executionContext
+const defaultExecutionContext = RemixLib.execution.executionContext
 
 const log = require('./utils/logs.js')
 const merge = require('merge')
@@ -16,7 +16,7 @@ const generateBlock = require('./genesis.js')
 var Provider = function (options) {
   this.options = options || {}
   // TODO: init executionContext here
-  this.executionContext = executionContext
+  this.executionContext = options.executionContext || defaultExecutionContext
   this.Accounts = new Accounts(this.executionContext)
   this.Transactions = new Transactions(this.executionContext)
 
