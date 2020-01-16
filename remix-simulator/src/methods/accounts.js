@@ -35,6 +35,12 @@ Accounts.prototype.init = async function () {
   }
 }
 
+Accounts.prototype.resetAccounts = function () {
+  this.accountsList = []
+  this.accounts = {}
+  this.accountsKeys = {}
+}
+
 Accounts.prototype.methods = function () {
   return {
     eth_accounts: this.eth_accounts.bind(this),
