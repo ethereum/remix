@@ -50,7 +50,7 @@ module.exports = {
       finalCallback(error, txResult)
     })
   },
-  
+
   /**
     * send the raw transaction to given contract ! that will create a transaction !
     *
@@ -66,14 +66,14 @@ module.exports = {
     *     [personal mode enabled, need password to continue] promptCb (okCb, cancelCb)
     * @param {Function} finalCallback    - last callback.
     */
-   sendRawTransaction: function (from, to, data, value, gasLimit, txRunner, callbacks, finalCallback) {
+  sendRawTransaction: function (from, to, data, value, gasLimit, txRunner, callbacks, finalCallback) {
     const tx = { from, to, data, useCall: false, value, gasLimit }
     txRunner.rawRun(tx, callbacks.confirmationCb, callbacks.gasEstimationForceSend, callbacks.promptCb, (error, txResult) => {
       // see universaldapp.js line 660 => 700 to check possible values of txResult (error case)
       finalCallback(error, txResult)
     })
    },
-  
+
   /**
     * check if the vm has errored
     *
