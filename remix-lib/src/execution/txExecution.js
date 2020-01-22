@@ -72,7 +72,7 @@ module.exports = {
       // see universaldapp.js line 660 => 700 to check possible values of txResult (error case)
       finalCallback(error, txResult)
     })
-   },
+  },
 
   /**
     * check if the vm has errored
