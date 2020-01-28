@@ -1,6 +1,5 @@
 const ethJSUtil = require('ethereumjs-util')
 const { BN, privateToAddress, toChecksumAddress } = require('ethereumjs-util')
-const BN = ethJSUtil.BN
 const Web3 = require('web3')
 
 const Accounts = function (executionContext) {
@@ -36,7 +35,7 @@ Accounts.prototype.init = async function () {
   }
 }
 
-Accounts.prototype.addAccount(privateKey, balance) {
+Accounts.prototype.addAccount = function (privateKey, balance) {
   privateKey = Buffer.from(privateKey, 'hex')
   const address = privateToAddress(privateKey)
 

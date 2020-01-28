@@ -29,7 +29,7 @@ var Provider = function (options) {
   this.methods = merge(this.methods, this.Transactions.methods())
 
   generateBlock(this.executionContext)
-  this.init()
+  // this.init()
 }
 
 Provider.prototype.resetAccounts = function () {
