@@ -34,6 +34,11 @@ var Provider = function (options) {
 
 Provider.prototype.resetAccounts = function () {
   this.Accounts.resetAccounts()
+  this.Transactions.init(this.Accounts.accounts)
+}
+
+Provider.prototype.addAccount = function (privateKey, balance) {
+  return this.Accounts.addAccount(privateKey, balance)
 }
 
 Provider.prototype.init = async function () {

@@ -1,5 +1,6 @@
-const ethJSUtil = require('ethereumjs-util')
-const { BN, privateToAddress, toChecksumAddress } = require('ethereumjs-util')
+// const ethJSUtil = require('ethereumjs-util')
+const { BN, privateToAddress, toChecksumAddress, stripHexPrefix } = require('ethereumjs-util')
+// const BN = ethJSUtil.BN
 const Web3 = require('web3')
 
 const Accounts = function (executionContext) {
@@ -13,11 +14,11 @@ const Accounts = function (executionContext) {
   this.executionContext.init({get: () => { return true }})
 }
 
-Accounts.prototype.init = async function () {
+Accounts.prototype.init = async () => {
   let setBalance = (account) => {
     return new Promise((resolve, reject) => {
-      this.accountsKeys[ethJSUtil.toChecksumAddress(account.address)] = account.privateKey
-      this.accounts[ethJSUtil.toChecksumAddress(account.address)] = { privateKey: Buffer.from(account.privateKey.replace('0x', ''), 'hex'), nonce: 0 }
+      this.accountsKeys[toChecksumAddress(account.address)] = account.privateKey
+      this.accounts[toChecksumAddress(account.address)] = { privateKey: Buffer.from(account.privateKey.replace('0x', ''), 'hex'), nonce: 0 }
 
       this.executionContext.vm().stateManager.getAccount(Buffer.from(account.address.replace('0x', ''), 'hex'), (err, account) => {
         if (err) {
@@ -49,7 +50,7 @@ Accounts.prototype.addAccount = function (privateKey, balance) {
     })
   })
 
-  this.accountsKeys[ethJSUtil.toChecksumAddress(account.address)] = account.privateKey
+  this.accountsKeys[toChecksumAddress(account.address)] = account.privateKey
   this.accounts[toChecksumAddress('0x' + address.toString('hex'))] = { privateKey, nonce: 0 }
 }
 
@@ -68,12 +69,12 @@ Accounts.prototype.methods = function () {
 }
 
 Accounts.prototype.eth_accounts = function (payload, cb) {
-  return cb(null, this.accountsList.map((x) => ethJSUtil.toChecksumAddress(x.address)))
+  return cb(null, this.accountsList.map((x) => toChecksumAddress(x.address)))
 }
 
 Accounts.prototype.eth_getBalance = function (payload, cb) {
   let address = payload.params[0]
-  address = ethJSUtil.stripHexPrefix(address)
+  address = stripHexPrefix(address)
 
   this.executionContext.vm().stateManager.getAccount(Buffer.from(address, 'hex'), (err, account) => {
     if (err) {
@@ -87,7 +88,7 @@ Accounts.prototype.eth_sign = function (payload, cb) {
   const address = payload.params[0]
   const message = payload.params[1]
 
-  const privateKey = this.accountsKeys[ethJSUtil.toChecksumAddress(address)]
+  const privateKey = this.accountsKeys[toChecksumAddress(address)]
   if (!privateKey) {
     return cb(new Error('unknown account'))
   }
