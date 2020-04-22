@@ -1,14 +1,11 @@
 const Web3 = require('web3')
-const Debugger = require('../debugger/debugger.js')
-const ContextManager = require('./contextManager.js')
-const EventManager = require('events')
 const remixLib = require('remix-lib')
-const executionContext = remixLib.execution.executionContext
+const Debugger = require('../debugger/debugger.js')
+const EventManager = require('events')
 
 class CmdLine {
 
   constructor () {
-    this.executionContext = executionContext
     this.events = new EventManager()
     this.lineColumnPos = null
     this.rawLocation = null
@@ -17,6 +14,7 @@ class CmdLine {
   connect (providerType, url) {
     if (providerType !== 'http') throw new Error('unsupported provider type')
     this.web3 = new Web3(new Web3.providers.HttpProvider(url))
+    remixLib.init.extend(this.web3)
   }
 
   loadCompilationData (inputJson, outputJson) {
@@ -32,21 +30,10 @@ class CmdLine {
   }
 
   initDebugger (cb) {
-    this.contextManager = new ContextManager(this.executionContext)
-
     this.debugger = new Debugger({
-      web3: this.contextManager.getWeb3(),
+      web3: this.web3,
       compiler: this.compilation
     })
-
-    this.contextManager.event.register('providerChanged', () => {
-      this.debugger.updateWeb3(this.contextManager.getWeb3())
-    })
-
-    this.contextManager.initProviders()
-
-    this.contextManager.addProvider('debugger_web3', this.web3)
-    this.contextManager.switchProvider('debugger_web3', cb)
   }
 
   getSource () {
@@ -115,7 +102,7 @@ class CmdLine {
         // TODO: this should be an onReady event
         setTimeout(cb, 1000)
       }
-    })
+    }).then(console.log).catch(console.error)
   }
 
   getVars () {
@@ -207,6 +194,13 @@ class CmdLine {
   displayGlobals () {
     console.dir('= displayGlobals')
     console.dir(this.solidityState)
+  }
+
+  displayCurrentStep () {
+    this.debugger.debugger.traceManager.getCurrentStep(this.debugger.step_manager.currentStepIndex, (error, step) => {
+      if (error) console.error(error)
+      console.dir(step)
+    })
   }
 }
 

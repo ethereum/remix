@@ -2,10 +2,13 @@
 
 const program = require('commander')
 const version = require('../package.json').version
+// const solc = require('solc')
+// const fs = require('fs')
+const repl = require('repl')
 
 program
   .command('version')
-  .description("outputs version number")
+  .description('outputs version number')
   .action(() => {
     console.log(version)
     process.exit(0)
@@ -13,7 +16,7 @@ program
 
 program
   .command('help')
-  .description("outputs usage information")
+  .description('outputs usage information')
   .action(() => {
     program.help()
     process.exit(0)
@@ -26,12 +29,6 @@ program
   .parse(process.argv)
 
 const CmdLine = require('../src/cmdline/index.js')
-
-const solc = require('solc')
-const fs = require('fs')
-
-const filename = 'test/sol/simple_storage.sol'
-const shortFilename = 'simple_storage.sol'
 
 const inputJson = {
   language: 'Solidity',
@@ -51,29 +48,29 @@ const inputJson = {
   }
 }
 
-inputJson.sources[shortFilename] = {content: fs.readFileSync(filename).toString()}
+// inputJson.sources[shortFilename] = {content: fs.readFileSync(filename).toString()}
 
 console.log('compiling...')
 
-const compilationData = JSON.parse(solc.compileStandardWrapper(JSON.stringify(inputJson)))
-const compilation = {}
-compilation.data = compilationData
-compilation.source = { sources: inputJson.sources }
+// const compilationData = JSON.parse(solc.compileStandardWrapper(JSON.stringify(inputJson)))
+let compilation = {}
+compilation.data = {}
+compilation.source = { sources: {} }
 
 const cmdLine = new CmdLine()
-cmdLine.connect('http', 'http://localhost:8545')
+cmdLine.connect('http', 'https://remix-goerli.ethdevops.io')
 cmdLine.loadCompilationResult(compilation)
 cmdLine.initDebugger()
 
-const tx = '0xf510c4f0b1d9ee262d7b9e9e87b4262f275fe029c2c733feef7dfa1e2b1e32aa'
+const tx = '0x033bf7d78260117b6e260c419238896bf61f2ddb343073bd324400c1ff1f1dcb'
 
-cmdLine.startDebug(tx, shortFilename)
+cmdLine.startDebug(tx)
 
 cmdLine.events.on('source', () => {
   cmdLine.getSource().forEach(console.dir)
 })
 
-const repl = require('repl')
+console.log('start')
 
 repl.start({
   prompt: '> ',
@@ -103,6 +100,12 @@ repl.start({
     if (command.split(' ')[0] === 'jump') {
       let stepIndex = parseInt(command.split(' ')[1], 10)
       cmdLine.jumpTo(stepIndex)
+    }
+    if (command === 'next' || command === 'n') {
+      cmdLine.stepOverForward(true)
+    }
+    if (command === 'current-step' || command === 'cs') {
+      cmdLine.displayCurrentStep()
     }
     cb(null, '')
   }
