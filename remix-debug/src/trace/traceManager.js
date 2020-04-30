@@ -4,7 +4,7 @@ const TraceRetriever = require('./traceRetriever')
 const TraceCache = require('./traceCache')
 const TraceStepManager = require('./traceStepManager')
 
-const traceHelper = require('../helpers/traceHelper')
+const traceHelper = require('./traceHelper')
 const util = require('../util')
 
 function TraceManager (options) {

@@ -1,5 +1,5 @@
 'use strict'
-const util = require('./util')
+const util = require('../util')
 const AstWalker = require('./astWalker')
 
 /**

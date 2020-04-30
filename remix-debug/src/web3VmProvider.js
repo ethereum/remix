@@ -1,6 +1,6 @@
-const util = require('../util')
-const uiutil = require('../helpers/uiHelper')
-const traceHelper = require('../helpers/traceHelper')
+const util = require('./util')
+const uiutil = require('./uiHelper')
+const traceHelper = require('./trace/traceHelper')
 const ethutil = require('ethereumjs-util')
 const Web3 = require('web3')
 

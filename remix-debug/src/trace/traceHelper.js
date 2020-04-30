@@ -1,5 +1,5 @@
 'use strict'
-const ui = require('./uiHelper')
+const ui = require('../uiHelper')
 
 module.exports = {
   // vmTraceIndex has to point to a CALL, CODECALL, ...

@@ -1,6 +1,5 @@
 'use strict'
-var remixLib = require('remix-lib')
-var util = remixLib.util
+var util = require('../../src/util')
 
 class MockStorageResolver {
   constructor (_storage) {

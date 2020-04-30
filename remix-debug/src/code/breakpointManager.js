@@ -1,7 +1,7 @@
 'use strict'
 
 const EventManager = require('../eventManager')
-const helper = require('../helpers/traceHelper')
+const helper = require('../trace/traceHelper')
 
 /**
   * allow to manage breakpoint

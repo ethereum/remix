@@ -1,6 +1,6 @@
 'use strict'
 
-const traceHelper = require('../helpers/traceHelper')
+const traceHelper = require('./traceHelper')
 const util = require('../util')
 
 function TraceStepManager (_traceAnalyser) {
