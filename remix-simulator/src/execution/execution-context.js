@@ -287,7 +287,7 @@ function ExecutionContext () {
         cb()
       } else {
         web3.setProvider(oldProvider)
-        cb('Not possible to connect to the Web3 provider. Make sure the provider is running and a connection is open (via IPC or RPC).')
+        cb(new Error('Not possible to connect to the Web3 provider. Make sure the provider is running and a connection is open (via IPC or RPC).'))
       }
     })
   }

@@ -2,7 +2,6 @@ const async = require('async')
 const crypto = require('crypto')
 
 class LogsManager {
-
   constructor () {
     this.notificationCallbacks = []
     this.subscriptions = {}
@@ -159,7 +158,6 @@ class LogsManager {
 
     return results
   }
-
 }
 
 module.exports = LogsManager

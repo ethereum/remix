@@ -51,14 +51,14 @@ module.exports = {
         params = params.replace(/(^|,\s+|,)(0[xX][0-9a-fA-F]+)(\s+,|,|$)/g, '$1"$2"$3') // replace non quoted hex string by quoted hex string
         funArgs = JSON.parse('[' + params + ']')
       } catch (e) {
-        return callback('Error encoding arguments: ' + e)
+        return callback(new Error('Error encoding arguments: ' + e))
       }
       if (funArgs.length > 0) {
         try {
           data = helper.encodeParams(funAbi, funArgs)
           dataHex = data.toString('hex')
         } catch (e) {
-          return callback('Error encoding arguments: ' + e)
+          return callback(new Error('Error encoding arguments: ' + e))
         }
       }
       if (data.slice(0, 9) === 'undefined') {
@@ -104,14 +104,14 @@ module.exports = {
           for (let libFile in linkLibraries) {
             for (let lib in linkLibraries[libFile]) {
               const address = linkLibraries[libFile][lib]
-              if (!ethJSUtil.isValidAddress(address)) return callback(address + ' is not a valid address. Please check the provided address is valid.')
+              if (!ethJSUtil.isValidAddress(address)) return callback(new Error(address + ' is not a valid address. Please check the provided address is valid.'))
               bytecodeToDeploy = this.linkLibraryStandardFromlinkReferences(lib, address.replace('0x', ''), bytecodeToDeploy, linkReferences)
             }
           }
         }
       }
       if (bytecodeToDeploy.indexOf('_') >= 0) {
-        return callback('Failed to link some libraries')
+        return callback(new Error('Failed to link some libraries'))
       }
       return callback(null, { dataHex: bytecodeToDeploy + encodedParam.dataHex, funAbi, funArgs: encodedParam.funArgs, contractBytecode: contract.evm.bytecode.object })
     })
@@ -139,7 +139,7 @@ module.exports = {
       if (bytecodeToDeploy.indexOf('_') >= 0) {
         this.linkBytecode(contract, contracts, (err, bytecode) => {
           if (err) {
-            callback('Error deploying required libraries: ' + err)
+            callback(new Error('Error deploying required libraries: ' + err))
           } else {
             bytecodeToDeploy = bytecode + dataHex
             return callback(null, {dataHex: bytecodeToDeploy, funAbi, funArgs: encodedParam.funArgs, contractBytecode, contractName: contractName})
@@ -181,13 +181,13 @@ module.exports = {
           funArgs = this.parseFunctionParams(params)
         }
       } catch (e) {
-        return callback('Error encoding arguments: ' + e)
+        return callback(new Error('Error encoding arguments: ' + e))
       }
       try {
         data = helper.encodeParams(funAbi, funArgs)
         dataHex = data.toString('hex')
       } catch (e) {
-        return callback('Error encoding arguments: ' + e)
+        return callback(new Error('Error encoding arguments: ' + e))
       }
       if (data.slice(0, 9) === 'undefined') {
         dataHex = data.slice(9)
@@ -203,7 +203,7 @@ module.exports = {
       if (bytecodeToDeploy.indexOf('_') >= 0) {
         this.linkBytecode(contract, contracts, (err, bytecode) => {
           if (err) {
-            callback('Error deploying required libraries: ' + err)
+            callback(new Error('Error deploying required libraries: ' + err))
           } else {
             bytecodeToDeploy = bytecode + dataHex
             return callback(null, {dataHex: bytecodeToDeploy, funAbi, funArgs, contractBytecode, contractName: contractName})
@@ -255,21 +255,21 @@ module.exports = {
   linkBytecodeLegacy: function (contract, contracts, callback, callbackStep, callbackDeployLibrary) {
     const libraryRefMatch = contract.evm.bytecode.object.match(/__([^_]{1,36})__/)
     if (!libraryRefMatch) {
-      return callback('Invalid bytecode format.')
+      return callback(new Error('Invalid bytecode format.'))
     }
     const libraryName = libraryRefMatch[1]
     // file_name:library_name
     const libRef = libraryName.match(/(.*):(.*)/)
     if (!libRef) {
-      return callback('Cannot extract library reference ' + libraryName)
+      return callback(new Error('Cannot extract library reference ' + libraryName))
     }
     if (!contracts[libRef[1]] || !contracts[libRef[1]][libRef[2]]) {
-      return callback('Cannot find library reference ' + libraryName)
+      return callback(new Error('Cannot find library reference ' + libraryName))
     }
     const libraryShortName = libRef[2]
     const library = contracts[libRef[1]][libraryShortName]
     if (!library) {
-      return callback('Library ' + libraryName + ' not found.')
+      return callback(new Error('Library ' + libraryName + ' not found.'))
     }
     this.deployLibrary(libraryName, libraryShortName, library, contracts, (err, address) => {
       if (err) {
@@ -451,4 +451,3 @@ module.exports = {
     return str.charAt(index) === '"' || str.charAt(index) === '['
   }
 }
-

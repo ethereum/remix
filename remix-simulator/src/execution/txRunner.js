@@ -41,7 +41,7 @@ class TxRunner {
           this._sendTransaction(this.executionContext.web3().personal.sendTransaction, tx, value, callback)
         },
         () => {
-          return callback('Canceled by user.')
+          return callback(new Error('Canceled by user.'))
         }
       )
     } else {
@@ -72,7 +72,7 @@ class TxRunner {
     try {
       sendTx.apply({}, args)
     } catch (e) {
-      return callback(`Send transaction failed: ${e.message} . if you use an injected provider, please check it is properly unlocked. `)
+      return callback(new Error(`Send transaction failed: ${e.message} . if you use an injected provider, please check it is properly unlocked. `))
     }
   }
 
@@ -97,12 +97,12 @@ class TxRunner {
     const self = this
     const account = self.vmaccounts[from]
     if (!account) {
-      return callback('Invalid account selected')
+      return callback(new Error('Invalid account selected'))
     }
 
     this.executionContext.vm().stateManager.getAccount(Buffer.from(from.replace('0x', ''), 'hex'), (err, res) => {
       if (err) {
-        callback('Account not found')
+        callback(new Error('Account not found'))
       } else {
         // See https://github.com/ethereumjs/ethereumjs-tx/blob/master/docs/classes/transaction.md#constructor
         // for initialization fields and their types
@@ -206,10 +206,10 @@ class TxRunner {
         warnEstimation += ' ' + err
 
         if (gasEstimation > gasLimit) {
-          return callback('Gas required exceeds limit: ' + gasLimit + '. ' + warnEstimation)
+          return callback(new Error('Gas required exceeds limit: ' + gasLimit + '. ' + warnEstimation))
         }
         if (gasEstimation > blockGasLimit) {
-          return callback('Gas required exceeds block gas limit: ' + gasLimit + '. ' + warnEstimation)
+          return callback(new Error('Gas required exceeds block gas limit: ' + gasLimit + '. ' + warnEstimation))
         }
       })
     })

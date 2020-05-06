@@ -17,7 +17,6 @@ const txHelper = require('./txHelper')
   *
   */
 class TxListener {
-
   constructor (opt, executionContext) {
     this.event = new EventManager()
     // has a default for now for backwards compatability

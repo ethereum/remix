@@ -155,7 +155,7 @@ module.exports = {
   visitContracts: (contracts, cb) => {
     for (let file in contracts) {
       for (let name in contracts[file]) {
-        if (cb({ name: name, object: contracts[file][name], file: file })) return
+        if (cb({ name: name, object: contracts[file][name], file: file })) return // eslint-disable-line
       }
     }
   },

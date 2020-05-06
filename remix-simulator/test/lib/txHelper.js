@@ -1,4 +1,5 @@
 'use strict'
+/* eslint-disable */
 const tape = require('tape')
 const txHelper = require('../src/execution/txHelper')
 

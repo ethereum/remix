@@ -28,7 +28,7 @@ class EventsDecoder {
 
   _decodeLogs (tx, receipt, contract, contracts, cb) {
     if (!contract || !receipt) {
-      return cb('cannot decode logs - contract or receipt not resolved ')
+      return cb(new Error('cannot decode logs - contract or receipt not resolved '))
     }
     if (!receipt.logs) {
       return cb(null, { decoded: [], raw: [] })
