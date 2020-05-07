@@ -7,7 +7,7 @@ import { checksEffectsInteraction } from '../../src/solidity-analyzer/modules/'
 import { install, require as requireNPMmodule } from 'npm-install-version'
 install('solc@0.5.0')
 const compiler = requireNPMmodule('solc@0.5.0')
-import { compilerInput } from '../util/compilerHelper'
+import { compilerInput } from '../../src/util/compilerHelper'
 const folder: string = 'solidity-v0.5'
 
 function compile (fileName): CompilationResult {

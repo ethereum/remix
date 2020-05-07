@@ -1,6 +1,6 @@
 import { default as test} from "tape"
 import { readFileSync } from 'fs'
-import { compilerInput } from '../util/compilerHelper'
+import { compilerInput } from '../../src/util/compilerHelper'
 import { join } from 'path'
 import { default as StatRunner } from '../../dist/src/solidity-analyzer'
 import { CompilationResult, AnalysisReportObj, AnalysisReport, AnalyzerModule } from '../../src/types'

@@ -1,5 +1,5 @@
 import { default as test} from "tape"
-import { compilerInput } from '../util/compilerHelper'
+import { compilerInput } from '../../src/util/compilerHelper'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { default as StatRunner } from '../../dist/src/solidity-analyzer'
