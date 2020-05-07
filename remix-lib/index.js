@@ -7,6 +7,7 @@ const SourceMappingDecoder = require('./src/sourceMappingDecoder')
 const SourceLocationTracker = require('./src/sourceLocationTracker')
 const OffsetToColumnConverter = require('./src/offsetToLineColumnConverter')
 const init = require('./src/init')
+
 const util = require('./src/util')
 const Web3Providers = require('./src/web3Provider/web3Providers')
 const DummyProvider = require('./src/web3Provider/dummyProvider')
