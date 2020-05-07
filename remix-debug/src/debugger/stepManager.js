@@ -189,18 +189,18 @@ class DebuggerStepManager {
     return this.resolveToReducedTrace(this.currentStepIndex, -1)
   }
 
-  resolveToReducedTrace (value, incr) {
-    if (this.debugger.callTree.reducedTrace.length) {
-      var nextSource = util.findClosestIndex(value, this.debugger.callTree.reducedTrace)
-      nextSource = nextSource + incr
-      if (nextSource <= 0) {
-        nextSource = 0
-      } else if (nextSource > this.debugger.callTree.reducedTrace.length) {
-        nextSource = this.debugger.callTree.reducedTrace.length - 1
-      }
-      return this.debugger.callTree.reducedTrace[nextSource]
+  resolveToReducedTrace(value, incr) {
+    if (!this.debugger.callTree.reducedTrace.length) {
+      return value
     }
-    return value
+    var nextSource = util.findClosestIndex(value, this.debugger.callTree.reducedTrace)
+    nextSource = nextSource + incr
+    if (nextSource <= 0) {
+      nextSource = 0
+    } else if (nextSource > this.debugger.callTree.reducedTrace.length) {
+      nextSource = this.debugger.callTree.reducedTrace.length - 1
+    }
+    return this.debugger.callTree.reducedTrace[nextSource]
   }
 
 }
