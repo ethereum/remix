@@ -1,5 +1,4 @@
 import { default as test} from "tape"
-import { helpers } from 'remix-lib'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { default as StatRunner } from '../../dist/src/solidity-analyzer'
@@ -8,7 +7,7 @@ import { checksEffectsInteraction } from '../../src/solidity-analyzer/modules/'
 import { install, require as requireNPMmodule } from 'npm-install-version'
 install('solc@0.5.0')
 const compiler = requireNPMmodule('solc@0.5.0')
-const {compilerInput  } = helpers.compiler
+import { compilerInput } from '../util/compilerHelper'
 const folder: string = 'solidity-v0.5'
 
 function compile (fileName): CompilationResult {

@@ -1,5 +1,5 @@
 import { default as test} from "tape"
-import { helpers } from 'remix-lib'
+import { compilerInput } from '../util/compilerHelper'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { default as StatRunner } from '../../dist/src/solidity-analyzer'
@@ -8,9 +8,7 @@ import { CompilationResult, AnalysisReportObj, AnalysisReport } from '../../src/
 import { install, require as requireNPMmodule } from 'npm-install-version'
 install('solc@0.4.24')
 const solc = requireNPMmodule('solc@0.4.24')
-const { compilerInput } = helpers.compiler
 const folder: string = 'solidity-v0.4.24'
-
 
 const testFiles: string[] = [
   'KingOfTheEtherThrone.sol',
