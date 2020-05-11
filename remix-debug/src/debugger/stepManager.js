@@ -189,7 +189,7 @@ class DebuggerStepManager {
     return this.resolveToReducedTrace(this.currentStepIndex, -1)
   }
 
-  resolveToReducedTrace(value, incr) {
+  resolveToReducedTrace (value, incr) {
     if (!this.debugger.callTree.reducedTrace.length) {
       return value
     }

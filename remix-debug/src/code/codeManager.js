@@ -55,7 +55,7 @@ CodeManager.prototype.resolveStep = function (stepIndex, tx) {
  */
 CodeManager.prototype.getCode = function (address, cb) {
   if (!traceHelper.isContractCreation(address)) {
-    return this.codeResolver.resolveCode(address, (address, code) => {
+    return this.codeResolver.resolveCode(address).then((code) => {
       cb(null, code)
     })
   }

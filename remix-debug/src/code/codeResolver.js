@@ -15,23 +15,20 @@ CodeResolver.prototype.clear = function () {
   this.instructionsIndexByBytesOffset = {}
 }
 
-CodeResolver.prototype.resolveCode = function (address, callBack) {
-  const cache = this.getExecutingCodeFromCache(address)
-  if (cache) {
-    return callBack(address, cache)
-  }
-
-  this.loadCode(address, (code) => {
-    callBack(address, this.cacheExecutingCode(address, code))
-  })
-}
-
-CodeResolver.prototype.loadCode = function (address, callback) {
-  this.web3.eth.getCode(address, (error, result) => {
-    if (error) {
-      return console.log(error)
+CodeResolver.prototype.resolveCode = async function (address) {
+  return new Promise((resolve, reject) => {
+    const cache = this.getExecutingCodeFromCache(address)
+    if (cache) {
+      return resolve(cache)
     }
-    callback(result)
+
+    this.web3.eth.getCode(address, (error, code) => {
+      if (error) {
+        // return console.log(error)
+        return reject(error)
+      }
+      return resolve(this.cacheExecutingCode(address, code))
+    })
   })
 }
 

@@ -121,7 +121,7 @@ class BreakpointManager {
     * @param {Int} line - line number where looking for breakpoint
     * @return {Bool} return true if the given @arg fileIndex @arg line refers to a breakpoint
     */
-  hasBreakpointAtLine(fileIndex, line) {
+  hasBreakpointAtLine (fileIndex, line) {
     const filename = this.debugger.solidityProxy.fileNameFromIndex(fileIndex)
     if (!(filename && this.breakpoints[filename])) {
       return false
@@ -167,7 +167,7 @@ class BreakpointManager {
     *
     * @param {Object} sourceLocation - position of the breakpoint { file: '<file index>', row: '<line number' }
     */
-  remove(sourceLocation) {
+  remove (sourceLocation) {
     var sources = this.breakpoints[sourceLocation.fileName]
     if (!sources) {
       return
