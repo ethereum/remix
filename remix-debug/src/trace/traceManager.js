@@ -211,28 +211,24 @@ TraceManager.prototype.getCurrentStep = function (stepIndex, callback) {
   callback(null, this.traceCache.steps[stepIndex])
 }
 
-TraceManager.prototype.getMemExpand = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
-    return callback(check, null)
-  }
-  callback(null, this.trace[stepIndex].memexpand ? this.trace[stepIndex].memexpand : '')
+TraceManager.prototype.getMemExpand = function (stepIndex) {
+  return (this.getStepProperty(stepIndex, 'memexpand') || '')
 }
 
-TraceManager.prototype.getStepCost = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
-    return callback(check, null)
-  }
-  callback(null, this.trace[stepIndex].gasCost)
+TraceManager.prototype.getStepCost = function (stepIndex) {
+  return this.getStepProperty(stepIndex, 'gasCost')
 }
 
-TraceManager.prototype.getRemainingGas = function (stepIndex, callback) {
+TraceManager.prototype.getRemainingGas = function (stepIndex) {
+  return this.getStepProperty(stepIndex, 'gas')
+}
+
+TraceManager.prototype.getStepProperty = function (stepIndex, property) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
-  callback(null, this.trace[stepIndex].gas)
+  return this.trace[stepIndex][property]
 }
 
 TraceManager.prototype.isCreationStep = function (stepIndex) {
