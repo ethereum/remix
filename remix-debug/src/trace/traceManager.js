@@ -27,17 +27,10 @@ TraceManager.prototype.resolveTrace = async function (tx, callback) {
 
     if (result.structLogs.length > 0) {
       this.trace = result.structLogs
-      this.traceAnalyser.analyse(result.structLogs, tx, function (error, result) {
-        if (error) {
-          this.isLoading = false
-          console.log(error)
-          callback(error, false)
-        } else {
-          this.isLoading = false
-          callback(null, true)
-        }
-      })
-      return
+
+      this.traceAnalyser.analyse(result.structLogs, tx)
+      this.isLoading = false
+      return callback(null, true)
     }
     var mes = tx.hash + ' is not a contract invocation or contract creation.'
     console.log(mes)
