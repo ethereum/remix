@@ -19,38 +19,37 @@ function TraceManager (options) {
 }
 
 // init section
-TraceManager.prototype.resolveTrace = function (tx, callback) {
+TraceManager.prototype.resolveTrace = async function (tx, callback) {
   this.tx = tx
   this.init()
   if (!this.web3) callback('web3 not loaded', false)
   this.isLoading = true
-  var self = this
-  this.traceRetriever.getTrace(tx.hash, (error, result) => {
-    if (error) {
-      console.log(error)
-      self.isLoading = false
-      callback(error, false)
-    } else {
-      if (result.structLogs.length > 0) {
-        self.trace = result.structLogs
-        self.traceAnalyser.analyse(result.structLogs, tx, function (error, result) {
-          if (error) {
-            self.isLoading = false
-            console.log(error)
-            callback(error, false)
-          } else {
-            self.isLoading = false
-            callback(null, true)
-          }
-        })
-      } else {
-        var mes = tx.hash + ' is not a contract invocation or contract creation.'
-        console.log(mes)
-        self.isLoading = false
-        callback(mes, false)
-      }
+  try {
+    const result = await this.traceRetriever.getTrace(tx.hash)
+
+    if (result.structLogs.length > 0) {
+      this.trace = result.structLogs
+      this.traceAnalyser.analyse(result.structLogs, tx, function (error, result) {
+        if (error) {
+          this.isLoading = false
+          console.log(error)
+          callback(error, false)
+        } else {
+          this.isLoading = false
+          callback(null, true)
+        }
+      })
+      return
     }
-  })
+    var mes = tx.hash + ' is not a contract invocation or contract creation.'
+    console.log(mes)
+    this.isLoading = false
+    callback(mes, false)
+  } catch (error) {
+    console.log(error)
+    this.isLoading = false
+    callback(error, false)
+  }
 }
 
 TraceManager.prototype.init = function () {
