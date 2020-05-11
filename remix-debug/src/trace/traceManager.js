@@ -1,6 +1,5 @@
 'use strict'
 const TraceAnalyser = require('./traceAnalyser')
-const TraceRetriever = require('./traceRetriever')
 const TraceCache = require('./traceCache')
 const TraceStepManager = require('./traceStepManager')
 
@@ -13,7 +12,6 @@ function TraceManager (options) {
   this.trace = null
   this.traceCache = new TraceCache()
   this.traceAnalyser = new TraceAnalyser(this.traceCache)
-  this.traceRetriever = new TraceRetriever({web3: this.web3})
   this.traceStepManager = new TraceStepManager(this.traceAnalyser)
   this.tx
 }
@@ -25,7 +23,7 @@ TraceManager.prototype.resolveTrace = async function (tx, callback) {
   if (!this.web3) callback('web3 not loaded', false)
   this.isLoading = true
   try {
-    const result = await this.traceRetriever.getTrace(tx.hash)
+    const result = await this.getTrace(tx.hash)
 
     if (result.structLogs.length > 0) {
       this.trace = result.structLogs
@@ -50,6 +48,21 @@ TraceManager.prototype.resolveTrace = async function (tx, callback) {
     this.isLoading = false
     callback(error, false)
   }
+}
+
+TraceManager.prototype.getTrace = function (txHash) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      disableStorage: true,
+      disableMemory: false,
+      disableStack: false,
+      fullStorage: false
+    }
+    this.web3.debug.traceTransaction(txHash, options, function (error, result) {
+      if (error) return reject(error)
+      resolve(result)
+    })
+  })
 }
 
 TraceManager.prototype.init = function () {
