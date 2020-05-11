@@ -26,7 +26,7 @@ if (typeof (window) !== 'undefined') {
 }
 
 function modules () {
-  return {   
+  return {
     EventManager: EventManager,
     vm: {
       Web3Providers: Web3Providers,
