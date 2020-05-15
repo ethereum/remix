@@ -19,8 +19,7 @@
     }
   ],
   "dependencies": {
-    "remix-astwalker": "0.0.24",
-    "remix-lib": "0.4.29"
+    "remix-astwalker": "0.0.24"
   },
   "scripts": {
     "build": "tsc",

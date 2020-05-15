@@ -1,6 +1,5 @@
 'use strict'
-const remixLib = require('remix-lib')
-const util = remixLib.util
+const util = require('../util')
 const mappingPreimages = require('./mappingPreimages')
 
  /**
