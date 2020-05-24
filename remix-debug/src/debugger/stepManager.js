@@ -18,17 +18,17 @@ class DebuggerStepManager {
 
   listenToEvents () {
     this.debugger.event.register('newTraceLoaded', this, () => {
-      this.traceManager.getLength((error, newLength) => {
-        if (error) {
-          return console.log(error)
-        }
+      try {
+        const newLength = this.traceManager.getLength()
         if (this.traceLength !== newLength) {
           this.event.trigger('traceLengthChanged', [newLength])
           this.traceLength = newLength
           this.codeTraceLength = this.calculateCodeLength()
         }
         this.jumpTo(0)
-      })
+      } catch (error) {
+        return console.log(error)
+      }
     })
 
     this.debugger.callTree.event.register('callTreeReady', () => {
@@ -64,21 +64,21 @@ class DebuggerStepManager {
   }
 
   triggerStepChanged (step) {
-    this.traceManager.getLength((error, length) => {
-      let stepState = 'valid'
+    const length = this.traceManager.getLength()
 
-      if (error) {
-        stepState = 'invalid'
-      } else if (step <= 0) {
-        stepState = 'initial'
-      } else if (step >= length - 1) {
-        stepState = 'end'
-      }
+    let stepState = 'valid'
 
-      let jumpOutDisabled = (step === this.traceManager.findStepOut(step))
+    if (length < 0) {
+      stepState = 'invalid'
+    } else if (step === 0) {
+      stepState = 'initial'
+    } else if (step >= length - 1) {
+      stepState = 'end'
+    }
 
-      this.event.trigger('stepChanged', [step, stepState, jumpOutDisabled])
-    })
+    let jumpOutDisabled = (step === this.traceManager.findStepOut(step))
+
+    this.event.trigger('stepChanged', [step, stepState, jumpOutDisabled])
   }
 
   stepIntoBack (solidityMode) {

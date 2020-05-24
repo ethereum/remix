@@ -39,24 +39,23 @@ class SolidityProxy {
     * @param {Int} vmTraceIndex  - index in the vm trave where to resolve the executed contract name
     * @param {Function} cb  - callback returns (error, contractName)
     */
-  contractNameAt (vmTraceIndex, cb) {
-    this.traceManager.getCurrentCalledAddressAt(vmTraceIndex, (error, address) => {
-      if (error) {
-        cb(error)
-      } else {
+  contractNameAt (vmTraceIndex) {
+    return new Promise((resolve, reject) => {
+      try {
+        const address = this.traceManager.getCurrentCalledAddressAt(vmTraceIndex)
         if (this.cache.contractNameByAddress[address]) {
-          cb(null, this.cache.contractNameByAddress[address])
-        } else {
-          this.codeManager.getCode(address, (error, code) => {
-            if (error) {
-              cb(error)
-            } else {
-              const contractName = contractNameFromCode(this.contracts, code.bytecode, address)
-              this.cache.contractNameByAddress[address] = contractName
-              cb(null, contractName)
-            }
-          })
+          return resolve(this.cache.contractNameByAddress[address])
         }
+        this.codeManager.getCode(address, (error, code) => {
+          if (error) {
+            return reject(error)
+          }
+          const contractName = contractNameFromCode(this.contracts, code.bytecode, address)
+          this.cache.contractNameByAddress[address] = contractName
+          resolve(contractName)
+        })
+      } catch (error) {
+        reject(error)
       }
     })
   }
@@ -96,13 +95,11 @@ class SolidityProxy {
     * @param {Int} vmTraceIndex  - index in the vm trave where to resolve the state variables
     * @return {Object} - returns state variables of @args vmTraceIndex
     */
-  extractStateVariablesAt (vmtraceIndex, cb) {
-    this.contractNameAt(vmtraceIndex, (error, contractName) => {
-      if (error) {
-        cb(error)
-      } else {
-        cb(null, this.extractStateVariables(contractName))
-      }
+  extractStateVariablesAt (vmtraceIndex) {
+    return new Promise((resolve, reject) => {
+      this.contractNameAt(vmtraceIndex).then((contractName) => {
+        resolve(this.extractStateVariables(contractName))
+      }).catch(reject)
     })
   }
 

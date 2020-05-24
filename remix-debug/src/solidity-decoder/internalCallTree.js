@@ -125,19 +125,14 @@ class InternalCallTree {
 
   extractSourceLocation (step) {
     return new Promise((resolve, reject) => {
-      this.traceManager.getCurrentCalledAddressAt(step, (error, address) => {
-        if (!error) {
-          this.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, step, this.solidityProxy.contracts, (error, sourceLocation) => {
-            if (!error) {
-              return resolve(sourceLocation)
-            } else {
-              return reject('InternalCallTree - Cannot retrieve sourcelocation for step ' + step + ' ' + error)
-            }
-          })
-        } else {
-          return reject('InternalCallTree - Cannot retrieve address for step ' + step + ' ' + error)
-        }
-      })
+      try {
+        const address = this.traceManager.getCurrentCalledAddressAt(step)
+        this.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, step, this.solidityProxy.contracts).then(resolve).catch((error) => {
+          return reject('InternalCallTree - Cannot retrieve sourcelocation for step ' + step + ' ' + error)
+        })
+      } catch (error) {
+        return reject('InternalCallTree - Cannot retrieve address for step ' + step + ' ' + error)
+      }
     })
   }
 }
@@ -223,26 +218,27 @@ function includeVariableDeclaration (tree, step, sourceLocation, scopeId, newLoc
   // we check if the current vm trace step target a new ast node of type VariableDeclaration
   // that way we know that there is a new local variable from here.
   if (variableDeclaration && !tree.scopes[scopeId].locals[variableDeclaration.attributes.name]) {
-    tree.traceManager.getStackAt(step, (error, stack) => {
+    try {
+      const stack = tree.traceManager.getStackAt(step)
       // the stack length at this point is where the value of the new local variable will be stored.
       // so, either this is the direct value, or the offset in memory. That depends on the type.
-      if (!error) {
-        tree.solidityProxy.contractNameAt(step, (error, contractName) => { // cached
-          if (!error && variableDeclaration.attributes.name !== '') {
-            var states = tree.solidityProxy.extractStatesDefinitions()
-            var location = typesUtil.extractLocationFromAstVariable(variableDeclaration)
-            location = location === 'default' ? 'storage' : location
-            // we push the new local variable in our tree
-            tree.scopes[scopeId].locals[variableDeclaration.attributes.name] = {
-              name: variableDeclaration.attributes.name,
-              type: decodeInfo.parseType(variableDeclaration.attributes.type, states, contractName, location),
-              stackDepth: stack.length,
-              sourceLocation: sourceLocation
-            }
+      tree.solidityProxy.contractNameAt(step).then((contractName) => {
+        if (variableDeclaration.attributes.name !== '') {
+          var states = tree.solidityProxy.extractStatesDefinitions()
+          var location = typesUtil.extractLocationFromAstVariable(variableDeclaration)
+          location = location === 'default' ? 'storage' : location
+          // we push the new local variable in our tree
+          tree.scopes[scopeId].locals[variableDeclaration.attributes.name] = {
+            name: variableDeclaration.attributes.name,
+            type: decodeInfo.parseType(variableDeclaration.attributes.type, states, contractName, location),
+            stackDepth: stack.length,
+            sourceLocation: sourceLocation
           }
-        })
-      }
-    })
+        }
+      }).catch((_error) => {
+      })
+    } catch (error) {
+    }
   }
   // we check here if we are at the beginning inside a new function.
   // if that is the case, we have to add to locals tree the inputs and output params
@@ -252,33 +248,30 @@ function includeVariableDeclaration (tree, step, sourceLocation, scopeId, newLoc
     const functionDefinitionAndInputs = {functionDefinition, inputs: []}
     // means: the previous location was a function definition && JUMPDEST
     // => we are at the beginning of the function and input/output are setup
-    tree.solidityProxy.contractNameAt(step, (error, contractName) => { // cached
-      if (!error) {
-        tree.traceManager.getStackAt(step, (error, stack) => {
-          if (!error) {
-            var states = tree.solidityProxy.extractStatesDefinitions()
-            if (functionDefinition.children && functionDefinition.children.length) {
-              let inputs
-              let outputs
-              for (const element of functionDefinition.children) {
-                if (element.name === 'ParameterList') {
-                  if (!inputs) inputs = element
-                  else {
-                    outputs = element
-                    break
-                  }
-                }
+    tree.solidityProxy.contractNameAt(step).then((contractName) => {
+      try {
+        const stack = tree.traceManager.getStackAt(step)
+        var states = tree.solidityProxy.extractStatesDefinitions()
+        if (functionDefinition.children && functionDefinition.children.length) {
+          let inputs
+          let outputs
+          for (const element of functionDefinition.children) {
+            if (element.name === 'ParameterList') {
+              if (!inputs) inputs = element
+              else {
+                outputs = element
+                break
               }
-              // input params
-              if (inputs) {
-                functionDefinitionAndInputs.inputs = addParams(inputs, tree, scopeId, states, contractName, previousSourceLocation, stack.length, inputs.children.length, -1)
-              }
-              // output params
-              if (outputs) addParams(outputs, tree, scopeId, states, contractName, previousSourceLocation, stack.length, 0, 1)
             }
           }
-        })
+          // input params
+          if (inputs) addParams(inputs, tree, scopeId, states, contractName, previousSourceLocation, stack.length, inputs.children.length, -1)
+          // output params
+          if (outputs) addParams(outputs, tree, scopeId, states, contractName, previousSourceLocation, stack.length, 0, 1)
+        }
+      } catch (error) {
       }
+    }).catch((_error) => {
     })
     tree.functionDefinitionsByScope[scopeId] = functionDefinitionAndInputs
   }

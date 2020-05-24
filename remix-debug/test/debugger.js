@@ -193,37 +193,45 @@ function testDebugging (debugManager) {
   // stack
   tape('traceManager.getStackAt 4', (t) => {
     t.plan(1)
-    debugManager.traceManager.getStackAt(4, (error, callstack) => {
-      if (error) return t.end(error)
-      t.equal(JSON.stringify(callstack), JSON.stringify([ '0x0000000000000000000000000000000000000000000000000000000000000000' ]))
-    })
+    try {
+      const callstack = debugManager.traceManager.getStackAt(4)
+      t.equal(JSON.stringify(callstack), JSON.stringify(['0x0000000000000000000000000000000000000000000000000000000000000000']))
+    } catch (error) {
+      return t.end(error)
+    }
   })
 
   tape('traceManager.getStackAt 41', (t) => {
     t.plan(1)
-    debugManager.traceManager.getStackAt(41, (error, callstack) => {
-      if (error) return t.end(error)
+    try {
+      const callstack = debugManager.traceManager.getStackAt(41)
       t.equal(JSON.stringify(callstack), JSON.stringify([
         '0x0000000000000000000000000000000000000000000000000000000000000080',
         '0x0000000000000000000000000000000000000000000000000000000000000020',
         '0x0000000000000000000000000000000000000000000000000000000000000080',
         '0x00000000000000000000000000000000000000000000000000000000000000e0',
         '0x00000000000000000000000000000000000000000000000000000000000000e0']))
-    })
+    } catch (error) {
+      return t.end(error)
+    }
   })
 
   // storage
   tape('traceManager.getCurrentCalledAddressAt', (t) => {
     t.plan(1)
-    debugManager.traceManager.getCurrentCalledAddressAt(38, (error, address) => {
-      if (error) return t.end(error)
+    try {
+      const address = debugManager.traceManager.getCurrentCalledAddressAt(38)
       console.log(address)
       var storageView = debugManager.storageViewAt(196, address)
-      storageView.storageRange((error, storage) => {
-        if (error) return t.end(error)
+
+      storageView.storageRange().then((storage) => {
         t.equal(JSON.stringify(storage), JSON.stringify({ '0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563': { key: '0x0000000000000000000000000000000000000000000000000000000000000000', value: '0x0000000000000000000000004b0897b0513fdc7c541b6d9d7e929c4e5364d2db' } }))
+      }).catch((error) => {
+        return t.end(error)
       })
-    })
+    } catch (error) {
+      return t.end(error)
+    }
   })
 
   tape('traceManager.decodeStateAt', (t) => {
@@ -247,8 +255,8 @@ function testDebugging (debugManager) {
   tape('traceManager.decodeLocalsAt', (t) => {
     t.plan(1)
     const tested = JSON.parse('{"proposalNames":{"value":[{"value":"0x48656C6C6F20576F726C64210000000000000000000000000000000000000000","type":"bytes32"}],"length":"0x1","type":"bytes32[]"},"p":{"value":"45","type":"uint256"},"addressLocal":{"value":"0x4B0897B0513FDC7C541B6D9D7E929C4E5364D2DB","type":"address"},"i":{"value":"2","type":"uint256"},"proposalsLocals":{"value":[{"value":{"name":{"value":"0x48656C6C6F20576F726C64210000000000000000000000000000000000000000","type":"bytes32"},"voteCount":{"value":"0","type":"uint256"}},"type":"struct Ballot.Proposal"}],"length":"0x1","type":"struct Ballot.Proposal[]"}}')
-    debugManager.traceManager.getCurrentCalledAddressAt(330, (error, address) => {
-      if (error) return t.end(error)
+    try {
+      const address = debugManager.traceManager.getCurrentCalledAddressAt(330)
       debugManager.sourceLocationFromVMTraceIndex(address, 330, (error, location) => {
         if (error) return t.end(error)
         debugManager.decodeLocalsAt(330, location, (error, decodedlocals) => {
@@ -256,7 +264,9 @@ function testDebugging (debugManager) {
           t.equal(JSON.stringify(decodedlocals), JSON.stringify(tested))
         })
       })
-    })
+    } catch (error) {
+      return t.end(error)
+    }
   })
 
   tape('breakPointManager', (t) => {

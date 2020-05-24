@@ -39,12 +39,12 @@ CodeManager.prototype.resolveStep = function (stepIndex, tx) {
   if (stepIndex === 0) {
     return retrieveCodeAndTrigger(this, tx.to, stepIndex, tx)
   }
-  this.traceManager.getCurrentCalledAddressAt(stepIndex, (error, address) => {
-    if (error) {
-      return console.log(error)
-    }
+  try {
+    const address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
     retrieveCodeAndTrigger(this, address, stepIndex, tx)
-  })
+  } catch (error) {
+    return console.log(error)
+  }
 }
 
 /**
@@ -63,12 +63,13 @@ CodeManager.prototype.getCode = function (address, cb) {
   if (codes) {
     return cb(null, codes)
   }
-  this.traceManager.getContractCreationCode(address, (error, hexCode) => {
-    if (!error) {
-      codes = this.codeResolver.cacheExecutingCode(address, hexCode)
-      cb(null, codes)
-    }
-  })
+
+  try {
+    const hexCode = this.traceManager.getContractCreationCode(address)
+    codes = this.codeResolver.cacheExecutingCode(address, hexCode)
+    cb(null, codes)
+  } catch (error) {
+  }
 }
 
 /**
@@ -80,19 +81,20 @@ CodeManager.prototype.getCode = function (address, cb) {
  * @return {Object} return the ast node of the function
  */
 CodeManager.prototype.getFunctionFromStep = function (stepIndex, sourceMap, ast) {
-  this.traceManager.getCurrentCalledAddressAt(stepIndex, (error, address) => {
-    if (error) {
-      console.log(error)
-      return { error: 'Cannot retrieve current address for ' + stepIndex }
-    }
-    this.traceManager.getCurrentPC(stepIndex, (error, pc) => {
-      if (error) {
-        console.log(error)
-        return { error: 'Cannot retrieve current PC for ' + stepIndex }
-      }
-      return this.getFunctionFromPC(address, pc, sourceMap, ast)
-    })
-  })
+  let address
+  try {
+    address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
+  } catch (error) {
+    console.log(error)
+    return { error: 'Cannot retrieve current address for ' + stepIndex }
+  }
+  try {
+    const pc = this.traceManager.getCurrentPC(stepIndex)
+    return this.getFunctionFromPC(address, pc, sourceMap, ast)
+  } catch (error) {
+    console.log(error)
+    return { error: 'Cannot retrieve current PC for ' + stepIndex }
+  }
 }
 
 /**
@@ -102,15 +104,15 @@ CodeManager.prototype.getFunctionFromStep = function (stepIndex, sourceMap, ast)
  * @param {String} step - vm trace step
  * @param {Function} callback - instruction index
  */
-CodeManager.prototype.getInstructionIndex = function (address, step, callback) {
-  this.traceManager.getCurrentPC(step, (error, pc) => {
-    if (error) {
-      console.log(error)
-      return callback('Cannot retrieve current PC for ' + step, null)
-    }
+CodeManager.prototype.getInstructionIndex = function (address, step) {
+  try {
+    const pc = this.traceManager.getCurrentPC(step)
     const itemIndex = this.codeResolver.getInstructionIndex(address, pc)
-    callback(null, itemIndex)
-  })
+    return itemIndex
+  } catch (error) {
+    console.log(error)
+    throw new Error('Cannot retrieve current PC for ' + step)
+  }
 }
 
 /**
@@ -137,12 +139,12 @@ function retrieveCodeAndTrigger (codeMananger, address, stepIndex, tx) {
 }
 
 function retrieveIndexAndTrigger (codeMananger, address, step, code) {
-  codeMananger.getInstructionIndex(address, step, (error, result) => {
-    if (error) {
-      return console.log(error)
-    }
+  try {
+    const result = codeMananger.getInstructionIndex(address, step)
     codeMananger.event.trigger('changed', [code, address, result])
-  })
+  } catch (error) {
+    return console.log(error)
+  }
 }
 
 module.exports = CodeManager
