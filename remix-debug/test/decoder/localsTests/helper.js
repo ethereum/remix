@@ -8,7 +8,15 @@ function decodeLocal (st, index, traceManager, callTree, verifier) {
   try {
     traceManager.waterfall([
       traceManager.getStackAt,
-      traceManager.getMemoryAt],
+      // traceManager.getMemoryAt],
+      function getMemoryAt(stepIndex, callback) {
+        try {
+          const result = traceManager.getMemoryAt(stepIndex)
+          callback(null, result)
+        } catch (error) {
+          callback(error)
+        }
+      },
       index,
       function (error, result) {
         if (!error) {

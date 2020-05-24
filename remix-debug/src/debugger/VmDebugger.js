@@ -67,14 +67,14 @@ class VmDebuggerLogic {
         }
       })
 
-      this._traceManager.getMemoryAt(index, (error, memory) => {
-        if (error) {
-          // console.log(error)
-          this.event.trigger('traceManagerMemoryUpdate', [{}])
-        } else if (this.stepManager.currentStepIndex === index) {
+      try {
+        const memory = this._traceManager.getMemoryAt(index)
+        if (this.stepManager.currentStepIndex === index) {
           this.event.trigger('traceManagerMemoryUpdate', [ui.formatMemory(memory, 16)])
         }
-      })
+      } catch (error) {
+        this.event.trigger('traceManagerMemoryUpdate', [{}])
+      }
 
       this._traceManager.getCallStackAt(index, (error, callstack) => {
         if (error) {
@@ -111,9 +111,12 @@ class VmDebuggerLogic {
         })
       })
 
-      this._traceManager.getCurrentStep(index, (error, step) => {
-        this.event.trigger('traceCurrentStepUpdate', [error, step])
-      })
+      try {
+        const step = this._traceManager.getCurrentStep(index)
+        this.event.trigger('traceCurrentStepUpdate', [null, step])
+      } catch (error) {
+        this.event.trigger('traceCurrentStepUpdate', [error])
+      }
 
       try {
         const addmem = this._traceManager.getMemExpand(index)
@@ -140,13 +143,15 @@ class VmDebuggerLogic {
         this.event.trigger('traceRemainingGasUpdate', [error])
       }
 
-      this._traceManager.getReturnValue(index, (error, returnValue) => {
-        if (error) {
-          this.event.trigger('traceReturnValueUpdate', [[error]])
-        } else if (this.stepManager.currentStepIndex === index) {
+      try {
+        const returnValue = this._traceManager.getReturnValue(index)
+        if (this.stepManager.currentStepIndex === index) {
           this.event.trigger('traceReturnValueUpdate', [[returnValue]])
         }
-      })
+      } catch (error) {
+        this.event.trigger('traceReturnValueUpdate', [[error]])
+      }
+
     })
   }
 

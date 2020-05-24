@@ -180,48 +180,44 @@ tape('TraceManager', function (t) {
 
   t.test('TraceManager.getMemoryAt', function (st) {
     st.plan(3)
-    traceManager.getMemoryAt(0, function (error, result) {
+    try {
+      const result = traceManager.getMemoryAt(0)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.length === 0)
-      }
-    })
+      st.ok(result.length === 0)
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getMemoryAt(34, function (error, result) {
+    try {
+      const result = traceManager.getMemoryAt(34)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.length === 3)
-        st.ok(result[2] === '0000000000000000000000000000000000000000000000000000000000000060')
-      }
-    })
+      st.ok(result.length === 3)
+      st.ok(result[2] === '0000000000000000000000000000000000000000000000000000000000000060')
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getCurrentPC', function (st) {
-    traceManager.getCurrentPC(13, function (error, result) {
+    try {
+      const result = traceManager.getCurrentPC(13)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '65')
-        st.end()
-      }
-    })
+      st.ok(result === '65')
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getCurrentStep', function (st) {
-    traceManager.getCurrentStep(66, function (error, result) {
+    try {
+      const result = traceManager.getCurrentStep(66)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === 2)
-        st.end()
-      }
-    })
+      st.ok(result === 2)
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getMemExpand', function (st) {
@@ -291,13 +287,12 @@ tape('TraceManager', function (t) {
   })
 
   t.test('TraceManager.getReturnValue', function (st) {
-    traceManager.getReturnValue(108, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result[0] === '0x60606040526008565b0000000000000000000000000000000000000000000000')
-        st.end()
-      }
-    })
+    try {
+      const result = traceManager.getReturnValue(108)
+      st.ok(result[0] === '0x60606040526008565b0000000000000000000000000000000000000000000000')
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 })

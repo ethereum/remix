@@ -173,42 +173,43 @@ TraceManager.prototype.getContractCreationCode = function (token, callback) {
   }
 }
 
-TraceManager.prototype.getMemoryAt = function (stepIndex, callback) {
+TraceManager.prototype.getMemoryAt = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   const lastChanges = util.findLowerBoundValue(stepIndex, this.traceCache.memoryChanges)
-  if (lastChanges === null) return callback('no memory found', null)
-  callback(null, this.trace[lastChanges].memory)
-}
-
-TraceManager.prototype.getCurrentPC = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
-    return callback(check, null)
+  if (lastChanges === null) {
+    throw new Error('no memory found')
   }
-  callback(null, this.trace[stepIndex].pc)
+  return this.trace[lastChanges].memory
 }
 
-TraceManager.prototype.getReturnValue = function (stepIndex, callback) {
+TraceManager.prototype.getCurrentPC = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
+  }
+  return this.trace[stepIndex].pc
+}
+
+TraceManager.prototype.getReturnValue = function (stepIndex) {
+  const check = this.checkRequestedStep(stepIndex)
+  if (check) {
+    throw new Error(check)
   }
   if (!this.traceCache.returnValues[stepIndex]) {
-    callback('current step is not a return step')
-  } else {
-    callback(null, this.traceCache.returnValues[stepIndex])
+    throw new Error('current step is not a return step')
   }
+  return this.traceCache.returnValues[stepIndex]
 }
 
-TraceManager.prototype.getCurrentStep = function (stepIndex, callback) {
+TraceManager.prototype.getCurrentStep = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
-  callback(null, this.traceCache.steps[stepIndex])
+  return this.traceCache.steps[stepIndex]
 }
 
 TraceManager.prototype.getMemExpand = function (stepIndex) {
