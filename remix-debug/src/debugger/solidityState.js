@@ -49,10 +49,8 @@ class DebuggerSolidityState {
   }
 
   decode (index) {
-    this.traceManager.getCurrentCalledAddressAt(this.stepManager.currentStepIndex, (error, address) => {
-      if (error) {
-        return this.event.trigger('solidityState', [{}])
-      }
+    try {
+      const address = this.traceManager.getCurrentCalledAddressAt(this.stepManager.currentStepIndex)
       if (this.stateVariablesByAddresses[address]) {
         return this.extractStateVariables(this.stateVariablesByAddresses[address], address)
       }
@@ -63,7 +61,9 @@ class DebuggerSolidityState {
         this.stateVariablesByAddresses[address] = stateVars
         this.extractStateVariables(stateVars, address)
       })
-    })
+    } catch (error) {
+      return this.event.trigger('solidityState', [{}])
+    }
   }
 
   extractStateVariables (stateVars, address) {

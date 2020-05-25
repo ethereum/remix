@@ -44,9 +44,9 @@ function Debugger (options) {
 }
 
 Debugger.prototype.registerAndHighlightCodeItem = function (index) {
-  // register selected code item, highlight the corresponding source location
-  this.debugger.traceManager.getCurrentCalledAddressAt(index, async (error, address) => {
-    if (error) return console.log(error)
+  try {
+    // register selected code item, highlight the corresponding source location
+    const address = this.debugger.traceManager.getCurrentCalledAddressAt(index)
     const compilationResultForAddress = await this.compilationResult(address)
     if (!compilationResultForAddress) return
     this.debugger.callTree.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, index, compilationResultForAddress.data.contracts, (error, rawLocation) => {
@@ -57,7 +57,9 @@ Debugger.prototype.registerAndHighlightCodeItem = function (index) {
         this.event.trigger('newSourceLocation', [null])
       }
     })
-  })
+  } catch (error) {
+    return console.log(error)
+  }
 }
 
 Debugger.prototype.updateWeb3 = function (web3) {

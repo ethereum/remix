@@ -41,7 +41,11 @@ class DebuggerSolidityLocals {
           callback(error)
         }
       },
-      this.traceManager.getCurrentCalledAddressAt],
+      // this.traceManager.getCurrentCalledAddressAt],
+      function getCurrentCalledAddressAt(stepIndex, next) {
+        const address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
+        next(null, address)
+      }],
       this.stepManager.currentStepIndex,
       (error, result) => {
         if (error) {

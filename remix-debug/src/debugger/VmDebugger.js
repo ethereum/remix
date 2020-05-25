@@ -94,8 +94,8 @@ class VmDebuggerLogic {
         }
       })
 
-      this._traceManager.getCurrentCalledAddressAt(index, (error, address) => {
-        if (error) return
+      try {
+        const address = this._traceManager.getCurrentCalledAddressAt(index)
         if (!this.storageResolver) return
 
         var storageViewer = new StorageViewer({ stepIndex: this.stepManager.currentStepIndex, tx: this.tx, address: address }, this.storageResolver, this._traceManager)
@@ -109,7 +109,9 @@ class VmDebuggerLogic {
             this.event.trigger('traceManagerStorageUpdate', [storage, header])
           }
         })
-      })
+      } catch (error) {
+        if (error) return
+      }
 
       try {
         const step = this._traceManager.getCurrentStep(index)
@@ -132,9 +134,12 @@ class VmDebuggerLogic {
         this.event.trigger('traceStepCostUpdate', [error])
       }
 
-      this._traceManager.getCurrentCalledAddressAt(index, (error, address) => {
-        this.event.trigger('traceCurrentCalledAddressAtUpdate', [error, address])
-      })
+      try {
+        const address = this._traceManager.getCurrentCalledAddressAt(index)
+        this.event.trigger('traceCurrentCalledAddressAtUpdate', [null, address])
+      } catch (error) {
+        this.event.trigger('traceCurrentCalledAddressAtUpdate', [error])
+      }
 
       try {
         const remaining = this._traceManager.getRemainingGas(index)

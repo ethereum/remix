@@ -134,43 +134,39 @@ TraceManager.prototype.getStackAt = function (stepIndex, callback) {
   }
 }
 
-TraceManager.prototype.getLastCallChangeSince = function (stepIndex, callback) {
+TraceManager.prototype.getLastCallChangeSince = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   const callChange = util.findCall(stepIndex, this.traceCache.callsTree.call)
   if (callChange === null) {
-    callback(null, 0)
-  } else {
-    callback(null, callChange)
+    return 0
   }
+  return callChange
 }
 
-TraceManager.prototype.getCurrentCalledAddressAt = function (stepIndex, callback) {
+TraceManager.prototype.getCurrentCalledAddressAt = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
-  this.getLastCallChangeSince(stepIndex, function (error, resp) {
-    if (error) {
-      callback(error, null)
-    } else {
-      if (resp) {
-        callback(null, resp.address)
-      } else {
-        callback('unable to get current called address. ' + stepIndex + ' does not match with a CALL')
-      }
+  try {
+    const resp = this.getLastCallChangeSince(stepIndex)
+    if (!resp) {
+      throw new Error('unable to get current called address. ' + stepIndex + ' does not match with a CALL')
     }
-  })
+    return resp.address
+  } catch (error) {
+    throw new Error(error)
+  }
 }
 
-TraceManager.prototype.getContractCreationCode = function (token, callback) {
-  if (this.traceCache.contractCreation[token]) {
-    callback(null, this.traceCache.contractCreation[token])
-  } else {
-    callback('no contract creation named ' + token, null)
+TraceManager.prototype.getContractCreationCode = function (token) {
+  if (!this.traceCache.contractCreation[token]) {
+    throw new Error('no contract creation named ' + token)
   }
+  return this.traceCache.contractCreation[token]
 }
 
 TraceManager.prototype.getMemoryAt = function (stepIndex) {

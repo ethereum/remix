@@ -106,76 +106,71 @@ tape('TraceManager', function (t) {
 
   t.test('TraceManager.getLastCallChangeSince', function (st) {
     st.plan(3)
-    traceManager.getLastCallChangeSince(10, function (error, result) {
-      console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.start === 0)
-      }
-    })
 
-    traceManager.getLastCallChangeSince(70, function (error, result) {
+    try {
+      const result = traceManager.getLastCallChangeSince(10)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.start === 64)
-      }
-    })
+      st.ok(result.start === 0)
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getLastCallChangeSince(111, function (error, result) {
+    try {
+      const result = traceManager.getLastCallChangeSince(70)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.start === 0)
-        // this was 109 before: 111 is targeting the root call (starting index 0)
-        // this test make more sense as it is now (109 is the index of RETURN).
-      }
-    })
+      st.ok(result.start === 64)
+    } catch (error) {
+      st.fail(error)
+    }
+
+    try {
+      const result = traceManager.getLastCallChangeSince(111)
+      console.log(result)
+      st.ok(result.start === 0)
+      // this was 109 before: 111 is targeting the root call (starting index 0)
+      // this test make more sense as it is now (109 is the index of RETURN).
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getCurrentCalledAddressAt', function (st) {
     st.plan(3)
-    traceManager.getCurrentCalledAddressAt(10, function (error, result) {
-      console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-      }
-    })
 
-    traceManager.getCurrentCalledAddressAt(70, function (error, result) {
+    try {
+      const result = traceManager.getCurrentCalledAddressAt(10)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '(Contract Creation - Step 63)')
-      }
-    })
+      st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getCurrentCalledAddressAt(111, function (error, result) {
+    try {
+      const result = traceManager.getCurrentCalledAddressAt(70)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-      }
-    })
+      st.ok(result === '(Contract Creation - Step 63)')
+    } catch (error) {
+      st.fail(error)
+    }
+
+    try {
+      const reuslt = traceManager.getCurrentCalledAddressAt(111)
+      console.log(result)
+      st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getContractCreationCode', function (st) { // contract code has been retrieved from the memory
-    traceManager.getContractCreationCode('(Contract Creation - Step 63)', function (error, result) {
+    try {
+      const result = traceManager.getContractCreationCode('(Contract Creation - Step 63)')
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '0x60606040526040516020806045833981016040528080519060200190919050505b806001016000600050819055505b50600a80603b6000396000f360606040526008565b00000000000000000000000000000000000000000000000000000000000000002d')
-        st.end()
-      }
-    })
+      st.ok(result === '0x60606040526040516020806045833981016040528080519060200190919050505b806001016000600050819055505b50600a80603b6000396000f360606040526008565b00000000000000000000000000000000000000000000000000000000000000002d')
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getMemoryAt', function (st) {

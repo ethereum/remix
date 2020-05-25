@@ -39,12 +39,12 @@ CodeManager.prototype.resolveStep = function (stepIndex, tx) {
   if (stepIndex === 0) {
     return retrieveCodeAndTrigger(this, tx.to, stepIndex, tx)
   }
-  this.traceManager.getCurrentCalledAddressAt(stepIndex, (error, address) => {
-    if (error) {
-      return console.log(error)
-    }
+  try {
+    const address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
     retrieveCodeAndTrigger(this, address, stepIndex, tx)
-  })
+  } catch (error) {
+    return console.log(error)
+  }
 }
 
 /**
@@ -63,12 +63,13 @@ CodeManager.prototype.getCode = function (address, cb) {
   if (codes) {
     return cb(null, codes)
   }
-  this.traceManager.getContractCreationCode(address, (error, hexCode) => {
-    if (!error) {
-      codes = this.codeResolver.cacheExecutingCode(address, hexCode)
-      cb(null, codes)
-    }
-  })
+
+  try {
+    const hexCode = this.traceManager.getContractCreationCode(address)
+    codes = this.codeResolver.cacheExecutingCode(address, hexCode)
+    cb(null, codes)
+  } catch (error) {
+  }
 }
 
 /**
@@ -80,19 +81,20 @@ CodeManager.prototype.getCode = function (address, cb) {
  * @return {Object} return the ast node of the function
  */
 CodeManager.prototype.getFunctionFromStep = function (stepIndex, sourceMap, ast) {
-  this.traceManager.getCurrentCalledAddressAt(stepIndex, (error, address) => {
-    if (error) {
-      console.log(error)
-      return { error: 'Cannot retrieve current address for ' + stepIndex }
-    }
-    try {
-      const pc = this.traceManager.getCurrentPC(stepIndex)
-      return this.getFunctionFromPC(address, pc, sourceMap, ast)
-    } catch (error) {
-      console.log(error)
-      return { error: 'Cannot retrieve current PC for ' + stepIndex }
-    }
-  })
+  let address
+  try {
+    address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
+  } catch (error) {
+    console.log(error)
+    return { error: 'Cannot retrieve current address for ' + stepIndex }
+  }
+  try {
+    const pc = this.traceManager.getCurrentPC(stepIndex)
+    return this.getFunctionFromPC(address, pc, sourceMap, ast)
+  } catch (error) {
+    console.log(error)
+    return { error: 'Cannot retrieve current PC for ' + stepIndex }
+  }
 }
 
 /**
