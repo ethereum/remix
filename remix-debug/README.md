@@ -40,7 +40,7 @@ debugger.debug(<tx_hash>)
 
 debugger.event.register('newTraceLoaded', () => {
   // start doing basic stuff like retrieving step details
-  debugger.traceManager.getCallStackAt(34, (error, callstack) => {})
+  const callstack = debugger.traceManager.getCallStackAt(34)
 })
 
 debugger.callTree.register('callTreeReady', () => {

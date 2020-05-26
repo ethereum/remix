@@ -72,51 +72,55 @@ TraceManager.prototype.isLoaded = function () {
   return !this.isLoading && this.trace !== null
 }
 
-TraceManager.prototype.getLength = function (callback) {
+TraceManager.prototype.getLength = function () {
   if (!this.trace) {
-    callback('no trace available', null)
-  } else {
-    callback(null, this.trace.length)
+    return -1
   }
+  return this.trace.length
 }
 
-TraceManager.prototype.accumulateStorageChanges = function (index, address, storageOrigin, callback) {
-  const storage = this.traceCache.accumulateStorageChanges(index, address, storageOrigin)
-  callback(null, storage)
+TraceManager.prototype.accumulateStorageChanges = function (index, address, storageOrigin) {
+  return this.traceCache.accumulateStorageChanges(index, address, storageOrigin)
 }
 
-TraceManager.prototype.getAddresses = function (callback) {
-  callback(null, this.traceCache.addresses)
+TraceManager.prototype.getAddresses = function () {
+  return this.traceCache.addresses
 }
 
-TraceManager.prototype.getCallDataAt = function (stepIndex, callback) {
+TraceManager.prototype.getCallDataAt = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   const callDataChange = util.findLowerBoundValue(stepIndex, this.traceCache.callDataChanges)
-  if (callDataChange === null) return callback('no calldata found', null)
-  callback(null, [this.traceCache.callsData[callDataChange]])
+  if (callDataChange === null) {
+    throw new Error('no calldata found')
+  }
+  return [this.traceCache.callsData[callDataChange]]
 }
 
-TraceManager.prototype.buildCallPath = function (stepIndex, callback) {
+TraceManager.prototype.buildCallPath = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   const callsPath = util.buildCallPath(stepIndex, this.traceCache.callsTree.call)
-  if (callsPath === null) return callback('no call path built', null)
-  callback(null, callsPath)
+  if (callsPath === null) {
+    throw new Error('no call path built')
+  }
+  return callsPath
 }
 
-TraceManager.prototype.getCallStackAt = function (stepIndex, callback) {
+TraceManager.prototype.getCallStackAt = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   const call = util.findCall(stepIndex, this.traceCache.callsTree.call)
-  if (call === null) return callback('no callstack found', null)
-  callback(null, call.callStack)
+  if (call === null) {
+    throw new Error('no callstack found')
+  }
+  return call.callStack
 }
 
 TraceManager.prototype.getStackAt = function (stepIndex) {

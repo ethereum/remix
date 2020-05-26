@@ -58,14 +58,14 @@ class VmDebuggerLogic {
 
       this.event.trigger('indexUpdate', [index])
 
-      this._traceManager.getCallDataAt(index, (error, calldata) => {
-        if (error) {
-          // console.log(error)
-          this.event.trigger('traceManagerCallDataUpdate', [{}])
-        } else if (this.stepManager.currentStepIndex === index) {
+      try {
+        const calldata = this._traceManager.getCallDataAt(index)
+        if (this.stepManager.currentStepIndex === index) {
           this.event.trigger('traceManagerCallDataUpdate', [calldata])
         }
-      })
+      } catch (error) {
+        this.event.trigger('traceManagerCallDataUpdate', [{}])
+      }
 
       try {
         const memory = this._traceManager.getMemoryAt(index)
@@ -76,14 +76,14 @@ class VmDebuggerLogic {
         this.event.trigger('traceManagerMemoryUpdate', [{}])
       }
 
-      this._traceManager.getCallStackAt(index, (error, callstack) => {
-        if (error) {
-          // console.log(error)
-          this.event.trigger('traceManagerCallStackUpdate', [{}])
-        } else if (this.stepManager.currentStepIndex === index) {
+      try {
+        const callstack = this._traceManager.getCallStackAt(index)
+        if (this.stepManager.currentStepIndex === index) {
           this.event.trigger('traceManagerCallStackUpdate', [callstack])
         }
-      })
+      } catch (error) {
+        this.event.trigger('traceManagerCallStackUpdate', [{}])
+      }
 
       try {
         const callstack = this._traceManager.getStackAt(index)
@@ -165,17 +165,15 @@ class VmDebuggerLogic {
     this.traceLength = 0
 
     this.debugger.event.register('newTraceLoaded', (length) => {
-      this._traceManager.getAddresses((error, addresses) => {
-        if (error) return
-        this.event.trigger('traceAddressesUpdate', [addresses])
-        this.addresses = addresses
-      })
+      const addresses = this._traceManager.getAddresses()
+      this.event.trigger('traceAddressesUpdate', [addresses])
+      this.addresses = addresses
 
-      this._traceManager.getLength((error, length) => {
-        if (error) return
+      const length = this._traceManager.getLength()
+      if (length > 0) {
         this.event.trigger('traceLengthUpdate', [length])
         this.traceLength = length
-      })
+      }
     })
 
     this.debugger.event.register('indexChanged', this, (index) => {

@@ -23,13 +23,11 @@ tape('TraceManager', function (t) {
   })
 
   t.test('TraceManager.getLength ', function (st) {
-    traceManager.getLength(function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.end()
-      }
-    })
+    const result = traceManager.getLength()
+    if (result < 0) {
+      return st.fail(error)
+    }
+    st.end()
   })
 
   t.test('TraceManager.inRange ', function (st) {
@@ -41,45 +39,41 @@ tape('TraceManager', function (t) {
   })
 
   t.test('TraceManager.accumulateStorageChanges', function (st) {
-    traceManager.accumulateStorageChanges(110, '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5', {}, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result['0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563'].value === '0x38')
-        st.end()
-      }
-    })
+    try {
+      const result = traceManager.accumulateStorageChanges(110, '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5', {})
+      st.ok(result['0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563'].value === '0x38')
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getCallData', function (st) {
-    traceManager.getCallDataAt(0, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result[0] === '0x60fe47b10000000000000000000000000000000000000000000000000000000000000038')
-        st.end()
-      }
-    })
+    try {
+      const result = traceManager.getCallDataAt(0)
+      st.ok(result[0] === '0x60fe47b10000000000000000000000000000000000000000000000000000000000000038')
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getCallStackAt', function (st) {
     st.plan(3)
-    traceManager.getCallStackAt(0, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result[0] === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-      }
-    })
+    try {
+      const result = traceManager.getCallStackAt(0)
+      st.ok(result[0] === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getCallStackAt(64, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.length === 2)
-        st.ok(result[1] === '(Contract Creation - Step 63)')
-      }
-    })
+    try {
+      const result = traceManager.getCallStackAt(64)
+      st.ok(result.length === 2)
+      st.ok(result[1] === '(Contract Creation - Step 63)')
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getStackAt', function (st) {
@@ -268,15 +262,14 @@ tape('TraceManager', function (t) {
   })
 
   t.test('TraceManager.getAddresses', function (st) {
-    traceManager.getAddresses(function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result[0] === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-        st.ok(result[1] === '(Contract Creation - Step 63)')
-        st.end()
-      }
-    })
+    try {
+      const result = traceManager.getAddresses()
+      st.ok(result[0] === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+      st.ok(result[1] === '(Contract Creation - Step 63)')
+      st.end()
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getReturnValue', function (st) {
