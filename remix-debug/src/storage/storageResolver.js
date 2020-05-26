@@ -24,10 +24,10 @@ class StorageResolver {
    * @param {String} - address - lookup address
    * @param {Function} - callback - contains a map: [hashedKey] = {key, hashedKey, value}
    */
-  storageRange (tx, stepIndex, address, callback) {
-    this.storageRangeInternal(this, this.zeroSlot, tx, stepIndex, address).then((result) => {
-      callback(null, result)
-    }).catch(callback)
+  storageRange(tx, stepIndex, address) {
+    return new Promise((resolve, reject) => {
+      this.storageRangeInternal(this, this.zeroSlot, tx, stepIndex, address).then(resolve).catch(reject)
+    })
   }
 
   /**
@@ -40,17 +40,16 @@ class StorageResolver {
    * @param {Array} corrections - used in case the calculated sha3 has been modifyed before SSTORE (notably used for struct in mapping).
    * @return {Function} - callback
    */
-  initialPreimagesMappings (tx, stepIndex, address, corrections, callback) {
-    if (this.preimagesMappingByAddress[address]) {
-      return callback(null, this.preimagesMappingByAddress[address])
-    }
-    this.storageRange(tx, stepIndex, address, (error, storage) => {
-      if (error) {
-        return callback(error)
+  initialPreimagesMappings(tx, stepIndex, address, corrections) {
+    return new Promise((resolve, reject) => {
+      if (this.preimagesMappingByAddress[address]) {
+        return resolve(this.preimagesMappingByAddress[address])
       }
-      const mappings = mappingPreimages.decodeMappingsKeys(this.web3, storage, corrections)
-      this.preimagesMappingByAddress[address] = mappings
-      callback(null, mappings)
+      this.storageRange(tx, stepIndex, address).then((storage) => {
+        const mappings = mappingPreimages.decodeMappingsKeys(this.web3, storage, corrections)
+        this.preimagesMappingByAddress[address] = mappings
+        resolve(mappings)
+      }).catch(reject)
     })
   }
 
@@ -63,7 +62,7 @@ class StorageResolver {
    * @param {String} - address - lookup address
    * @param {Function} - callback - {key, hashedKey, value} -
    */
-  storageSlot (slot, tx, stepIndex, address, callback) {
+  storageSlot (slot, tx, stepIndex, address) {
     return new Promise((resolve, reject) => {
       this.storageRangeInternal(this, slot, tx, stepIndex, address).then((storage) => {
         resolve(storage[slot] !== undefined ? storage[slot] : null)
@@ -135,7 +134,7 @@ class StorageResolver {
     self.storageByAddress[address].storage = Object.assign(self.storageByAddress[address].storage || {}, storage)
   }
 
-  storageRangeWeb3Call(tx, address, start, maxSize, callback) {
+  storageRangeWeb3Call(tx, address, start, maxSize) {
     return new Promise((resolve, reject) => {
       if (traceHelper.isContractCreation(address)) {
         return resolve([{}])
