@@ -1,9 +1,6 @@
-const RemixLib = require('remix-lib')
-const executionContext = RemixLib.execution.executionContext
-
 const log = require('./utils/logs.js')
 const merge = require('merge')
-
+const executionContext = require('../src/execution/execution-context')
 const Accounts = require('./methods/accounts.js')
 const Blocks = require('./methods/blocks.js')
 const Filters = require('./methods/filters.js')
