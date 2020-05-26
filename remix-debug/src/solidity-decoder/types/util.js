@@ -27,6 +27,7 @@ function decodeIntFromHex (value, byteLength, signed) {
 function readFromStorage (slot, storageResolver) {
   const hexSlot = '0x' + normalizeHex(ethutil.bufferToHex(slot))
   return new Promise((resolve, reject) => {
+    // TODO: is this used? the signature looks wrong
     storageResolver.storageSlot(hexSlot, (error, slot) => {
       if (error) {
         return reject(error)
