@@ -45,12 +45,13 @@ function testMapping (st, vm, privateKey, contractAddress, output, cb) {
                 st.end(error)
               } else {
                 var traceManager = new TraceManager({web3: vm.web3})
-                traceManager.resolveTrace(tx, () => {
+                try {
+                  traceManager.resolveTrace(tx)
                   var storageViewer = new StorageViewer({
                     stepIndex: 268,
                     tx: tx,
                     address: contractAddress
-                  }, new StorageResolver({web3: vm.web3}), traceManager)
+                  }, new StorageResolver({ web3: vm.web3 }), traceManager)
                   var stateVars = stateDecoder.extractStateVariables('SimpleMappingState', output.sources)
                   stateDecoder.decodeState(stateVars, storageViewer).then((result) => {
                     console.log('ok', JSON.stringify(result))
@@ -67,7 +68,8 @@ function testMapping (st, vm, privateKey, contractAddress, output, cb) {
                     console.log('fail')
                     st.end(reason)
                   })
-                })
+                } catch (error) {
+                }
               }
             })
           }

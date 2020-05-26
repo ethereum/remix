@@ -13,13 +13,12 @@ tape('TraceManager', function (t) {
 
   t.test('TraceManager.resolveTrace', function (st) {
     const tx = web3Test.eth.getTransaction('0x20ef65b8b186ca942fcccd634f37074dde49b541c27994fc7596740ef44cfd51')
-    traceManager.resolveTrace(tx, function (error, result) {
-      if (error) {
-        st.fail(' - traceManager.resolveTrace - failed ' + result)
-      } else {
-        st.end()
-      }
-    })
+    try {
+      traceManager.resolveTrace(tx)
+      st.end()
+    } catch (error) {
+      st.fail(' - traceManager.resolveTrace - failed ')
+    }
   })
 
   t.test('TraceManager.getLength ', function (st) {

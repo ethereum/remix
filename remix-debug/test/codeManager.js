@@ -10,13 +10,13 @@ tape('CodeManager', function (t) {
   const contractCode = web3Test.eth.getCode('0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
   codeManager.codeResolver.cacheExecutingCode('0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5', contractCode) // so a call to web3 is not necessary
   const tx = web3Test.eth.getTransaction('0x20ef65b8b186ca942fcccd634f37074dde49b541c27994fc7596740ef44cfd51')
-  traceManager.resolveTrace(tx, function (error, result) {
-    if (error) {
-      t.fail(' - traceManager.resolveTrace - failed ' + result)
-    } else {
-      continueTesting(t, codeManager)
-    }
-  })
+
+  try {
+    traceManager.resolveTrace(tx)
+    continueTesting(t, codeManager)
+  } catch (error) {
+    t.fail(' - traceManager.resolveTrace - failed ')
+  }
 })
 
 function continueTesting (t, codeManager) {

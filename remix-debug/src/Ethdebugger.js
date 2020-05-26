@@ -188,18 +188,17 @@ Ethdebugger.prototype.debug = function (tx) {
     tx.to = traceHelper.contractCreationToken('0')
   }
   this.tx = tx
-  this.traceManager.resolveTrace(tx, async (error, result) => {
-    if (result) {
-      this.setCompilationResult(await this.compilationResult(tx.to))
-      this.event.trigger('newTraceLoaded', [this.traceManager.trace])
-      if (this.breakpointManager && this.breakpointManager.hasBreakpoint()) {
-        this.breakpointManager.jumpNextBreakpoint(false)
-      }
-      this.storageResolver = new StorageResolver({web3: this.traceManager.web3})
-    } else {
-      this.statusMessage = error ? error.message : 'Trace not loaded'
+  try {
+    this.traceManager.resolveTrace(tx)
+    this.setCompilationResult(await this.compilationResult(tx.to))
+    this.event.trigger('newTraceLoaded', [this.traceManager.trace])
+    if (this.breakpointManager && this.breakpointManager.hasBreakpoint()) {
+      this.breakpointManager.jumpNextBreakpoint(false)
     }
-  })
+    this.storageResolver = new StorageResolver({ web3: this.traceManager.web3 })
+  } catch (error) {
+    this.statusMessage = error ? error.message : 'Trace not loaded'
+  }
 }
 
 module.exports = Ethdebugger
