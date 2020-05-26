@@ -85,14 +85,14 @@ class VmDebuggerLogic {
         }
       })
 
-      this._traceManager.getStackAt(index, (error, callstack) => {
-        if (error) {
-          // console.log(error)
-          this.event.trigger('traceManagerStackUpdate', [{}])
-        } else if (this.stepManager.currentStepIndex === index) {
+      try {
+        const callstack = this._traceManager.getStackAt(index)
+        if (this.stepManager.currentStepIndex === index) {
           this.event.trigger('traceManagerStackUpdate', [callstack])
         }
-      })
+      } catch (error) {
+        this.event.trigger('traceManagerStackUpdate', [{}])
+      }
 
       try {
         const address = this._traceManager.getCurrentCalledAddressAt(index)

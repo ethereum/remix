@@ -31,7 +31,15 @@ class DebuggerSolidityLocals {
   decode (sourceLocation) {
     this.event.trigger('solidityLocalsMessage', [''])
     this.traceManager.waterfall([
-      this.traceManager.getStackAt,
+      // this.traceManager.getStackAt,
+      function getStackAt(stepIndex, callback) {
+        try {
+          const result = this.traceManager.getStackAt(stepIndex)
+          callback(null, result)
+        } catch (error) {
+          callback(error)
+        }
+      },
       // this.traceManager.getMemoryAt,
       function getMemoryAt(stepIndex, callback) {
         try {

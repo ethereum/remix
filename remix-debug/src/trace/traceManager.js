@@ -119,19 +119,18 @@ TraceManager.prototype.getCallStackAt = function (stepIndex, callback) {
   callback(null, call.callStack)
 }
 
-TraceManager.prototype.getStackAt = function (stepIndex, callback) {
+TraceManager.prototype.getStackAt = function (stepIndex) {
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   let stack
-  if (this.trace[stepIndex] && this.trace[stepIndex].stack) { // there's always a stack
-    stack = this.trace[stepIndex].stack.slice(0)
-    stack.reverse()
-    callback(null, stack)
-  } else {
-    callback('no stack found', null)
+  if (!(this.trace[stepIndex] && this.trace[stepIndex].stack)) { // there's always a stack
+    throw new Error('no stack found')
   }
+  stack = this.trace[stepIndex].stack.slice(0)
+  stack.reverse()
+  return stack
 }
 
 TraceManager.prototype.getLastCallChangeSince = function (stepIndex) {
