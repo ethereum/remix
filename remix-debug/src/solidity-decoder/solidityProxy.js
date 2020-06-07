@@ -95,10 +95,12 @@ class SolidityProxy {
     * @param {Int} vmTraceIndex  - index in the vm trave where to resolve the state variables
     * @return {Object} - returns state variables of @args vmTraceIndex
     */
-  extractStateVariablesAt (vmtraceIndex, cb) {
-    this.contractNameAt(vmtraceIndex).then((contractName) => {
-      cb(null, this.extractStateVariables(contractName))
-    }).catch(cb)
+  extractStateVariablesAt (vmtraceIndex) {
+    return new Promise((resolve, reject) => {
+      this.contractNameAt(vmtraceIndex).then((contractName) => {
+        resolve(this.extractStateVariables(contractName))
+      }).catch(reject)
+    })
   }
 
   /**

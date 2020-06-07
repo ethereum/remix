@@ -104,15 +104,14 @@ CodeManager.prototype.getFunctionFromStep = function (stepIndex, sourceMap, ast)
  * @param {String} step - vm trace step
  * @param {Function} callback - instruction index
  */
-CodeManager.prototype.getInstructionIndex = function (address, step, callback) {
+CodeManager.prototype.getInstructionIndex = function (address, step) {
   try {
     const pc = this.traceManager.getCurrentPC(step)
     const itemIndex = this.codeResolver.getInstructionIndex(address, pc)
-    return callback(null, itemIndex)
+    return itemIndex
   } catch (error) {
     console.log(error)
-    // throw new Error('Cannot retrieve current PC for ' + step)
-    callback('Cannot retrieve current PC for ' + step)
+    throw new Error('Cannot retrieve current PC for ' + step)
   }
 }
 
@@ -140,12 +139,12 @@ function retrieveCodeAndTrigger (codeMananger, address, stepIndex, tx) {
 }
 
 function retrieveIndexAndTrigger (codeMananger, address, step, code) {
-  codeMananger.getInstructionIndex(address, step, (error, result) => {
-    if (error) {
-      return console.log(error)
-    }
+  try {
+    const result = codeMananger.getInstructionIndex(address, step)
     codeMananger.event.trigger('changed', [code, address, result])
-  })
+  } catch (error) {
+    return console.log(error)
+  }
 }
 
 module.exports = CodeManager

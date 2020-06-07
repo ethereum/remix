@@ -141,9 +141,9 @@ Ethdebugger.prototype.decodeLocalsAt = function (step, sourceLocation, callback)
 
 /* decode state */
 Ethdebugger.prototype.extractStateAt = function (step, callback) {
-  this.solidityProxy.extractStateVariablesAt(step, (error, stateVars) => {
-    callback(error, stateVars)
-  })
+  this.solidityProxy.extractStateVariablesAt(step).then((stateVars) => {
+    callback(null, stateVars)
+  }).catch(callback)
 }
 
 Ethdebugger.prototype.decodeStateAt = function (step, stateVars, callback) {

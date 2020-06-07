@@ -41,12 +41,12 @@ SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function
 SourceLocationTracker.prototype.getSourceLocationFromVMTraceIndex = function (address, vmtraceStepIndex, contracts) {
   return new Promise((resolve, reject) => {
     extractSourceMap(this, this.codeManager, address, contracts).then((sourceMap) => {
-      this.codeManager.getInstructionIndex(address, vmtraceStepIndex, (error, index) => {
-        if (error) {
-          return reject(error)
-        }
+      try {
+        const index = this.codeManager.getInstructionIndex(address, vmtraceStepIndex)
         resolve(this.sourceMappingDecoder.atIndex(index, sourceMap))
-      })
+      } catch (error) {
+        reject(error)
+      }
     }).catch(reject)
   })
 }
