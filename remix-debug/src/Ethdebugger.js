@@ -66,15 +66,15 @@ Ethdebugger.prototype.setCompilationResult = function (compilationResult) {
 
 /* resolve source location */
 Ethdebugger.prototype.sourceLocationFromVMTraceIndex = function (address, stepIndex, callback) {
-  this.callTree.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, stepIndex, this.solidityProxy.contracts, (error, rawLocation) => {
-    callback(error, rawLocation)
-  })
+  this.callTree.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, stepIndex, this.solidityProxy.contracts).then((rawLocation) => {
+    callback(null, rawLocation)
+  }).catch(callback)
 }
 
 Ethdebugger.prototype.sourceLocationFromInstructionIndex = function (address, instIndex, callback) {
-  this.callTree.sourceLocationTracker.getSourceLocationFromInstructionIndex(address, instIndex, this.solidityProxy.contracts, (error, rawLocation) => {
-    callback(error, rawLocation)
-  })
+  this.callTree.sourceLocationTracker.getSourceLocationFromInstructionIndex(address, instIndex, this.solidityProxy.contracts).then((rawLocation) => {
+    callback(null, rawLocation)
+  }).catch(callback)
 }
 
 /* breakpoint */

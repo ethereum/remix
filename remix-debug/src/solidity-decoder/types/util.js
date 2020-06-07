@@ -28,18 +28,17 @@ function readFromStorage (slot, storageResolver) {
   const hexSlot = '0x' + normalizeHex(ethutil.bufferToHex(slot))
   return new Promise((resolve, reject) => {
     // TODO: is this used? the signature looks wrong
-    storageResolver.storageSlot(hexSlot, (error, slot) => {
-      if (error) {
-        return reject(error)
-      } else {
-        if (!slot) {
-          slot = {
-            key: slot,
-            value: ''
-          }
+
+    storageResolver.storageSlot(hexSlot).then((slot) => {
+      if (!slot) {
+        slot = {
+          key: slot,
+          value: ''
         }
-        return resolve(normalizeHex(slot.value))
       }
+      return resolve(normalizeHex(slot.value))
+    }).catch((error) => {
+      return reject(error)
     })
   })
 }

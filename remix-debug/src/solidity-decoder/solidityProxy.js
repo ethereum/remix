@@ -39,23 +39,25 @@ class SolidityProxy {
     * @param {Int} vmTraceIndex  - index in the vm trave where to resolve the executed contract name
     * @param {Function} cb  - callback returns (error, contractName)
     */
-  contractNameAt(vmTraceIndex, cb) {
-    try {
-      const address = this.traceManager.getCurrentCalledAddressAt(vmTraceIndex)
-      if (this.cache.contractNameByAddress[address]) {
-        return cb(null, this.cache.contractNameByAddress[address])
-      }
-      this.codeManager.getCode(address, (error, code) => {
-        if (error) {
-          return cb(error)
+  contractNameAt(vmTraceIndex) {
+    return new Promise((resolve, reject) => {
+      try {
+        const address = this.traceManager.getCurrentCalledAddressAt(vmTraceIndex)
+        if (this.cache.contractNameByAddress[address]) {
+          return resolve(this.cache.contractNameByAddress[address])
         }
-        const contractName = contractNameFromCode(this.contracts, code.bytecode, address)
-        this.cache.contractNameByAddress[address] = contractName
-        cb(null, contractName)
-      })
-    } catch (error) {
-      cb(error)
-    }
+        this.codeManager.getCode(address, (error, code) => {
+          if (error) {
+            return reject(error)
+          }
+          const contractName = contractNameFromCode(this.contracts, code.bytecode, address)
+          this.cache.contractNameByAddress[address] = contractName
+          resolve(contractName)
+        })
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
   /**
@@ -94,13 +96,9 @@ class SolidityProxy {
     * @return {Object} - returns state variables of @args vmTraceIndex
     */
   extractStateVariablesAt (vmtraceIndex, cb) {
-    this.contractNameAt(vmtraceIndex, (error, contractName) => {
-      if (error) {
-        cb(error)
-      } else {
-        cb(null, this.extractStateVariables(contractName))
-      }
-    })
+    this.contractNameAt(vmtraceIndex).then((contractName) => {
+      cb(null, this.extractStateVariables(contractName))
+    }).catch(cb)
   }
 
   /**

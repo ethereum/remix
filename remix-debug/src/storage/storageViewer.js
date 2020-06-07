@@ -23,10 +23,12 @@ class StorageViewer {
     *
     * @param {Function} - callback - contains a map: [hashedKey] = {key, hashedKey, value}
     */
-  storageRange (callback) {
-    this.storageResolver.storageRange(this.context.tx, this.context.stepIndex, this.context.address).then((storage) => {
-      callback(null, Object.assign({}, storage, this.storageChanges))
-    }).catch(callback)
+  storageRange () {
+    return new Promise((resolve, reject) => {
+      this.storageResolver.storageRange(this.context.tx, this.context.stepIndex, this.context.address).then((storage) => {
+        resolve([Object.assign({}, storage, this.storageChanges)])
+      }).catch(reject)
+    })
   }
 
   /**
@@ -34,14 +36,16 @@ class StorageViewer {
     * @param {String} - slot - slot key (not hashed key!)
     * @param {Function} - callback - {key, hashedKey, value} -
     */
-  storageSlot (slot, callback) {
-    const hashed = util.sha3_256(slot)
-    if (this.storageChanges[hashed]) {
-      return callback(null, this.storageChanges[hashed])
-    }
-    this.storageResolver.storageSlot(hashed, this.context.tx, this.context.stepIndex, this.context.address).then((storage) => {
-      callback(null, storage)
-    }).catch(callback)
+  storageSlot (slot) {
+    return new Promise((resolve, reject) => {
+      const hashed = util.sha3_256(slot)
+      if (this.storageChanges[hashed]) {
+        return resolve(this.storageChanges[hashed])
+      }
+      this.storageResolver.storageSlot(hashed, this.context.tx, this.context.stepIndex, this.context.address).then((storage) => {
+        resolve(storage)
+      }).catch(reject)
+    })
   }
 
   /**
@@ -93,6 +97,7 @@ class StorageViewer {
     * @param {Map} storageChanges
     * @param {Array} corrections - used in case the calculated sha3 has been modifyed before SSTORE (notably used for struct in mapping).
     */
+  // TODO: looks like this is ununsed and can be removed
   extractMappingsLocationChanges (storageChanges, corrections, callback) {
     if (this.mappingsLocationChanges) {
       return callback(null, this.mappingsLocationChanges)
