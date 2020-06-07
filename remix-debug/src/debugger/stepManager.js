@@ -62,7 +62,7 @@ class DebuggerStepManager {
     })
   }
 
-  triggerStepChanged(step) {
+  triggerStepChanged (step) {
     const length = this.traceManager.getLength()
 
     let stepState = 'valid'
@@ -80,7 +80,7 @@ class DebuggerStepManager {
     this.event.trigger('stepChanged', [step, stepState, jumpOutDisabled])
   }
 
-  stepIntoBack(solidityMode) {
+  stepIntoBack (solidityMode) {
     if (!this.traceManager.isLoaded()) return
     let step = this.currentStepIndex - 1
     this.currentStepIndex = step
@@ -93,7 +93,7 @@ class DebuggerStepManager {
     this.event.trigger('stepChanged', [step])
   }
 
-  stepIntoForward(solidityMode) {
+  stepIntoForward (solidityMode) {
     if (!this.traceManager.isLoaded()) return
     let step = this.currentStepIndex + 1
     this.currentStepIndex = step
@@ -106,7 +106,7 @@ class DebuggerStepManager {
     this.event.trigger('stepChanged', [step])
   }
 
-  stepOverBack(solidityMode) {
+  stepOverBack (solidityMode) {
     if (!this.traceManager.isLoaded()) return
     let step = this.traceManager.findStepOverBack(this.currentStepIndex)
     if (solidityMode) {
@@ -116,7 +116,7 @@ class DebuggerStepManager {
     this.event.trigger('stepChanged', [step])
   }
 
-  stepOverForward(solidityMode) {
+  stepOverForward (solidityMode) {
     if (!this.traceManager.isLoaded()) return
     let step = this.currentStepIndex + 1
     let scope = this.debugger.callTree.findScope(step)
@@ -130,7 +130,7 @@ class DebuggerStepManager {
     this.event.trigger('stepChanged', [step])
   }
 
-  jumpOut(solidityMode) {
+  jumpOut (solidityMode) {
     if (!this.traceManager.isLoaded()) return
     var step = this.traceManager.findStepOut(this.currentStepIndex)
     if (solidityMode) {
@@ -140,30 +140,30 @@ class DebuggerStepManager {
     this.event.trigger('stepChanged', [step])
   }
 
-  jumpTo(step) {
+  jumpTo (step) {
     if (!this.traceManager.inRange(step)) return
     this.currentStepIndex = step
     this.event.trigger('stepChanged', [step])
   }
 
-  jumpToException() {
+  jumpToException () {
     this.jumpTo(this.revertionPoint)
   }
 
-  jumpNextBreakpoint() {
+  jumpNextBreakpoint () {
     this.debugger.breakpointManager.jumpNextBreakpoint(this.currentStepIndex, true)
   }
 
-  jumpPreviousBreakpoint() {
+  jumpPreviousBreakpoint () {
     this.debugger.breakpointManager.jumpPreviousBreakpoint(this.currentStepIndex, true)
   }
 
-  calculateFirstStep() {
+  calculateFirstStep () {
     let step = this.resolveToReducedTrace(0, 1)
     return this.resolveToReducedTrace(step, 1)
   }
 
-  calculateCodeStepList() {
+  calculateCodeStepList () {
     let step = 0
     let steps = []
     while (step < this.traceLength) {
@@ -176,20 +176,20 @@ class DebuggerStepManager {
     return steps
   }
 
-  calculateCodeLength() {
+  calculateCodeLength () {
     this.calculateCodeStepList().reverse()
     return this.calculateCodeStepList().reverse()[1] || this.traceLength
   }
 
-  nextStep() {
+  nextStep () {
     return this.resolveToReducedTrace(this.currentStepIndex, 1)
   }
 
-  previousStep() {
+  previousStep () {
     return this.resolveToReducedTrace(this.currentStepIndex, -1)
   }
 
-  resolveToReducedTrace(value, incr) {
+  resolveToReducedTrace (value, incr) {
     if (!this.debugger.callTree.reducedTrace.length) {
       return value
     }

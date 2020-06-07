@@ -8,7 +8,7 @@ function decodeLocal (st, index, traceManager, callTree, verifier) {
   try {
     traceManager.waterfall([
       // traceManager.getStackAt,
-      function getStackAt(stepIndex, callback) {
+      function getStackAt (stepIndex, callback) {
         try {
           const result = this.traceManager.getStackAt(stepIndex)
           callback(null, result)
@@ -17,7 +17,7 @@ function decodeLocal (st, index, traceManager, callTree, verifier) {
         }
       },
       // traceManager.getMemoryAt],
-      function getMemoryAt(stepIndex, callback) {
+      function getMemoryAt (stepIndex, callback) {
         try {
           const result = traceManager.getMemoryAt(stepIndex)
           callback(null, result)
@@ -34,7 +34,7 @@ function decodeLocal (st, index, traceManager, callTree, verifier) {
         } else {
           st.fail(error)
         }
-      })
+      }])
   } catch (e) {
     st.fail(e.message)
   }

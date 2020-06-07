@@ -39,7 +39,7 @@ class SolidityProxy {
     * @param {Int} vmTraceIndex  - index in the vm trave where to resolve the executed contract name
     * @param {Function} cb  - callback returns (error, contractName)
     */
-  contractNameAt(vmTraceIndex) {
+  contractNameAt (vmTraceIndex) {
     return new Promise((resolve, reject) => {
       try {
         const address = this.traceManager.getCurrentCalledAddressAt(vmTraceIndex)

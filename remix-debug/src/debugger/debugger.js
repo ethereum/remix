@@ -47,11 +47,14 @@ Debugger.prototype.registerAndHighlightCodeItem = function (index) {
   try {
     // register selected code item, highlight the corresponding source location
     const address = this.debugger.traceManager.getCurrentCalledAddressAt(index)
-    const compilationResultForAddress = await this.compilationResult(address)
+
+    // const compilationResultForAddress = await this.compilationResult(address)
+    const compilationResultForAddress = this.compilationResult(address)
+
     if (!compilationResultForAddress) return
 
     this.debugger.callTree.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, index, compilationResultForAddress.data.contracts).then((rawLocation) => {
-      if (!error && compilationResultForAddress && compilationResultForAddress.data) {
+      if (compilationResultForAddress && compilationResultForAddress.data) {
         var lineColumnPos = this.offsetToLineColumnConverter.offsetToLineColumn(rawLocation, rawLocation.file, compilationResultForAddress.source.sources, compilationResultForAddress.data.sources)
         this.event.trigger('newSourceLocation', [lineColumnPos, rawLocation])
       } else {

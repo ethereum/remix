@@ -58,7 +58,7 @@ class DebuggerSolidityState {
       this.solidityProxy.extractStateVariablesAt(index).then((stateVars) => {
         this.stateVariablesByAddresses[address] = stateVars
         this.extractStateVariables(stateVars, address)
-      }).catch((error) => {
+      }).catch((_error) => {
         this.event.trigger('solidityState', [{}])
       })
     } catch (error) {

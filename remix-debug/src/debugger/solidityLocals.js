@@ -32,7 +32,7 @@ class DebuggerSolidityLocals {
     this.event.trigger('solidityLocalsMessage', [''])
     this.traceManager.waterfall([
       // this.traceManager.getStackAt,
-      function getStackAt(stepIndex, callback) {
+      function getStackAt (stepIndex, callback) {
         try {
           const result = this.traceManager.getStackAt(stepIndex)
           callback(null, result)
@@ -41,7 +41,7 @@ class DebuggerSolidityLocals {
         }
       },
       // this.traceManager.getMemoryAt,
-      function getMemoryAt(stepIndex, callback) {
+      function getMemoryAt (stepIndex, callback) {
         try {
           const result = this.traceManager.getMemoryAt(stepIndex)
           callback(null, result)
@@ -50,7 +50,7 @@ class DebuggerSolidityLocals {
         }
       },
       // this.traceManager.getCurrentCalledAddressAt],
-      function getCurrentCalledAddressAt(stepIndex, next) {
+      function getCurrentCalledAddressAt (stepIndex, next) {
         const address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
         next(null, address)
       }],

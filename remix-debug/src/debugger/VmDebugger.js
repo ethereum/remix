@@ -155,7 +155,6 @@ class VmDebuggerLogic {
       } catch (error) {
         this.event.trigger('traceReturnValueUpdate', [[error]])
       }
-
     })
   }
 
@@ -168,10 +167,10 @@ class VmDebuggerLogic {
       this.event.trigger('traceAddressesUpdate', [addresses])
       this.addresses = addresses
 
-      const length = this._traceManager.getLength()
-      if (length > 0) {
-        this.event.trigger('traceLengthUpdate', [length])
-        this.traceLength = length
+      const getLength = this._traceManager.getLength()
+      if (getLength > 0) {
+        this.event.trigger('traceLengthUpdate', [getLength])
+        this.traceLength = getLength
       }
     })
 
@@ -190,7 +189,7 @@ class VmDebuggerLogic {
         storageViewer.storageRange().then((result) => {
           storageJSON[address] = result
           this.event.trigger('traceStorageUpdate', [storageJSON])
-        }).catch((error) => {
+        }).catch((_error) => {
         })
       }
     })

@@ -24,7 +24,7 @@ class StorageResolver {
    * @param {String} - address - lookup address
    * @param {Function} - callback - contains a map: [hashedKey] = {key, hashedKey, value}
    */
-  storageRange(tx, stepIndex, address) {
+  storageRange (tx, stepIndex, address) {
     return new Promise((resolve, reject) => {
       this.storageRangeInternal(this, this.zeroSlot, tx, stepIndex, address).then(resolve).catch(reject)
     })
@@ -40,7 +40,7 @@ class StorageResolver {
    * @param {Array} corrections - used in case the calculated sha3 has been modifyed before SSTORE (notably used for struct in mapping).
    * @return {Function} - callback
    */
-  initialPreimagesMappings(tx, stepIndex, address, corrections) {
+  initialPreimagesMappings (tx, stepIndex, address, corrections) {
     return new Promise((resolve, reject) => {
       if (this.preimagesMappingByAddress[address]) {
         return resolve(this.preimagesMappingByAddress[address])
@@ -134,7 +134,7 @@ class StorageResolver {
     self.storageByAddress[address].storage = Object.assign(self.storageByAddress[address].storage || {}, storage)
   }
 
-  storageRangeWeb3Call(tx, address, start, maxSize) {
+  storageRangeWeb3Call (tx, address, start, maxSize) {
     return new Promise((resolve, reject) => {
       if (traceHelper.isContractCreation(address)) {
         return resolve([{}])

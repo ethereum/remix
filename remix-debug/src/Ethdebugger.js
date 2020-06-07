@@ -90,7 +90,7 @@ Ethdebugger.prototype.extractLocalsAt = function (step, callback) {
 Ethdebugger.prototype.decodeLocalsAt = function (step, sourceLocation, callback) {
   this.traceManager.waterfall([
     // this.traceManager.getStackAt,
-    function getStackAt(stepIndex, callback) {
+    function getStackAt (stepIndex, callback) {
       try {
         const result = this.traceManager.getStackAt(stepIndex)
         callback(null, result)
@@ -99,7 +99,7 @@ Ethdebugger.prototype.decodeLocalsAt = function (step, sourceLocation, callback)
       }
     },
     // this.traceManager.getMemoryAt,
-    function getMemoryAt(stepIndex, callback) {
+    function getMemoryAt (stepIndex, callback) {
       try {
         const result = this.traceManager.getMemoryAt(stepIndex)
         callback(null, result)
@@ -108,7 +108,7 @@ Ethdebugger.prototype.decodeLocalsAt = function (step, sourceLocation, callback)
       }
     },
     // this.traceManager.getCurrentCalledAddressAt],
-    function getCurrentCalledAddressAt(stepIndex, next) {
+    function getCurrentCalledAddressAt (stepIndex, next) {
       const address = this.traceManager.getCurrentCalledAddressAt(stepIndex)
       next(null, address)
     }],
@@ -190,7 +190,12 @@ Ethdebugger.prototype.debug = function (tx) {
   this.tx = tx
   try {
     this.traceManager.resolveTrace(tx)
-    this.setCompilationResult(await this.compilationResult(tx.to))
+
+    // this.setCompilationResult(await this.compilationResult(tx.to))
+
+    const compilationResult = this.compilationResult(tx.to)
+    this.setCompilationResult(compilationResult)
+
     this.event.trigger('newTraceLoaded', [this.traceManager.trace])
     if (this.breakpointManager && this.breakpointManager.hasBreakpoint()) {
       this.breakpointManager.jumpNextBreakpoint(false)

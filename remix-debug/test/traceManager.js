@@ -24,7 +24,8 @@ tape('TraceManager', function (t) {
   t.test('TraceManager.getLength ', function (st) {
     const result = traceManager.getLength()
     if (result < 0) {
-      return st.fail(error)
+      // return st.fail(error)
+      return st.fail('error')
     }
     st.end()
   })
@@ -145,7 +146,7 @@ tape('TraceManager', function (t) {
     }
 
     try {
-      const reuslt = traceManager.getCurrentCalledAddressAt(111)
+      const result = traceManager.getCurrentCalledAddressAt(111)
       console.log(result)
       st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
     } catch (error) {
