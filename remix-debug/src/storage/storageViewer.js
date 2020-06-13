@@ -23,12 +23,9 @@ class StorageViewer {
     *
     * @param {Function} - callback - contains a map: [hashedKey] = {key, hashedKey, value}
     */
-  storageRange () {
-    return new Promise((resolve, reject) => {
-      this.storageResolver.storageRange(this.context.tx, this.context.stepIndex, this.context.address).then((storage) => {
-        resolve([Object.assign({}, storage, this.storageChanges)])
-      }).catch(reject)
-    })
+  async storageRange () {
+    const storage = await this.storageResolver.storageRange(this.context.tx, this.context.stepIndex, this.context.address)
+    return [Object.assign({}, storage, this.storageChanges)]
   }
 
   /**
@@ -36,16 +33,13 @@ class StorageViewer {
     * @param {String} - slot - slot key (not hashed key!)
     * @param {Function} - callback - {key, hashedKey, value} -
     */
-  storageSlot (slot) {
-    return new Promise((resolve, reject) => {
-      const hashed = util.sha3_256(slot)
-      if (this.storageChanges[hashed]) {
-        return resolve(this.storageChanges[hashed])
-      }
-      this.storageResolver.storageSlot(hashed, this.context.tx, this.context.stepIndex, this.context.address).then((storage) => {
-        resolve(storage)
-      }).catch(reject)
-    })
+  async storageSlot (slot) {
+    const hashed = util.sha3_256(slot)
+    if (this.storageChanges[hashed]) {
+      return this.storageChanges[hashed]
+    }
+    const storage = await this.storageResolver.storageSlot(hashed, this.context.tx, this.context.stepIndex, this.context.address)
+    return storage
   }
 
   /**

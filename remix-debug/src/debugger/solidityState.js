@@ -48,19 +48,16 @@ class DebuggerSolidityState {
     this.stateVariablesByAddresses = {}
   }
 
-  decode (index) {
+  async decode (index) {
     try {
       const address = this.traceManager.getCurrentCalledAddressAt(this.stepManager.currentStepIndex)
       if (this.stateVariablesByAddresses[address]) {
         return this.extractStateVariables(this.stateVariablesByAddresses[address], address)
       }
 
-      this.solidityProxy.extractStateVariablesAt(index).then((stateVars) => {
-        this.stateVariablesByAddresses[address] = stateVars
-        this.extractStateVariables(stateVars, address)
-      }).catch((_error) => {
-        this.event.trigger('solidityState', [{}])
-      })
+      const stateVars = await this.solidityProxy.extractStateVariablesAt(index)
+      this.stateVariablesByAddresses[address] = stateVars
+      this.extractStateVariables(stateVars, address)
     } catch (error) {
       return this.event.trigger('solidityState', [{}])
     }

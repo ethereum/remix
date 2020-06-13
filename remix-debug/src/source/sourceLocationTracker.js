@@ -22,12 +22,9 @@ function SourceLocationTracker (_codeManager) {
  * @param {Object} contractDetails - AST of compiled contracts
  * @param {Function} cb - callback function
  */
-SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function (address, index, contracts) {
-  return new Promise((resolve, reject) => {
-    extractSourceMap(this, this.codeManager, address, contracts).then((sourceMap) => {
-      resolve(this.sourceMappingDecoder.atIndex(index, sourceMap))
-    }).catch(reject)
-  })
+SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = async function (address, index, contracts) {
+  const sourceMap = await extractSourceMap(this, this.codeManager, address, contracts)
+  return this.sourceMappingDecoder.atIndex(index, sourceMap)
 }
 
 /**
@@ -38,17 +35,10 @@ SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function
  * @param {Object} contractDetails - AST of compiled contracts
  * @param {Function} cb - callback function
  */
-SourceLocationTracker.prototype.getSourceLocationFromVMTraceIndex = function (address, vmtraceStepIndex, contracts) {
-  return new Promise((resolve, reject) => {
-    extractSourceMap(this, this.codeManager, address, contracts).then((sourceMap) => {
-      try {
-        const index = this.codeManager.getInstructionIndex(address, vmtraceStepIndex)
-        resolve(this.sourceMappingDecoder.atIndex(index, sourceMap))
-      } catch (error) {
-        reject(error)
-      }
-    }).catch(reject)
-  })
+SourceLocationTracker.prototype.getSourceLocationFromVMTraceIndex = async function (address, vmtraceStepIndex, contracts) {
+  const sourceMap = await extractSourceMap(this, this.codeManager, address, contracts)
+  const index = this.codeManager.getInstructionIndex(address, vmtraceStepIndex)
+  return this.sourceMappingDecoder.atIndex(index, sourceMap)
 }
 
 SourceLocationTracker.prototype.clearCache = function () {

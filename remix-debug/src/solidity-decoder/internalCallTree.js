@@ -93,17 +93,19 @@ class InternalCallTree {
     return scope
   }
 
-  extractSourceLocation (step) {
-    return new Promise((resolve, reject) => {
-      try {
-        const address = this.traceManager.getCurrentCalledAddressAt(step)
-        this.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, step, this.solidityProxy.contracts).then(resolve).catch((error) => {
-          return reject('InternalCallTree - Cannot retrieve sourcelocation for step ' + step + ' ' + error)
-        })
-      } catch (error) {
-        return reject('InternalCallTree - Cannot retrieve address for step ' + step + ' ' + error)
-      }
-    })
+  async extractSourceLocation (step) {
+    let address
+    try {
+      address = this.traceManager.getCurrentCalledAddressAt(step)
+    } catch (error) {
+      throw new Error('InternalCallTree - Cannot retrieve address for step ' + step + ' ' + error)
+    }
+    try {
+      const result = await this.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, step, this.solidityProxy.contracts)
+      return result
+    } catch (error) {
+      throw new Error('InternalCallTree - Cannot retrieve sourcelocation for step ' + step + ' ' + error)
+    }
   }
 }
 

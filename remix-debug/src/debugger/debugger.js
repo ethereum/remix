@@ -43,7 +43,7 @@ function Debugger (options) {
   })
 }
 
-Debugger.prototype.registerAndHighlightCodeItem = function (index) {
+Debugger.prototype.registerAndHighlightCodeItem = async function (index) {
   try {
     // register selected code item, highlight the corresponding source location
     const address = this.debugger.traceManager.getCurrentCalledAddressAt(index)
@@ -53,16 +53,13 @@ Debugger.prototype.registerAndHighlightCodeItem = function (index) {
 
     if (!compilationResultForAddress) return
 
-    this.debugger.callTree.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, index, compilationResultForAddress.data.contracts).then((rawLocation) => {
-      if (compilationResultForAddress && compilationResultForAddress.data) {
-        var lineColumnPos = this.offsetToLineColumnConverter.offsetToLineColumn(rawLocation, rawLocation.file, compilationResultForAddress.source.sources, compilationResultForAddress.data.sources)
-        this.event.trigger('newSourceLocation', [lineColumnPos, rawLocation])
-      } else {
-        this.event.trigger('newSourceLocation', [null])
-      }
-    }).catch((_error) => {
+    const rawLocation = await this.debugger.callTree.sourceLocationTracker.getSourceLocationFromVMTraceIndex(address, index, compilationResultForAddress.data.contracts)
+    if (compilationResultForAddress && compilationResultForAddress.data) {
+      var lineColumnPos = this.offsetToLineColumnConverter.offsetToLineColumn(rawLocation, rawLocation.file, compilationResultForAddress.source.sources, compilationResultForAddress.data.sources)
+      this.event.trigger('newSourceLocation', [lineColumnPos, rawLocation])
+    } else {
       this.event.trigger('newSourceLocation', [null])
-    })
+    }
   } catch (error) {
     return console.log(error)
   }
