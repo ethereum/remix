@@ -35,9 +35,11 @@ const createExpressions = function (instructions) {
 const toString = function (expr) {
   if (expr.name.slice(0, 4) === 'PUSH') {
     return util.hexConvert(expr.pushData)
-  } else if (expr.name === 'JUMPDEST') {
+  }
+  if (expr.name === 'JUMPDEST') {
     return expr.label + ':'
-  } else if (expr.args) {
+  }
+  if (expr.args) {
     return expr.name.toLowerCase() + '(' + expr.args.reverse().map(toString).join(', ') + ')'
   }
   return expr.name.toLowerCase()

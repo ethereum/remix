@@ -100,9 +100,8 @@ function extractLocation (type) {
   let match = type.match(/( storage ref| storage pointer| memory| calldata)?$/)
   if (match[1] !== '') {
     return match[1].trim()
-  } else {
-    return null
   }
+  return null
 }
 
 function extractLocationFromAstVariable (node) {

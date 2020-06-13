@@ -64,12 +64,12 @@ class StorageViewer {
     * @param {Array} corrections - used in case the calculated sha3 has been modifyed before SSTORE (notably used for struct in mapping).
     */
   async initialMappingsLocation (corrections) {
-    if (!this.initialMappingsLocationPromise) {
-      this.initialMappingsLocationPromise = new Promise((resolve, reject) => {
-        this.storageResolver.initialPreimagesMappings(this.context.tx, this.context.stepIndex, this.context.address, corrections).then(resolve).catch(reject)
-      })
+    if (this.initialMappingsLocationPromise) {
+      return this.initialMappingsLocationPromise
     }
-    return this.initialMappingsLocationPromise
+    this.initialMappingsLocationPromise = new Promise((resolve, reject) => {
+      this.storageResolver.initialPreimagesMappings(this.context.tx, this.context.stepIndex, this.context.address, corrections).then(resolve).catch(reject)
+    })
   }
 
   /**
@@ -78,18 +78,13 @@ class StorageViewer {
     * @param {Array} corrections - used in case the calculated sha3 has been modifyed before SSTORE (notably used for struct in mapping).
     */
   async mappingsLocation (corrections) {
-    if (!this.currentMappingsLocationPromise) {
-      this.currentMappingsLocationPromise = new Promise((resolve, reject) => {
-        this.extractMappingsLocationChanges(this.storageChanges, corrections, (error, mappingsLocationChanges) => {
-          if (error) {
-            reject(error)
-          } else {
-            resolve(mappingsLocationChanges)
-          }
-        })
-      })
+    if (this.currentMappingsLocationPromise) {
+      return this.currentMappingsLocationPromise
     }
-    return this.currentMappingsLocationPromise
+    this.currentMappingsLocationPromise = new Promise((resolve, reject) => {
+      const mappingsLocationChanges = this.extractMappingsLocationChanges(this.storageChanges, corrections)
+      resolve(mappingsLocationChanges)
+    })
   }
 
   /**
@@ -98,14 +93,13 @@ class StorageViewer {
     * @param {Array} corrections - used in case the calculated sha3 has been modifyed before SSTORE (notably used for struct in mapping).
     */
   // TODO: looks like this is ununsed and can be removed
-  extractMappingsLocationChanges (storageChanges, corrections, callback) {
+  extractMappingsLocationChanges (storageChanges, corrections) {
     if (this.mappingsLocationChanges) {
-      return callback(null, this.mappingsLocationChanges)
+      return this.mappingsLocationChanges
     }
 
-    const mappings = mappingPreimages.decodeMappingsKeys(this.web3, storageChanges, corrections)
-    this.mappingsLocationChanges = mappings
-    return callback(null, this.mappingsLocationChanges)
+    this.mappingsLocationChanges = mappingPreimages.decodeMappingsKeys(this.web3, storageChanges, corrections)
+    return this.mappingsLocationChanges
   }
 }
 
