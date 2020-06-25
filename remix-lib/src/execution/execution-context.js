@@ -110,9 +110,11 @@ function ExecutionContext () {
 
   let executionContext = null
 
+  this.currentProviderName = null
   this.blockGasLimitDefault = 4300000
   this.blockGasLimit = this.blockGasLimitDefault
   this.customNetWorks = {}
+  this.customWeb3Providers = {}
   this.blocks = {}
   this.latestBlockNumber = 0
   this.txs = {}
@@ -133,6 +135,10 @@ function ExecutionContext () {
 
   this.getProvider = function () {
     return executionContext
+  }
+
+  this.getProviderName = function () {
+    return this.currentProviderName
   }
 
   this.isVM = function () {
@@ -180,9 +186,23 @@ function ExecutionContext () {
   }
 
   this.addProvider = (network) => {
-    if (network && network.name && network.url) {
+    if (network && network.name && network.url && !this.customNetWorks[network.name]) {
       this.customNetWorks[network.name] = network
       this.event.trigger('addProvider', [network])
+    }
+  }
+
+  this.addWeb3provider = (name, provider) => {
+    if (name && !this.customWeb3Providers[name]) {
+      this.customWeb3Providers[name] = provider
+      this.event.trigger('addWeb3Provider', [{name}])
+    }
+  }
+
+  this.removeWeb3Provider = (name) => {
+    if (name && this.customWeb3Providers[name]) {
+      delete this.customWeb3Providers[name]
+      this.event.trigger('removeWeb3Provider', [name])
     }
   }
 
@@ -205,9 +225,10 @@ function ExecutionContext () {
 
   this.executionContextChange = (context, endPointUrl, confirmCb, infoCb, cb) => {
     if (!cb) cb = () => {}
-
+    console.log('executionContextChange', context)
     if (context === 'vm') {
       executionContext = context
+      this.currentProviderName = context
       vms[currentFork].stateManager.revert(() => {
         vms[currentFork].stateManager.checkpoint(() => {})
       })
@@ -222,6 +243,7 @@ function ExecutionContext () {
       } else {
         this.askPermission()
         executionContext = context
+        this.currentProviderName = context
         web3.setProvider(injectedProvider)
         this._updateBlockGasLimit()
         this.event.trigger('contextChanged', ['injected'])
@@ -230,12 +252,20 @@ function ExecutionContext () {
     }
 
     if (context === 'web3') {
+      this.currentProviderName = context
       confirmCb(cb)
     }
 
     if (this.customNetWorks[context]) {
       var provider = this.customNetWorks[context]
-      setProviderFromEndpoint(provider.url, 'web3', () => { cb() })
+      this.currentProviderName = context
+      this.setProviderFromEndpoint(provider.url, 'web3', () => { cb() })
+    }
+
+    if (this.customWeb3Providers[context]) {
+      const provider = this.customWeb3Providers[context]
+      this.currentProviderName = context
+      this.setProviderFromEndpoint(provider, 'web3', () => { cb() })
     }
   }
 
@@ -269,15 +299,20 @@ function ExecutionContext () {
 
   // TODO: remove this when this function is moved
   const self = this
-  // TODO: not used here anymore and needs to be moved
-  function setProviderFromEndpoint (endpoint, context, cb) {
+
+  this.setProviderFromEndpoint = (endpoint, context, cb) => {
     const oldProvider = web3.currentProvider
 
-    if (endpoint === 'ipc') {
-      web3.setProvider(new web3.providers.IpcProvider())
+    if (typeof endpoint === 'string') {
+      if (endpoint === 'ipc') {
+        web3.setProvider(new web3.providers.IpcProvider())
+      } else {
+        web3.setProvider(new web3.providers.HttpProvider(endpoint))
+      }
     } else {
-      web3.setProvider(new web3.providers.HttpProvider(endpoint))
+      web3.setProvider(endpoint)
     }
+
     web3.eth.net.isListening((err, isConnected) => {
       if (!err && isConnected) {
         executionContext = context
@@ -291,7 +326,6 @@ function ExecutionContext () {
       }
     })
   }
-  this.setProviderFromEndpoint = setProviderFromEndpoint
 
   this.txDetailsLink = (network, hash) => {
     if (transactionDetailsLinks[network]) {
