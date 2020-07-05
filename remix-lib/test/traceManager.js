@@ -118,34 +118,32 @@ tape('TraceManager', function (t) {
 
   t.test('TraceManager.getLastCallChangeSince', function (st) {
     st.plan(3)
-    traceManager.getLastCallChangeSince(10, function (error, result) {
-      console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.start === 0)
-      }
-    })
 
-    traceManager.getLastCallChangeSince(70, function (error, result) {
+    try {
+      const result = traceManager.getLastCallChangeSince(10)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.start === 64)
-      }
-    })
+      st.ok(result.start === 0)
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getLastCallChangeSince(111, function (error, result) {
+    try {
+      const result = traceManager.getLastCallChangeSince(70)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.start === 0)
-        // this was 109 before: 111 is targeting the root call (starting index 0)
-        // this test make more sense as it is now (109 is the index of RETURN).
-      }
-    })
+      st.ok(result.start === 64)
+    } catch (error) {
+      st.fail(error)
+    }
+
+    try {
+      const result = traceManager.getLastCallChangeSince(111)
+      console.log(result)
+      st.ok(result.start === 0)
+      // this was 109 before: 111 is targeting the root call (starting index 0)
+      // this test make more sense as it is now (109 is the index of RETURN).
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getCurrentCalledAddressAt', function (st) {
