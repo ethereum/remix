@@ -109,14 +109,17 @@ TraceManager.prototype.buildCallPath = function (stepIndex, callback) {
   callback(null, callsPath)
 }
 
-TraceManager.prototype.getCallStackAt = function (stepIndex, callback) {
+TraceManager.prototype.getCallStackAt = function (stepIndex) {
+  // this.checkRequestedStep(stepIndex)
   const check = this.checkRequestedStep(stepIndex)
   if (check) {
-    return callback(check, null)
+    throw new Error(check)
   }
   const call = util.findCall(stepIndex, this.traceCache.callsTree.call)
-  if (call === null) return callback('no callstack found', null)
-  callback(null, call.callStack)
+  if (call === null) {
+    throw new Error('no callstack found')
+  }
+  return call.callStack
 }
 
 TraceManager.prototype.getStackAt = function (stepIndex, callback) {

@@ -78,22 +78,20 @@ tape('TraceManager', function (t) {
 
   t.test('TraceManager.getCallStackAt', function (st) {
     st.plan(3)
-    traceManager.getCallStackAt(0, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result[0] === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-      }
-    })
+    try {
+      const result = traceManager.getCallStackAt(0)
+      st.ok(result[0] === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getCallStackAt(64, function (error, result) {
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result.length === 2)
-        st.ok(result[1] === '(Contract Creation - Step 63)')
-      }
-    })
+    try {
+      const result = traceManager.getCallStackAt(64)
+      st.ok(result.length === 2)
+      st.ok(result[1] === '(Contract Creation - Step 63)')
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getStackAt', function (st) {
