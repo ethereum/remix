@@ -22,13 +22,11 @@ function SourceLocationTracker (_codeManager) {
  * @param {Object} contractDetails - AST of compiled contracts
  * @param {Function} cb - callback function
  */
-SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function (address, index, contracts, cb) {
-  extractSourceMap(this, this.codeManager, address, contracts, (error, sourceMap) => {
-    if (error) {
-      cb(error)
-    } else {
-      cb(null, this.sourceMappingDecoder.atIndex(index, sourceMap))
-    }
+SourceLocationTracker.prototype.getSourceLocationFromInstructionIndex = function (address, index, contracts) {
+  return new Promise((resolve, reject) => {
+    extractSourceMap(this, this.codeManager, address, contracts).then((sourceMap) => {
+      resolve(this.sourceMappingDecoder.atIndex(index, sourceMap))
+    }).catch(reject)
   })
 }
 
