@@ -90,8 +90,9 @@ TraceManager.prototype.getAddresses = function (callback) {
 }
 
 TraceManager.prototype.getCallDataAt = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   const callDataChange = util.findLowerBoundValue(stepIndex, this.traceCache.callDataChanges)
@@ -100,8 +101,9 @@ TraceManager.prototype.getCallDataAt = function (stepIndex, callback) {
 }
 
 TraceManager.prototype.buildCallPath = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   const callsPath = util.buildCallPath(stepIndex, this.traceCache.callsTree.call)
@@ -110,9 +112,9 @@ TraceManager.prototype.buildCallPath = function (stepIndex, callback) {
 }
 
 TraceManager.prototype.getCallStackAt = function (stepIndex) {
-  // this.checkRequestedStep(stepIndex)
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     throw new Error(check)
   }
   const call = util.findCall(stepIndex, this.traceCache.callsTree.call)
@@ -123,8 +125,9 @@ TraceManager.prototype.getCallStackAt = function (stepIndex) {
 }
 
 TraceManager.prototype.getStackAt = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   let stack
@@ -151,9 +154,9 @@ TraceManager.prototype.getStackAt = function (stepIndex, callback) {
 // }
 
 TraceManager.prototype.getLastCallChangeSince = function (stepIndex) {
-  // this.checkRequestedStep(stepIndex)
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     // return callback(check, null)
     throw new Error(check)
   }
@@ -201,8 +204,9 @@ TraceManager.prototype.getLastCallChangeSince = function (stepIndex) {
 // }
 
 TraceManager.prototype.getCurrentCalledAddressAt = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
 
@@ -229,8 +233,9 @@ TraceManager.prototype.getContractCreationCode = function (token, callback) {
 }
 
 TraceManager.prototype.getMemoryAt = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   const lastChanges = util.findLowerBoundValue(stepIndex, this.traceCache.memoryChanges)
@@ -239,16 +244,18 @@ TraceManager.prototype.getMemoryAt = function (stepIndex, callback) {
 }
 
 TraceManager.prototype.getCurrentPC = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   callback(null, this.trace[stepIndex].pc)
 }
 
 TraceManager.prototype.getReturnValue = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   if (!this.traceCache.returnValues[stepIndex]) {
@@ -259,8 +266,9 @@ TraceManager.prototype.getReturnValue = function (stepIndex, callback) {
 }
 
 TraceManager.prototype.getCurrentStep = function (stepIndex, callback) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     return callback(check, null)
   }
   callback(null, this.traceCache.steps[stepIndex])
@@ -279,8 +287,9 @@ TraceManager.prototype.getRemainingGas = function (stepIndex) {
 }
 
 TraceManager.prototype.getStepProperty = function (stepIndex, property) {
-  const check = this.checkRequestedStep(stepIndex)
-  if (check) {
+  try {
+    this.checkRequestedStep(stepIndex)
+  } catch (check) {
     throw new Error(check)
   }
   return this.trace[stepIndex][property]
@@ -307,14 +316,12 @@ TraceManager.prototype.findStepOut = function (currentStep) {
   return this.traceStepManager.findStepOut(currentStep)
 }
 
-// util
 TraceManager.prototype.checkRequestedStep = function (stepIndex) {
   if (!this.trace) {
-    return 'trace not loaded'
+    throw new Error('trace not loaded')
   } else if (stepIndex >= this.trace.length) {
-    return 'trace smaller than requested'
+    throw new Error('trace smaller than requested')
   }
-  return undefined
 }
 
 TraceManager.prototype.waterfall = function (calls, stepindex, cb) {
