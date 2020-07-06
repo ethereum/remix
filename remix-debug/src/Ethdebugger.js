@@ -88,10 +88,18 @@ Ethdebugger.prototype.extractLocalsAt = function (step, callback) {
 }
 
 Ethdebugger.prototype.decodeLocalsAt = function (step, sourceLocation, callback) {
+  const self = this
   this.traceManager.waterfall([
     this.traceManager.getStackAt,
     this.traceManager.getMemoryAt,
-    this.traceManager.getCurrentCalledAddressAt],
+    function getCurrentCalledAddressAt (stepIndex, next) {
+      try {
+        const address = self.traceManager.getCurrentCalledAddressAt(stepIndex)
+        next(null, address)
+      } catch (error) {
+        next(error)
+      }
+    }],
     step,
     (error, result) => {
       if (!error) {
@@ -127,8 +135,8 @@ Ethdebugger.prototype.extractStateAt = function (step, callback) {
 }
 
 Ethdebugger.prototype.decodeStateAt = function (step, stateVars, callback) {
-  this.traceManager.getCurrentCalledAddressAt(step, (error, address) => {
-    if (error) return callback(error)
+  try {
+    const address = this.traceManager.getCurrentCalledAddressAt(step)
     const storageViewer = new StorageViewer({
       stepIndex: step,
       tx: this.tx,
@@ -141,7 +149,9 @@ Ethdebugger.prototype.decodeStateAt = function (step, stateVars, callback) {
         callback(result.error)
       }
     })
-  })
+  } catch (error) {
+    callback(error)
+  }
 }
 
 Ethdebugger.prototype.storageViewAt = function (step, address) {

@@ -45,10 +45,12 @@ function Debugger (options) {
   })
 }
 
-Debugger.prototype.registerAndHighlightCodeItem = function (index) {
+Debugger.prototype.registerAndHighlightCodeItem = async function (index) {
   // register selected code item, highlight the corresponding source location
-  this.debugger.traceManager.getCurrentCalledAddressAt(index, async (error, address) => {
-    if (error) return console.log(error)
+  // this.debugger.traceManager.getCurrentCalledAddressAt(index, async (error, address) => {
+
+  try {
+    const address = this.debugger.traceManager.getCurrentCalledAddressAt(index)
     const compilationResultForAddress = await this.compilationResult(address)
     if (!compilationResultForAddress) return
 
@@ -62,7 +64,10 @@ Debugger.prototype.registerAndHighlightCodeItem = function (index) {
     }).catch((_error) => {
       this.event.trigger('newSourceLocation', [null])
     })
-  })
+    // })
+  } catch (error) {
+    return console.log(error)
+  }
 }
 
 Debugger.prototype.updateWeb3 = function (web3) {

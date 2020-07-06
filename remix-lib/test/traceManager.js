@@ -148,32 +148,30 @@ tape('TraceManager', function (t) {
 
   t.test('TraceManager.getCurrentCalledAddressAt', function (st) {
     st.plan(3)
-    traceManager.getCurrentCalledAddressAt(10, function (error, result) {
-      console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-      }
-    })
 
-    traceManager.getCurrentCalledAddressAt(70, function (error, result) {
+    try {
+      const result = traceManager.getCurrentCalledAddressAt(10)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '(Contract Creation - Step 63)')
-      }
-    })
+      st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+    } catch (error) {
+      st.fail(error)
+    }
 
-    traceManager.getCurrentCalledAddressAt(111, function (error, result) {
+    try {
+      const result = traceManager.getCurrentCalledAddressAt(70)
       console.log(result)
-      if (error) {
-        st.fail(error)
-      } else {
-        st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
-      }
-    })
+      st.ok(result === '(Contract Creation - Step 63)')
+    } catch (error) {
+      st.fail(error)
+    }
+
+    try {
+      const result = traceManager.getCurrentCalledAddressAt(111)
+      console.log(result)
+      st.ok(result === '0x0d3a18d64dfe4f927832ab58d6451cecc4e517c5')
+    } catch (error) {
+      st.fail(error)
+    }
   })
 
   t.test('TraceManager.getContractCreationCode', function (st) { // contract code has been retrieved from the memory
