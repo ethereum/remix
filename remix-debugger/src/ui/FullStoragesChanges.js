@@ -27,12 +27,9 @@ FullStoragesChanges.prototype.init = function () {
   var self = this
   this.parent.event.register('newTraceLoaded', this, function (length) {
     self.panels = []
-    self.traceManager.getAddresses(function (error, addresses) {
-      if (!error) {
-        self.addresses = addresses
-        self.basicPanel.update({})
-      }
-    })
+    const addresses = self._traceManager.getAddresses()
+    self.addresses = addresses
+    self.basicPanel.update({})
 
     self.traceManager.getLength(function (error, length) {
       if (!error) {
