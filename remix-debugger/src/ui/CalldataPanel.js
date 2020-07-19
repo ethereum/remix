@@ -18,15 +18,15 @@ CalldataPanel.prototype.init = function () {
   this.parent.event.register('indexChanged', this, function (index) {
     if (index < 0) return
     if (self.parent.currentStepIndex !== index) return
-
-    self.traceManager.getCallDataAt(index, function (error, calldata) {
-      if (error) {
-        self.basicPanel.update({})
-        console.log(error)
-      } else if (self.parent.currentStepIndex === index) {
+    try {
+      const calldata = self.traceManager.getCallDataAt(index)
+      if (self.parent.currentStepIndex === index) {
         self.basicPanel.update(calldata)
       }
-    })
+    } catch (error) {
+      self.basicPanel.update({})
+      console.log(error)
+    }
   })
 }
 
