@@ -54,33 +54,31 @@ function ButtonNavigator (_parent, _traceManager) {
     if (index < 0) return
     if (_parent.currentStepIndex !== index) return
 
-    this.traceManager.buildCallPath(index, (error, callsPath) => {
-      if (error) {
-        console.log(error)
-        resetWarning(this)
+    this.traceManager.buildCallPath(index).then((callsPath) => {
+      this.currentCall = callsPath[callsPath.length - 1]
+      if (this.currentCall.reverted) {
+        this.revertionPoint = this.currentCall.return
+        this.view.querySelector('#reverted').style.display = 'block'
+        this.view.querySelector('#reverted #outofgas').style.display = this.currentCall.outOfGas ? 'inline' : 'none'
+        this.view.querySelector('#reverted #parenthasthrown').style.display = 'none'
       } else {
-        this.currentCall = callsPath[callsPath.length - 1]
-        if (this.currentCall.reverted) {
-          this.revertionPoint = this.currentCall.return
-          this.view.querySelector('#reverted').style.display = 'block'
-          this.view.querySelector('#reverted #outofgas').style.display = this.currentCall.outOfGas ? 'inline' : 'none'
-          this.view.querySelector('#reverted #parenthasthrown').style.display = 'none'
-        } else {
-          var k = callsPath.length - 2
-          while (k >= 0) {
-            var parent = callsPath[k]
-            if (parent.reverted) {
-              this.revertionPoint = parent.return
-              this.view.querySelector('#reverted').style.display = 'block'
-              this.view.querySelector('#reverted #parenthasthrown').style.display = parent ? 'inline' : 'none'
-              this.view.querySelector('#reverted #outofgas').style.display = 'none'
-              return
-            }
-            k--
+        var k = callsPath.length - 2
+        while (k >= 0) {
+          var parent = callsPath[k]
+          if (parent.reverted) {
+            this.revertionPoint = parent.return
+            this.view.querySelector('#reverted').style.display = 'block'
+            this.view.querySelector('#reverted #parenthasthrown').style.display = parent ? 'inline' : 'none'
+            this.view.querySelector('#reverted #outofgas').style.display = 'none'
+            return
           }
-          resetWarning(this)
+          k--
         }
+        resetWarning(this)
       }
+    }).catch((error) => {
+      console.log(error)
+      resetWarning(this)
     })
   })
 
