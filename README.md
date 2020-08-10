@@ -1,5 +1,3 @@
-# Remix
-
 **The project has been moved to https://github.com/ethereum/remix-project**
 
 **Remix** is a suite of tools that helps smart contract development, compilation, testing & deployment. These tools also works as a core of native plugins of Remix IDE.
