@@ -1,5 +1,7 @@
 # Remix
 
+**The project has been moved to https://github.com/ethereum/remix-project**
+
 [![Join the chat at https://gitter.im/ethereum/remix](https://badges.gitter.im/ethereum/remix.svg)](https://gitter.im/ethereum/remix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![CircleCI](https://circleci.com/gh/ethereum/remix/tree/master.svg?style=svg)](https://circleci.com/gh/ethereum/remix/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://remix-ide.readthedocs.io/en/latest/index.html)
