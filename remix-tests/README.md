@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-tests**
+
 ## Remix-Tests
 [![npm version](https://badge.fury.io/js/remix-tests.svg)](https://www.npmjs.com/package/remix-tests)
 [![npm](https://img.shields.io/npm/dt/remix-tests.svg?label=Total%20Downloads)](https://www.npmjs.com/package/remix-tests)
