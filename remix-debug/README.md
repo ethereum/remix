@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-debug**
+
 # `remix-debug`
 
 remix-debug wrap other remix-* libraries and can be used to debug Ethereum transactions.
