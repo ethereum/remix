@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-solidity**
+
 ## Remix-Solidity
 [![npm version](https://badge.fury.io/js/remix-solidity.svg)](https://www.npmjs.com/package/remix-solidity)
 [![npm](https://img.shields.io/npm/dt/remix-solidity.svg?label=Total%20Downloads)](https://www.npmjs.com/package/remix-solidity)
