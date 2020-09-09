@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-analyzer**
+
 ## Remix Analyzer
 [![npm version](https://badge.fury.io/js/remix-analyzer.svg)](https://www.npmjs.com/package/remix-analyzer)
 [![npm](https://img.shields.io/npm/dt/remix-analyzer.svg?label=Total%20Downloads)](https://www.npmjs.com/package/remix-analyzer)
