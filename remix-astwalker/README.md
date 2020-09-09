@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-astwalker**
+
 ## Remix ASTwalker
 `remix-astwalker` module walks through solidity AST and spits out AST nodes.
 
