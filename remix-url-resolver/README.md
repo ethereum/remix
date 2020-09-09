@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-url-resolver**
+
 ## Remix URL resolver engine
 
 `resolve(url, urlHandler)`
