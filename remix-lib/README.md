@@ -1,3 +1,5 @@
+**The project has been moved to https://github.com/ethereum/remix-project/tree/master/libs/remix-lib**
+
 # `remix-lib`
 
 Provides:
